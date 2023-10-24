@@ -10,10 +10,12 @@ The Rust docs are very good but somewhat verbose. I like documentation that is s
 
 # The Guide
 
-Rust is awesome
+The below text is valid Rust code. It is a copy of the code in the src directory.
 
 ``` rust
 /* Comment blocks start with slash-star,
    and end with star-slash. */
 // Line comments begin with a double slash.
+
+/* Rust was inspired by the ML family of languages. As such, variables are not, by default, variable.
 ```
