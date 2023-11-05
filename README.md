@@ -37,17 +37,19 @@ change, even as people on the proverbial edge started to realize that OOP had
 fundamental problems that were not easily soluble. These problems produced one
 of, if not the, greatest technical manuals in computing history: the legendary
 book _Design Patterns_ by the now-famous "Gang Of Four," a title they
-unfortunately share with Communist extremists from 1970s China. A critical
-analysis of _Design Patterns_ is outside the scope of this guide, suffice it to
-say that many analyses have shown the problems they solve are _linguistic_
-problems and not implementation problems. To wit, the patterns described are
-band-aids over a broken paradigm. _Design Patterns_ was published in 1994, but
-work on it started in 1990. We are over thirty years into an industry-wide quest
-to put lipstick on a pig.
+unfortunately share with Communist extremists from 1970s China, which you will
+learn if you try to Google that phrase.
 
-But beautiful change is in the air. Now is the autumn of the old ways, and I do not
-speak of AI. Indeed, AI, or at least the AI that is generating excitement at the
-current moment, is firmly rooted in the old ways: the ways of
+A critical analysis of _Design Patterns_ is outside the scope of this guide,
+suffice it to say that many analyses have shown the problems they solve are
+_linguistic_ problems and not implementation problems. To wit, the patterns
+described are band-aids over a broken paradigm. _Design Patterns_ was published
+in 1994, but work on it started in 1990. We are over thirty years into an
+industry-wide quest to put lipstick on a pig.
+
+But beautiful change is in the air. Now is the autumn of the old ways. To be
+clear, I do not speak of AI. Indeed, AI, or at least the AI that is generating
+excitement at the current moment, is firmly rooted in the old ways: the ways of
 feature delivery at all costs, quality and symbolic integrity be damned. The new
 ways recognize that the fundamental tools at use must be built with the goal of
 symbolic integrity in mind. This means languages.
@@ -55,7 +57,13 @@ symbolic integrity in mind. This means languages.
 Basically, it is time for the joke about good and bad programming languages to
 cease being true.
 
+JavaScript is perhaps the ultimate manifestation of this, with Node and JS
+infecting everything, everywhere.
+
 The below text is valid Rust code. It is a copy of the code in the src directory.
+
+This was written in VSCode and using an interactive IDE with code linting and
+highlighting is recommended.
 
 ``` rust
 /* Comment blocks start with slash-star,

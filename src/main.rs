@@ -248,21 +248,16 @@ fn main() {
 
     // Use double quotes for strings.
     let greeting = "Hello world!"; // type of &str
-    let another_greeting = greeting + " Glad to be here.";
+    // let another_greeting = greeting + " Glad to be here.";
 
     // Strings can span multiple lines. When compiled, new line characters are generated.
     let a_longer_greeting = "Look at me,
     I'm a
     multi-line string";
 
-    // Strings 
-    let helloWorld = {j|hello, $(world)|j};
-
-
-
-    // Concatenate strings with `++`.
-    let name = "John " ++ "Wayne";
-    let emailSubject = "Hi " ++ name ++ ", you're a valued customer";
+    // Concatenate strings with `+`.
+    // let name = "John " + "Wayne";
+    // let email_subject = "Hi " + name + ", you're a valued customer";
 
 
     /*** > Char ***/
@@ -349,7 +344,7 @@ fn main() {
     structure just so long as usage of the type is consistent. Basically,
     programs can use symbols without knowing what they mean. */
 
-    type kwyjibo;
+    struct kwyjibo;
 
     /*** Tuples ***/
 
@@ -453,10 +448,10 @@ fn main() {
         soon as a difference is discovered and will not continue to do a complete
         comparison. */
 
-    let bigObj = [10, 10000000, 10000000];
-    let smallObj = [11, 1, 1];
+    let big_obj = [10, 10000000, 10000000];
+    let small_obj = [11, 1, 1];
 
-    bigObj > smallObj; // - : bool = false
+    big_obj > small_obj; // - : bool = false
 
     /* Because 10 and 11 are different, and 10 is smaller than 11, false is returned
         even though the next two values are much larger. */
@@ -464,8 +459,8 @@ fn main() {
     /* Referential, or physical, equality, using the triple-glyph operator, compares
         the identity of each entity. */
 
-    author1 === author2; // - : bool = false
-    author1 === author1; // - : bool = true
+    author1 == author2; // - : bool = false
+    author1 == author1; // - : bool = true
 
 
     /* Comparing Values */
@@ -474,13 +469,159 @@ fn main() {
     // Both `==` and `===` will become strict equality `===` when compiled to JavaScript.
     // Attempting to compare two different types will cause a compile error.
 
-    let myString1 = "A world without string is chaos.";
-    let myString2 = "A world without string is chaos.";
+    let my_string_1 = "A world without string is chaos.";
+    let my_string_2 = "A world without string is chaos.";
 
-    "A string" === "A string"; // - : bool = true
-    "A string" == "A string";  // - : bool = true
-    42 === 42;                 // - : bool = true
+    "A string" == "A string"; // - : bool = true
     42 == 42;                  // - : bool = true
     // 42 === "A string"       // Error
+
+    /*----------------------------------------------
+    * Function
+    *----------------------------------------------
+    */
+
+    /* Rust is deeply inspired by functional languages, so unsurprisingly its
+    functions are distinctly different from many other languages, such as those
+    from the C family. This difference was briefly discussed earlier where the
+    semantic use of semicolons was pointed out.
+    
+    To reiterate, Rust has en explicit `return` statement as a concession to the
+    C tradition, but it also has implicit final return as denoted by the lack
+    of semicolon. In most cases, the final statement of a block being used as 
+    the implicit return will be the ideal and idiomatic pattern.
+
+    All evaluation blocks, and thus all functions, _must_ return something. If
+    no final value is present, the block will return the special value `unit`,
+    which will be discussed shortly.
+
+    For example, the below function has one evaluation block: the if/else. As
+    such, this is the return of the function. The if/else is composed of two
+    evluation blocks that each return a value. Thus, the two booleans count as
+    the final return of the entire function. */
+
+    fn greater_than_42(x: i32) -> bool {
+        if x > 42 {
+            false
+        } else {
+            true
+        }
+    }
+
+    /* It is important to note that, even though Rust has a return statement,
+    it applies only to the function level, and not the level of general
+    evaluation blocks. And only through the return statement can early return be
+    achieved. To wit, while Rust allows a return statement, it restricts the
+    semantics to avoid mixing up paradigms. Within evaluation blocks, only
+    implicit returns are allowed, and Rust bars implicit early return.
+    
+    Let's break the function to illustrate. if the `false` is uncommented,
+    the first false would lack a semicolon, and Rust's compiler would think that
+    it is thus meant to be the block's return. But since there is a statement
+    _after_ that, it knows that it cannot be the implicit return. It will thus
+    throw a missing semicolon error.
+    
+    If the second if/else is uncommented, a similar problem arises. The second
+    if/else becomes the implicit return of the function block, and thus the
+    booleans contained therein become the return value of the entire function.
+    The compiler knows that the implicit returns of the first if/else block are
+    now not being caught by anything and will thus throw an error indicating
+    that an explicit `return`, to thus break out of the function, was likely
+    intended. This is why uncommenting the `return true` line does not throw an
+    error, it will instead throw a warning of unreachable code.
+    
+    This illustrates how the need for an explicit return likely means that the
+    function has been poorly designed. Composing a function of evaluation blocks
+    that all return values, and having the function itself finally evaluate to a
+    final value, should be the ideal pattern. */
+
+    fn less_than_42(x: i32) -> bool {
+        if x < 42 {
+            // false
+            false
+        } else {
+            // return true;
+            true
+        }
+        // if x < 42 {
+        //     false
+        // } else {
+        //     true
+        // }
+    }
+
+    // Fat arrow syntax declares a function.
+    // Parenthesis are optional on single-parameter functions.
+    let signUpToNewsletter = (email) => "Thanks for signing up " ++ email;
+
+    let getEmailPrefs = (email) => {
+        let message = "Update settings for " ++ email;
+        let prefs = ["Weekly News", "Daily Notifications"];
+
+        (message, prefs); // Implicitly returned
+    };
+
+    // Call a function with the standard syntax.
+    signUpToNewsletter("hello@reason.org");
+
+
+    /*** Unit ***/
+
+    /* You may have noticed in the above example if you uncommented the second
+    if/else block the specific error that was displayed was how () was expected,
+    but a boolean was returned. In the previous section, I used the term
+    "caught" when describing that the first ef/else was returning something to
+    nothing. That lack of a catch for the evaluation return means that Rust
+    expected that block to return `unit`, or nothing.
+    */
+
+    /* Reason has a special type called `unit`. It is the concept of a "thing"
+        that is "nothing." It is different from `None` in that `None` is the state
+        of nothing being where `Some()` could also have been. `Unit` is the state of
+        expected nothing. It is similar to `void` in other languages. Unit can be
+        declared with the `unit` type keyword or the `()` syntax. 
+        
+        From a mathematical perspective, it could be seen as the empty set, in
+        that it is still a set, but it is a set of nothing. */
+        
+    // Unit's first use is in declaring functions that take no arguments.
+    let noArgument = () => { "I've got nothing" };
+
+    /* All functions necessarily return something, so if there is no expression
+        intended for return, such as in functions that only handle side-effects, then
+        that function will return `unit`. Functions that return `unit` can be
+        explicitly typed. */
+        
+    let noReturn = (input) : unit => { print_endline("I just print " ++ input) };
+
+    /* The above function expects to return nothing and will throw a compile error
+        if anything is returned. */
+
+
+    /*** > Labeled Paramters/Arguments ***/
+
+    type position = {
+        posx : float,
+        posy : float
+    }
+
+    // Parameters can be labeled with the `~` symbol.
+    let moveTo = (~x, ~y) => {posx : x, posy : y};
+
+    // Any order of labeled arguments is acceptable.
+    moveTo(~x=7.0, ~y=3.5);
+    moveTo(~y=3.5, ~x=7.0);
+
+    // Labeled parameters can also have an alias used within the function.
+    let getMessage = (~message as msg) => "Message for you, sir... " ++ msg;
+
+    // Labeled parameters support explicit typing.
+    let logMessage = (~message: string) => {
+        print_endline(message);
+    };
+
+    let logAnotherMessage = (~message as msg: string) => {
+        print_endline(msg);
+    };
 
 }
