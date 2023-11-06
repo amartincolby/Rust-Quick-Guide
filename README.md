@@ -25,7 +25,8 @@ The art of programming cannot be taught by just educating people in writing a
 React component or a Java class.
 
 The Rust docs are very good but somewhat verbose. I like documentation that is
-simple enough to be a one-pager. I aim for [the famous Smalltalk postcard](https://richardeng.medium.com/syntax-on-a-post-card-cb6d85fabf88).
+simple enough to be a one-pager. I aim for
+[the famous Smalltalk postcard](https://richardeng.medium.com/syntax-on-a-post-card-cb6d85fabf88).
 I did a previous quick guide for ReasonML, a syntax of OCaml, which profoundly
 inspired Rust's semantics.
 
@@ -58,7 +59,7 @@ suffice it to say that many analyses have shown the problems they solve are
 _linguistic_ problems and not implementation problems. To wit, the patterns
 described are band-aids over a broken paradigm. _Design Patterns_ was published
 in 1994, but work on it started in 1990. We are over thirty years into an
-industry-wide quest to put lipstick on a pig.
+industry-wide quest to put lipstick on a pig. [1]
 
 But beautiful change is in the air. Now is the autumn of the old ways. To be
 clear, I do not speak of AI. Indeed, AI, or at least the AI that is generating
@@ -81,7 +82,7 @@ called assembly language.
 
 Rust starts on the academic end of the spectrum of languages and moves toward
 the machine in search of maximum, real-world performance. Meanwhile Rust's
-philsophical counterpart, C, starts from the machine and moves toward symblic
+philsophical counterpart, C, starts from the machine and moves toward symbolic
 purity. Indeed, the entire purpose of C was to be "portable assembly": the
 thinnest possible symbolic layer over machine instruction to faciliate writing
 programs for the multitude of CPU architectures that existed in the late 1970s.
@@ -98,7 +99,30 @@ Unfortunately, unlike symbols, which are pure and Platonic, the machine state is
 unpredictable and messy. One command can easily be incompatible with another.
 
 I see the juxtaposition of C and Rust to be a microcosm, a synecdoche of sorts,
-for the whole of computer history.
+for the whole of computer history. The famous book _Hackers: Heroes of The
+Computer Revolution_ captures it well. Even in the earliest days of computing,
+philosophers and academics were aware of how to robustly build symbolic
+machines. The problem was that representing these robust symbolic structures
+required a great deal of processing power that, in the 1950s and 1960s, was in
+short supply. As such, the excitement and successes of the real world was
+defined by the first "hackers," who were people less concerned with what symbols
+could do and more concerned with the cool things that could be achieved with
+direct control over the machine. This divide between the symbolic purists and
+the hackers would continue into every successive generation of geeks. The
+divide goes back even further, though, with the very first people in the field,
+Ada Lovelace and Charles Babbage, separated along the same lines. Lovelace was a
+self-described metaphysician who recognized the philsophical possibilities in
+Babbage's machine, while Babbage himself cared about the machine itself. The
+narrative thread connecting Rust and C goes to the very beginning of this
+industry.
+
+(1) While _Design Patterns_ vis-a-vis languages is open to significant critique,
+the concepts discussed in the book are still valuable, especially as regards
+distributed systems. Solving problems of multi-service systems necessarily
+cannot be solved with any current language and must be solved in the
+implementation. The next great language may be one that turns archiectural
+concerns into linguistic concerns, yet again obviating the book, but for the
+time being, it remains a must-read.
 
 The below text is valid Rust code. It is a copy of the code in the src directory.
 
