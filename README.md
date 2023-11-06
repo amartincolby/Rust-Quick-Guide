@@ -73,6 +73,33 @@ cease being true.
 JavaScript is perhaps the ultimate manifestation of this, with Node and JS
 infecting everything, everywhere.
 
+Programming languages exist on a spectrum. On one end is the realm of pure
+symbols. These are like mathematical formulae. They are relationships to be
+computed and have no need to specify the machine on which they run. On the other
+end of the spectrum is the direct representation of machine state. This is often
+called assembly language.
+
+Rust starts on the academic end of the spectrum of languages and moves toward
+the machine in search of maximum, real-world performance. Meanwhile Rust's
+philsophical counterpart, C, starts from the machine and moves toward symblic
+purity. Indeed, the entire purpose of C was to be "portable assembly": the
+thinnest possible symbolic layer over machine instruction to faciliate writing
+programs for the multitude of CPU architectures that existed in the late 1970s.
+There was basically an architecture for each company making commputers. The idea
+of something like the x86 architecture dominating the CPU industry was mostly
+unimagineable. There were other higher-level languages available at the time,
+notably COBOL, Lisp, Fortran, PL/I, Algol, and Pascal, but none of them were
+simple enough to be easily usable for truly general tasks, and their performance
+was universaly much slower than hand-written assembly, as all highly symbolic
+languages are. C was specifically created to move only as far away from the
+machine as was necessary to fulfill the goal of code portability.
+
+Unfortunately, unlike symbols, which are pure and Platonic, the machine state is
+unpredictable and messy. One command can easily be incompatible with another.
+
+I see the juxtaposition of C and Rust to be a microcosm, a synecdoche of sorts,
+for the whole of computer history.
+
 The below text is valid Rust code. It is a copy of the code in the src directory.
 
 This was written in VSCode and using an interactive IDE with code linting and

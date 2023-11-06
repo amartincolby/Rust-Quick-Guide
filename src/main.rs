@@ -244,7 +244,8 @@ fn main() {
     of the standard library and is best described as a wrapper around `str` that
     provides helpful functionality.
     
-    You can think of a string slice  */
+    A string slice is a slice, and a slice is a window into a contiguous
+    sequence of entities in memory. */
 
     // Use double quotes for strings.
     let greeting = "Hello world!"; // type of &str
@@ -623,5 +624,27 @@ fn main() {
     let logAnotherMessage = (~message as msg: string) => {
         print_endline(msg);
     };
+
+    /*----------------------------------------------
+    * Ownership
+    *----------------------------------------------
+    */
+
+    /* At two points earlier in this tutorial, the concept of a return being
+    "caught" by something was discussed. Now we can talk about what is doing the
+    catching, which is the central concept to Rust's true party piece:
+    
+    Ownership.
+    
+    In Rust, every value has an "owner". This owner is the aforementioned
+    catcher. */
+
+    let catcher_in_the_rust = "Holden Caulfield";
+
+    /* In the above, the value of "Holden Caulfield" is owned by the entity
+    `catcher_in_the_rust`. They are "bound". In essence, the only permanent
+    value assocaited with `catcher_in_the_rust` is the type of value that can be
+    bound to it, in the above case `&str`. By using variable shdowing, the value
+    that `catcher_in_the_rust` owns can change. */
 
 }
