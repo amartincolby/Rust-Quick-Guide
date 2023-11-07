@@ -25,23 +25,26 @@ fn main() {
     */
 
     /* Rust was inspired by the ML family of languages. As such, variables are
-    not, by default, variable; they are bindings. But unlike the more pure,
-    academic languages of OCaml and Haskell, Rust makes concessions to
-    real-world performance. Making values mutable increases performance. Thus,
-    Rust's compromise is to make values immutable by default. */
+    not, by default, variable; they are bindings. As such, even though the term
+    "variable" is commonly used, the more accurate term is "identifier." Thus,
+    values are bound to identifiers.
+    
+    Unlike the more pure, academic languages of OCaml and Haskell, Rust makes
+    concessions to real-world performance. Making values mutable increases
+    performance. Rust's compromise is to make values immutable by default. */
 
     let immutable_value = 42;
 
-    // Note that the above binding is an evaluation, meaning the right-hand side
-    // is an expression. Expressions are code that return a value. The above is
-    // identical to:
+    /* Note that the above binding is an evaluation, meaning the right-hand side
+    is an expression. Expressions are code that return a value. The above is
+    identical to: */
 
     let immutable_value = { 42 };
 
-    // This also illustrates a concept in Rust called variable shadowing. This
-    // is far from unique to Rust but allows an engineer to re-declare a
-    // variable and have the new value apply henceforth. Shadowing allows the
-    // type to be changed.
+    /* This also illustrates a concept in Rust called variable shadowing. This
+    is far from unique to Rust but allows an engineer to re-declare a
+    variable and have the new value apply henceforth. Shadowing allows the
+    type to be changed. */
 
     // Because the above is immutable, trying to assign a new value will cause a
     // compiler failure.
@@ -54,6 +57,15 @@ fn main() {
     // Mutable values must still abide by the type of the original binding. The
     // below would cause a compiler error.
     // mutable_value = "One ring to rule them all.";
+
+    /* At this point, it is important to discuss the relationship of values and
+    identifiers. A value is any entity existing in memory, and it is the
+    identifier that determines how the program will interact with that value.
+    As such, values are not mutable or immutable, it is whether the `mut`
+    modifier is present that determines if the program will treat that value as
+    mutable or immutable. This may seem like an esoteric restatement of what was
+    already said, but it is important to understand this relationship to better
+    grasp the later discussion of Rust's party piece, ownership. */
 
     /*** Constants ***/
 
@@ -251,7 +263,8 @@ fn main() {
     let greeting = "Hello world!"; // type of &str
     // let another_greeting = greeting + " Glad to be here.";
 
-    // Strings can span multiple lines. When compiled, new line characters are generated.
+    // Strings can span multiple lines. When compiled, new line characters are
+    // generated.
     let a_longer_greeting = "Look at me,
     I'm a
     multi-line string";
@@ -268,7 +281,6 @@ fn main() {
 
     let lastLetter = 'z';
 
-    
 
     /*----------------------------------------------
     * Structs, Tuples, & Enums
@@ -551,8 +563,11 @@ fn main() {
         // }
     }
 
-    // Fat arrow syntax declares a function.
-    // Parenthesis are optional on single-parameter functions.
+    /* Rust has two ways to declare functions which will again be very familiar
+    to TypeScript developers. The first is the obvious way as illustrated above,
+    but just like JavaScript and TypeScript, functions can be "anonymous",
+    meaning that the function itself has no identifier, but is intead bound to
+    an identifier. */
     let signUpToNewsletter = (email) => "Thanks for signing up " ++ email;
 
     let getEmailPrefs = (email) => {
@@ -637,7 +652,8 @@ fn main() {
     Ownership.
     
     In Rust, every value has an "owner". This owner is the aforementioned
-    catcher. */
+    catcher. An owner is also known as an identifier since only through the
+    identifier can a value be accessed. */
 
     let catcher_in_the_rust = "Holden Caulfield";
 
