@@ -59,26 +59,26 @@ suffice it to say that many analyses have shown the problems they solve are
 _linguistic_ problems and not implementation problems. To wit, the patterns
 described are band-aids over a broken paradigm. _Design Patterns_ was published
 in 1994, but work on it started in 1990. We are over thirty years into an
-industry-wide quest to put lipstick on a pig. [1]
+industry-wide quest to put lipstick on a pig.[1]
 
 But beautiful change is in the air. Now is the autumn of the old ways. To be
 clear, I do not speak of AI. Indeed, AI, or at least the AI that is generating
-excitement at the current moment, is firmly rooted in the old ways: the ways of
-feature delivery at all costs, quality and symbolic integrity be damned. The new
-ways recognize that the fundamental tools at use must be built with the goal of
-symbolic integrity in mind. This means languages.
+excitement at the current moment, is firmly rooted in the old ways. It is not
+doing things _differently_, it is merely doing the same things more quickly. The
+new ways recognize that the fundamental tools at use must be built with the goal
+of symbolic integrity in mind. The foundations themselves must change. This
+means languages.
 
 Basically, it is time for the joke about good and bad programming languages to
 cease being true.
 
-JavaScript is perhaps the ultimate manifestation of this, with Node and JS
-infecting everything, everywhere.
-
 Programming languages exist on a spectrum. On one end is the realm of pure
 symbols. These are like mathematical formulae. They are relationships to be
-computed and have no need to specify the machine on which they run. On the other
-end of the spectrum is the direct representation of machine state. This is often
-called assembly language.
+computed and have no need to specify the machine on which they run. This sort of
+language is often called "academic" because they are usually the focus of
+esoteric computer science classes. On the other end of the spectrum is the
+direct representation of machine state. This is often called assembly language,
+where each statement represents a command going to the computer.
 
 Rust starts on the academic end of the spectrum of languages and moves toward
 the machine in search of maximum, real-world performance. Meanwhile Rust's

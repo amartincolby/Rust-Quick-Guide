@@ -24,10 +24,11 @@ fn main() {
     *-----------------------------------------------
     */
 
-    /* Rust was inspired by the ML family of languages. As such, variables are
-    not, by default, variable; they are bindings. As such, even though the term
-    "variable" is commonly used, the more accurate term is "identifier." Thus,
-    values are bound to identifiers.
+    /* In the tradition of the ML language family that is Rust's inspiration,
+    variables are not, by default, variable; they are bindings. As such, even
+    though the term "variable" is commonly used, the more accurate term is
+    "identifier." Thus, values are bound to identifiers, and only through
+    identifiers can values be accessed (usually).
     
     Unlike the more pure, academic languages of OCaml and Haskell, Rust makes
     concessions to real-world performance. Making values mutable increases
@@ -36,36 +37,39 @@ fn main() {
     let immutable_value = 42;
 
     /* Note that the above binding is an evaluation, meaning the right-hand side
-    is an expression. Expressions are code that return a value. The above is
-    identical to: */
+    is an expression. Expressions are code that return a value. The majority of
+    Rust code statements are expressions. The above is identical to: */
 
     let immutable_value = { 42 };
 
     /* This also illustrates a concept in Rust called variable shadowing. This
     is far from unique to Rust but allows an engineer to re-declare a
     variable and have the new value apply henceforth. Shadowing allows the
-    type to be changed. */
+    type to be changed because, even though the name is the same, it is actually
+    a _different_ identifier, which is why we can re-declare the value as
+    mutable. */
 
-    // Because the above is immutable, trying to assign a new value will cause a
-    // compiler failure.
-    // immutable_value = 2001;
+    let mut immutable_value = 2001;
 
     // A mutable value is created with the `mut` modifier.
+    // Mutable values must still abide by the type of the original binding.
     let mut mutable_value = 42;
     mutable_value = 2001;
 
-    // Mutable values must still abide by the type of the original binding. The
-    // below would cause a compiler error.
-    // mutable_value = "One ring to rule them all.";
-
     /* At this point, it is important to discuss the relationship of values and
-    identifiers. A value is any entity existing in memory, and it is the
-    identifier that determines how the program will interact with that value.
-    As such, values are not mutable or immutable, it is whether the `mut`
-    modifier is present that determines if the program will treat that value as
-    mutable or immutable. This may seem like an esoteric restatement of what was
-    already said, but it is important to understand this relationship to better
-    grasp the later discussion of Rust's party piece, ownership. */
+    identifiers. Both values and identifiers are entities existing in memory. It
+    is the identifier that determines how the program will interact with the
+    value. Values are not inherently mutable or immutable -- again, they are
+    just 1's and 0's in memory somewhere -- it is whether the `mut` modifier is
+    present that determines if the program will _treat_ that value as mutable or
+    immutable.
+    
+    This may seem like an esoteric restatement of what was already said, but it
+    is important to understand this relationship to better grasp the later
+    discussion of Rust's party piece, ownership. */
+
+    /* TODO: Talk about how variable names can reference earlier versions of the
+    same name and how this pertains to ownership. */
 
     /*** Constants ***/
 
@@ -75,25 +79,25 @@ fn main() {
     changed, but they also cannot be modified as mutable. Constants must have a
     type annotation. Unlike `let`, constants can also be declared in any scope,
     including the global scope. You can see a constant at the top of this file.
-    Finally, Constants must be the result of an expression that can be
-    determined at compile time. Constants cannot store a value that requires the
-    program to run to determine. */
+    Constant identifier names use all capital letters as convention. Finally,
+    Constants must be the result of an expression that can be determined at
+    compile time. Constants cannot store a value that requires the program to
+    run to determine. */
 
-    // Constants are in all-caps.
     const THE_ANSWER: i32 = 42;
     const HALF_THE_ANSWER: i32 = THE_ANSWER / 2;
     // const RANDOM_NUMBER: i32 = generate_random_int(); // Fails.
 
     /* These behaviors make sense. Constants exist to provide a high-performance
     method for storing data of known, fixed size for sharing across parts of the
-    application. */
+    application. The global state should not be dynamic. */
 
     /*** Type Inference ***/
 
-    // Rust does an excellent job of inferring types from values.
+    // Rust can usually infer types.
 
-    let x = 42; // 32-bit unsigned integer.
-    let y = 3.14; // 64-bit float.
+    let x = 42;                // 32-bit unsigned integer.
+    let y = 3.14;              // 64-bit float.
     let z = "Dinner for one"; // &str, a primitive string of fixed size.
 
     // Functions will not infer parameter and return types.
@@ -101,6 +105,10 @@ fn main() {
     fn add_ints(a: i32, b: i32) -> i32 { a + b }
 
     /*** Scope ***/
+
+    /* Scope is the "space" in which entities exist and can thus be accessed.
+    Scope is especially important in Rust because it is how Rust's memory
+    management works. */
 
     // Binding scopes are delineated by curly braces.
     if true {
@@ -126,10 +134,11 @@ fn main() {
     https://doc.rust-lang.org/reference/keywords.html
 
     To see the unused variable warnings below, comment out
-    #[allow(unused_variables)] on line 15.
+    #[allow(unused_variables)] near the top of this file.
 
     Prefixing a variable name with an underscore creates a casual variable.
     These variables, if unused, will not trigger a compiler warning.
+    
     Unused variable warnings only apply to block scopes and will not be
     raised on variables declared at the global or module level. 
     
@@ -162,8 +171,8 @@ fn main() {
     let another_number = a_basic_number; // another i32
     let a_basic_reference = &a_basic_number; // type of &i32
 
-    /* In the above, a_basic_number is a 32-bit integer. When referencing
-    primitives, they are copied by default, so another_number is also a 32-bit
+    /* In the above, `a_basic_number` is a 32-bit integer. When referencing
+    primitives, they are copied by default, so `another_number` is also a 32-bit
     integer. But if an ampersand is prepended to the variable usage, it becomes
     a reference that holds no value, but instead points to the location of
     another value. The copy does not occur.
@@ -171,40 +180,38 @@ fn main() {
     There is more to be said about references, since Rust's management of values
     is its party trick, but we will get to that in the section on ownership. */
 
-    // TODO: COver that. Copy the original values entirely to go back over what
+    // TODO: Cover that. Copy the original values entirely to go back over what
     // was previously discussed.
+
+    /*** Pointers ***/
+
+    /* As was mentioned earlier, only through identifiers can values be accessed
+    and mutated... usually. Considering that Rust is inspired by C, all of you
+    C developers were probably immediately thinking about _pointers_.
+    
+    A pointer is also a form of identifier, but instead of identifying something
+    in the symbolic structure of the program, it identifies something in the
+    computer itself. This usually means that the pointer "points" to a specific
+    location in the computer's memory.
+    
+    This form of value access is extremely performant since it directly uses the
+    computer instead of passing through the symbolic realm. But it is also very
+    dangerous. This is why pointer usage is associated with what is known as
+    "unsafe" Rust.
+    
+    Except for library writing, unsafe Rust is something that the average
+    developer will never do. "Safe" Rust's performance is already so good that
+    unsafe Rust is unecessary in all but the most demanding situations. Unsafe
+    Rust will be explored more fully later.
+    
+    Because pointers in Rust are deeply connected with Rust's patterns of
+    memory management, a full explanation this early into the tutorial is not
+    tenable. A full explanation of pointers will happen later. */
 
     /*----------------------------------------------
     * Primitive Types
     *-----------------------------------------------
     */
-
-    /*
-    &str
-    ints
-    floats
-    array
-    slice?
-     */
-
-    /* All of Rust's types have methods attached that can be accessed via dot
-    syntax or the double-colon operator. For example: */
-    
-    let a_number = 42;
-    let number_to_string = a_number.to_string();
-    let string_to_number = String::from(a_number);
-
-    /* The different syntax represents where the method exists. If using dot
-    syntax, the method exists on the instance and can potentially change. The
-    double-colon syntax means it is a method on the type itself and will never
-    change. A good analogy for those coming from other OO languages is to see
-    the double-colon as calling static methods. The different syntax helps
-    provide clarity as to where and how method calls work.
-    
-    The functionality seems duplicated, and for the use case here it is, but the
-    underlying process is very different. These will be discussed later.  */
-
-    // TODO: Cover this subject. Cover traits.
 
     /*** > Integer ***/
 
@@ -243,7 +250,6 @@ fn main() {
     let formatted_int = 12_34_56;       // i32 = 123456
     let formatted_float = 12_34_56.0;   // f64 = 123456.0
     
-
     /*** > String ***/
 
     /* Strings in Rust are not true primitives in the sense that a primitive is
@@ -273,17 +279,15 @@ fn main() {
     // let name = "John " + "Wayne";
     // let email_subject = "Hi " + name + ", you're a valued customer";
 
-
     /*** > Char ***/
 
-    /* Use single quotes for a char. Chars compile to an integer between 0 and 255
-        and thus do not support Unicode or UTF-8. */
-
-    let lastLetter = 'z';
+    // Use single quotes for a char. Chars compile to an integer between 0 and
+    // 255 and thus do not support Unicode or UTF-8.
+    let last_letter = 'z';
 
 
     /*----------------------------------------------
-    * Structs, Tuples, & Enums
+    * Structs, Tuples, Enums, & Modules
     *-----------------------------------------------
     */
 
@@ -333,8 +337,9 @@ fn main() {
         bank_balance: f64,
     }
 
-    // Unlike TypeScript, but like C, a struct is not simply annotated on an
-    // object. The struct is instantiated explicitly.
+    /* Unlike TypeScript, but like C, a struct is not simply annotated on an
+    object. The struct is instantiated explicitly, as though you are calling a
+    function that returns an object. */
 
     let mut a_user = UserData {
         id: String::from("abc123"),
@@ -348,36 +353,78 @@ fn main() {
     the same struct must be used. Individual fields of a struct cannot be
     independently tagged as mutable. */
 
-    /* ReasonML makes little distinction between primitive types and what could be
-    called user-defined types or structs. They are simply "things" represented
-    by symbols.
+    /* Rust does not allow un-typed structs. This will be one of the biggest
+    differences for those coming from TypeScript. In TypeScript, this is
+    perfectly acceptable:
+    
+    const anUntypedObject = {
+        id: "abc123",
+        name: "Duncan Idaho",
+        display_name: "The Duncanator",
+        bank_balance: 3.14,
+    }
 
-    The below type is an abstract type, meaning that the symbol has no structure
-    attached to it. Any program using this type does not need to know its
-    structure just so long as usage of the type is consistent. Basically,
-    programs can use symbols without knowing what they mean. */
+    TypeScript will infer an anonymous type that will then be used to type-check
+    later uses of this object. This sort of entity in JavaScript and TypeScript
+    is called an object literal. Rust also has the term "struct literal" but it
+    denotes the entity created _by_ a struct usage. */
 
-    struct kwyjibo;
+    /*** Unit Struct ***/
+
+    /* One of the best aspects of OCaml was, since it separated the existence of
+    an identifier and value in both the logic and the type structure, to have
+    _unbound_ type identifiers that had no values. These are known as _abstract_
+    types. In Rust, the language is a bit muddled and they instead refer to them
+    as "unit structs". Unit again rears its head, but you will have to wait
+    a little longer for a discussion on it.
+
+    The below struct is a unit struct. Any entity using this struct does not
+    need to know its structure just so long as usage of the type is consistent.
+    Basically, programs can use symbols without knowing what they mean.
+    
+    The superpower of unit structs is to enable type-safe program structure
+    experimentation and scaffolding. A developer can draw out a structure on a
+    whiteboard, then code out the same structure, with unit structs being used
+    to connect the entities. Later, when behaviors are figured out, the struct
+    can be built out while maintaining strict type security across all of the
+    struct's consumers. 
+    
+    Unit structs will be explored in detail in the sections on enums and
+    implementations. */
+
+    struct Kwyjibo;
 
     /*** Tuples ***/
 
-    /* The Rust documentation calls tuples a form of struct which I disagree
-    with. They are indeed the same thing, but I think the unifying term "type"
-    is more appropriate than struct and tuple struct.
+    /* In Rust, tuples are considered a form of struct. I disagree with this
+    and think that it comes from the conflating of OCaml and C terminology. In
+    Rust, "struct" is used in a broadly similar way to "type" in OCaml, as
+    illustrated above with the unit struct, but because structs represent
+    physical memory, the analogy necessarily breaks.
     
-    But I digress.
+    Like a traditional struct, a tuple contains data packed together in memory,
+    but unlike a struct, the constituents of the tuple are unnamed. Instead,
+    they are defined by their order. */
+
+    struct ATuple (String, i32);
+    let the_answer = ATuple(String::from("The answer is "), 42);
+
+    /* An important difference between structs and tuples, and a major reason
+    why I think calling tuples a form of struct is a mistake, is that tuples can
+    be instantiated _without_ a declared struct type. */
     
-    */
-    
-    /*
-    This is sounding very object-orienty, but
-    don't worry. Rust is not beholden to the mistakes of past languages. */
+    let an_untyped_tuple = ("The answer is ", 42);
+
+    /* The above will evaluate to an anonymous type of (&str, i32). There are
+    good reasons for why tuples can be type-inferred like integers or strings
+    while structs cannot. My criticism is not with the implementation. It is
+    with the term usage because terms are important. */
 
     /*** Struct Methods ***/
 
     /* As mentioned, structs are just grouped data. They are not like classic
     "objects" in the sense of having behavior and data. To add behaviors, aka
-    methods, to a struct, it must be implemented. */
+    methods, to a struct, it must be "implemented". */
 
     struct Square {
         width: f64,
@@ -391,6 +438,22 @@ fn main() {
     }
 
     /*** Traits ***/
+    
+    let a_number = 42;
+    let number_to_string = a_number.to_string();
+    let string_to_number = String::from(a_number);
+
+    /* The different syntax represents where the method exists. If using dot
+    syntax, the method exists on the instance and can potentially change. The
+    double-colon syntax means it is a method on the type itself and will never
+    change. A good analogy for those coming from other OO languages is to see
+    the double-colon as calling static methods. The different syntax helps
+    provide clarity as to where and how method calls work.
+    
+    The functionality seems duplicated, and for the use case here it is, but the
+    underlying process is very different. These will be discussed later.  */
+
+    // TODO: Cover this subject. Cover traits.
 
     /*** Tuples ***/
 
@@ -398,6 +461,64 @@ fn main() {
     is a set of primitive values in a shared space, sitting together in memory,
     then a classic tuple fits the bill. Just as with traditional structs */
 
+    /*** Modules ***/
+
+    /* Modules are similar in conception to modules in other languages. In
+    comparison to other, object-oriented languages, a module also has passing
+    similarities to classes. The primary purpose of modules is to hide structs
+    and/or functionality from other parts of the program. */
+
+    mod stuff {
+        use stuff::PrivateStruct;
+
+
+        struct PrivateStruct {
+            x: i32,
+            y: i32,
+        }
+
+        pub struct PublicStruct {
+            x: i32,
+            y: i32,
+        }
+
+        pub fn get_thing() -> PrivateStruct {
+            PrivateStruct {
+                x: 42,
+                y: 2001,
+            }
+        }
+    }
+
+    /* Neither PrivateStruct nor PublicStruct are accessible outside of that
+    module by simply calling their names, even though this module is a child of
+    the main() function. As such, this would fail.
+    
+    let new_thing = PublicStruct {
+        x: 42,
+        y: 2001,
+    };
+
+    The only thing that exists within the scope of main() is the module itself.
+    As such, any usage of that module must call the module. */
+    
+    let new_thing = stuff::PublicStruct {
+        x: 42,
+        y: 2001,
+    };
+
+    /* Further, only public entities within the module can be consumed. In the
+    above example, just as with basically every class-based language in
+    existence, PrivateStruct cannot be consumed outside of the module. */
+
+    /* A key difference from class-based languages is that a module is entirely
+    defined by behavior. It contains no internal data. A function within a
+    module can instantiate data, but it does not persist and only exists within
+    the scope of the function. In the above example module, get_thing()
+    instantiates a private struct and returns it via implicit return. */
+
+    let i_got_a_thing = stuff::get_thing(); // type of PrivateStruct
+    
     
     /*----------------------------------------------
     * Basic operators
@@ -566,9 +687,10 @@ fn main() {
     /* Rust has two ways to declare functions which will again be very familiar
     to TypeScript developers. The first is the obvious way as illustrated above,
     but just like JavaScript and TypeScript, functions can be "anonymous",
-    meaning that the function itself has no identifier, but is intead bound to
-    an identifier. */
-    let signUpToNewsletter = (email) => "Thanks for signing up " ++ email;
+    meaning that the function itself has no identifier, but is instead bound to
+    an identifier. This allows a function to be passed around instead of
+    simply called. The syntax is slightly different. */
+    let sign_up_to_newsletter = |email: &str| -> String { format!({-"{} {}", "Thanks for signing up ", email}) };
 
     let getEmailPrefs = (email) => {
         let message = "Update settings for " ++ email;
