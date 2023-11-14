@@ -17,6 +17,7 @@ const _GREETING: &str = "Stay awhile. Stay foever.";
 #[allow(unused_variables)]
 #[allow(unused_assignments)]
 #[allow(dead_code)]
+#[allow(unused_mut)]
 fn main() {
 
     /*----------------------------------------------
@@ -100,8 +101,7 @@ fn main() {
     let y = 3.14;              // 64-bit float.
     let z = "Dinner for one"; // &str, a primitive string of fixed size.
 
-    // Functions will not infer parameter and return types.
-    // fn add_ints(a, b) { a + b } // This will fail to compile.
+    // Functions cannot infer parameter and return types.
     fn add_ints(a: i32, b: i32) -> i32 { a + b }
 
     /*** Scope ***/
@@ -285,6 +285,10 @@ fn main() {
     // 255 and thus do not support Unicode or UTF-8.
     let last_letter = 'z';
 
+    /*** > Option ***/
+
+    /* Option is not a true primitive */
+
 
     /*----------------------------------------------
     * Structs, Tuples, Enums, & Modules
@@ -441,7 +445,7 @@ fn main() {
     
     let a_number = 42;
     let number_to_string = a_number.to_string();
-    let string_to_number = String::from(a_number);
+    // let string_to_number = String::from(a_number);
 
     /* The different syntax represents where the method exists. If using dot
     syntax, the method exists on the instance and can potentially change. The
@@ -469,21 +473,20 @@ fn main() {
     and/or functionality from other parts of the program. */
 
     mod stuff {
-        use stuff::PrivateStruct;
-
 
         struct PrivateStruct {
             x: i32,
             y: i32,
         }
-
+        // Notice how the individual keys can be public or private.
         pub struct PublicStruct {
-            x: i32,
-            y: i32,
+            pub x: i32,
+            pub y: i32,
         }
 
-        pub fn get_thing() -> PrivateStruct {
-            PrivateStruct {
+        // Only public structs can be exposed.
+        pub fn get_thing() -> PublicStruct {
+            PublicStruct {
                 x: 42,
                 y: 2001,
             }
@@ -515,7 +518,7 @@ fn main() {
     defined by behavior. It contains no internal data. A function within a
     module can instantiate data, but it does not persist and only exists within
     the scope of the function. In the above example module, get_thing()
-    instantiates a private struct and returns it via implicit return. */
+    instantiates a public struct and returns it via implicit return. */
 
     let i_got_a_thing = stuff::get_thing(); // type of PrivateStruct
     
@@ -542,7 +545,7 @@ fn main() {
     'a' > 'b'; // - bool : false
     5 < 42;    // - bool : true
 
-    /* Equality */
+    /*** Equality ***/
 
     /* In the below example, we want to use the equality operator on a struct.
     Rust comes with operator capabilities built in, but for custom structs these
@@ -577,24 +580,17 @@ fn main() {
     let authors_2 = author1 == author3; // - : bool = false
     let authors_3 = author1 != author3; // - : bool = true
 
-    /* Any attempt at using greater-than or less-than vis-à-vis structures will
-        trigger a structural comparison. The comparison will return a boolean as 
-        soon as a difference is discovered and will not continue to do a complete
-        comparison. */
+    println!("{} {} {}", authors_1, authors_2, authors_3);
 
     let big_obj = [10, 10000000, 10000000];
     let small_obj = [11, 1, 1];
 
-    big_obj > small_obj; // - : bool = false
+    let big_array = big_obj > small_obj; // - : bool = false
 
-    /* Because 10 and 11 are different, and 10 is smaller than 11, false is returned
-        even though the next two values are much larger. */
+    println!("{}", big_array);
 
-    /* Referential, or physical, equality, using the triple-glyph operator, compares
-        the identity of each entity. */
-
-    author1 == author2; // - : bool = false
-    author1 == author1; // - : bool = true
+    let compare_authors_1 = author1 == author2; // - : bool = false
+    let compare_authors_2 = author1 == author1; // - : bool = true
 
 
     /* Comparing Values */
@@ -607,8 +603,9 @@ fn main() {
     let my_string_2 = "A world without string is chaos.";
 
     "A string" == "A string"; // - : bool = true
-    42 == 42;                  // - : bool = true
-    // 42 === "A string"       // Error
+    42 == 42;                 // - : bool = true
+    // 42 === "A string"      // Error
+
 
     /*----------------------------------------------
     * Function
@@ -689,78 +686,64 @@ fn main() {
     but just like JavaScript and TypeScript, functions can be "anonymous",
     meaning that the function itself has no identifier, but is instead bound to
     an identifier. This allows a function to be passed around instead of
-    simply called. The syntax is slightly different. */
-    let sign_up_to_newsletter = |email: &str| -> String { format!({-"{} {}", "Thanks for signing up ", email}) };
+    simply called. The syntax is slightly different but likely very familiar to
+    TypeScript developers who use fat arrow function syntax. */
 
-    let getEmailPrefs = (email) => {
-        let message = "Update settings for " ++ email;
-        let prefs = ["Weekly News", "Daily Notifications"];
+    let sign_up_to_newsletter = |email: &str| -> String {
+        format!("{} {}", String::from("Thanks for signing up"), email)
+    };
 
-        (message, prefs); // Implicitly returned
+    /* Of note, the standard function declaration syntax is actually called
+    function _pointer_ syntax. That's right. The `fn` keyword is actually what
+    is known as a "smart" pointer that allows performance _and_ safety. Smart
+    pointers will be discussed later. */
+
+    let get_email_prefs = |email : String| -> (String, [String; 2]) {
+        let message = format!("{} {}", String::from("Update settings for"), email);
+        let prefs = [String::from("Weekly News"), String::from("Daily Notifications")];
+
+        (message, prefs)
     };
 
     // Call a function with the standard syntax.
-    signUpToNewsletter("hello@reason.org");
+    sign_up_to_newsletter("hello@rust_lovers.org");
 
 
     /*** Unit ***/
 
-    /* You may have noticed in the above example if you uncommented the second
-    if/else block the specific error that was displayed was how () was expected,
-    but a boolean was returned. In the previous section, I used the term
-    "caught" when describing that the first ef/else was returning something to
-    nothing. That lack of a catch for the evaluation return means that Rust
-    expected that block to return `unit`, or nothing.
-    */
-
-    /* Reason has a special type called `unit`. It is the concept of a "thing"
-        that is "nothing." It is different from `None` in that `None` is the state
-        of nothing being where `Some()` could also have been. `Unit` is the state of
-        expected nothing. It is similar to `void` in other languages. Unit can be
-        declared with the `unit` type keyword or the `()` syntax. 
+    /* You may have noticed in the above example of less_than_42, that if you
+    uncommented the second if/else block, the specific error that was displayed
+    was how () was expected, but a boolean was returned. In the previous
+    section, I used the term "caught" when describing that the first if/else was
+    returning something to nothing. That lack of a catcher for the evaluation's
+    return means that Rust expected that block to return `unit`, or nothing.
+   
+    Unit is an interesting concept. It is the concept of a "thing" that is
+    "nothing." It is different from `None` in that `None` is the state of
+    nothing being where `Some()` could also have been. `Unit` is the state of
+    expected nothing. It is similar to `void` in other languages. Unit can be
+    declared with the `unit` type keyword or the `()` syntax. 
         
-        From a mathematical perspective, it could be seen as the empty set, in
-        that it is still a set, but it is a set of nothing. */
+    From a mathematical perspective, it could be seen as the empty set, in
+    that it is still a set, but it is a set of nothing. */
         
     // Unit's first use is in declaring functions that take no arguments.
-    let noArgument = () => { "I've got nothing" };
-
-    /* All functions necessarily return something, so if there is no expression
-        intended for return, such as in functions that only handle side-effects, then
-        that function will return `unit`. Functions that return `unit` can be
-        explicitly typed. */
-        
-    let noReturn = (input) : unit => { print_endline("I just print " ++ input) };
-
-    /* The above function expects to return nothing and will throw a compile error
-        if anything is returned. */
-
-
-    /*** > Labeled Paramters/Arguments ***/
-
-    type position = {
-        posx : float,
-        posy : float
+    fn no_argument() -> String {
+        String::from("I've got nothing")
     }
 
-    // Parameters can be labeled with the `~` symbol.
-    let moveTo = (~x, ~y) => {posx : x, posy : y};
+    /* All functions necessarily return something, so if there is no expression
+    intended for return, such as in functions that only handle side-effects, then
+    that function will return `unit`. Functions that return `unit` can be
+    explicitly typed. */
+        
+    fn no_return(input: String) -> () {
+        println!("I just print {}", input)
+    }
 
-    // Any order of labeled arguments is acceptable.
-    moveTo(~x=7.0, ~y=3.5);
-    moveTo(~y=3.5, ~x=7.0);
+    /* The above function expects to return nothing and will throw a compile
+    error if anything is returned. */
 
-    // Labeled parameters can also have an alias used within the function.
-    let getMessage = (~message as msg) => "Message for you, sir... " ++ msg;
-
-    // Labeled parameters support explicit typing.
-    let logMessage = (~message: string) => {
-        print_endline(message);
-    };
-
-    let logAnotherMessage = (~message as msg: string) => {
-        print_endline(msg);
-    };
 
     /*----------------------------------------------
     * Ownership

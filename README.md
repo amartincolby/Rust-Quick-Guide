@@ -24,6 +24,10 @@ high art of painting cannot be taught by just educating people in brush strokes.
 The art of programming cannot be taught by just educating people in writing a
 React component or a Java class.
 
+These two goals, concise simplicity and broad context, are obviously at odds
+with one another. I hope that I find a middle ground that is approachable and
+easy to understand.
+
 The Rust docs are very good but somewhat verbose. I like documentation that is
 simple enough to be a one-pager. I aim for
 [the famous Smalltalk postcard](https://richardeng.medium.com/syntax-on-a-post-card-cb6d85fabf88).
