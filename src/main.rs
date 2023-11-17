@@ -1,3 +1,5 @@
+use core::num;
+
 const _GREETING: &str = "Stay awhile. Stay foever.";
 
 /* Comment blocks start with slash-star,
@@ -249,7 +251,53 @@ fn main() {
     // are purely visual.
     let formatted_int = 12_34_56;       // i32 = 123456
     let formatted_float = 12_34_56.0;   // f64 = 123456.0
+
+    /*** > Char ***/
+
+    /* Char represents Rust's true text primitive. Strings are best thought of
+    as an array of chars. Rust supports unicode and as such a char is actually
+    a scalar value. In code, a char can be represented either as a glyph or as
+    the scalar values as found on the Wikipedia page for Unicode characters:
+    https://en.wikipedia.org/wiki/List_of_Unicode_characters 
     
+    Be careful, though, because treating a glyph like a char is not always
+    correct. There are many singular glyphs that actually require multiple chars
+    to represent. This is primarily a concern when converting from a string. */
+
+    // Use single quotes for a char.
+    let last_letter = 'z';
+    let last_letter_unicode = '\u{007a}';
+    let kannada_char = 'ಠ';
+    let kannada_char_unicode = '\u{0ca0}';
+
+    /*** > Array ***/
+
+    /* Arrays are being discussed early because, much like Lisp, Rust's
+    conception of data structures can often be broken down to lists, to wit
+    things that sit seriatim in memory. This is especially true for strings,
+    which will be discussed immediately after this.
+    
+    If you are coming from C or Go, then arrays in Rust will be immediately
+    familiar. If you are coming from TypeScript or JavaScript, they will be a
+    little different. Arrays in Rust are typed, fixed-length lists of entities.
+    Unlike TypeScript, you cannot simply push to an array because an array's
+    length must be set when it is instantiated. JavaScript runtimes hide this
+    complexity from you when using arrays. */
+
+    // The length of an array is part of the identifier.
+    let array_of_five: [i32; 5] = [1, 2, 3, 42, 5];
+
+    // Arrays cannot be instantied with no values.
+    // let array_of_ten: [i32; 10] = []; // This throws an error.
+
+    // Arrays can be instantiated with the same value in all indices, though.
+    let array_of_ten: [i32; 10] = [42; 10];
+
+    /* The value syntax above is simply saying to create an array with the value
+    of 42 set in 10 indices. */
+    
+    // TODO: Talk about arrays being on the stack instead of the heap.
+
     /*** > String ***/
 
     /* Strings in Rust are not true primitives in the sense that a primitive is
@@ -260,10 +308,20 @@ fn main() {
     The fundamental type, to wit the type that is part of the language itself,
     is `str`, which is called a string slice. The `String` type is actually part
     of the standard library and is best described as a wrapper around `str` that
-    provides helpful functionality.
+    provides helpful functionality. Because of the common usage of `String`, the
+    two types are often confused in conversation, with people using the term
+    "string" to refer to either `String` or `str`. This tutorial will be
+    explicit, unly using the word "string" to refer to `String` types.
+
+    But what will the `str` be called? Why "string slice" of course! This
+    terminology requires an understanding of slices, which will be explored
+    fully later. For people coming from languages such as C++ or Go, slices in
+    Rust are extremely similar. For the time being, just understand that a slice
+    is a window into a contiguous sequence of entities in memory.
     
-    A string slice is a slice, and a slice is a window into a contiguous
-    sequence of entities in memory. */
+    For example, "ABCDEFG" are chars sitting next to each other in memory. A
+    slice can represent all of them, some of them, or none of them. Rust does
+    not have a type for representing the sequence of chars itself. */
 
     // Use double quotes for strings.
     let greeting = "Hello world!"; // type of &str
@@ -279,15 +337,14 @@ fn main() {
     // let name = "John " + "Wayne";
     // let email_subject = "Hi " + name + ", you're a valued customer";
 
-    /*** > Char ***/
-
-    // Use single quotes for a char. Chars compile to an integer between 0 and
-    // 255 and thus do not support Unicode or UTF-8.
-    let last_letter = 'z';
 
     /*** > Option ***/
 
-    /* Option is not a true primitive */
+    /* Option is not a true primitive but it so common in Rust that it is
+    reasonable to treat it as one. As mentioned, Rust was inspired by functional
+    languages, and one great thing in those languages is the ability to
+    reliably represent nothing, as with unit, and also the _possibility_ of
+    something or nothing. */
 
 
     /*----------------------------------------------
@@ -531,19 +588,23 @@ fn main() {
     /* The reason for putting basic operators so late into this tutorial is
     because they are somewhat supercharged in Rust. Instead of relying on fixed
     operators, custom evaluators can be written, thus allowing engineers to
-    decide how operators such as > or == function. */
+    decide how operators such as `>` or `==` function. */
 
     /*** > Boolean ***/
 
-    // A boolean can be either true or false.
+    // Operators on the standard primitive types work as you would expect. 5 is
+    // indeed larger than 2.
+
     let is_learning = true;
 
     let logical_and = true && false; // - : bool = false; 
     let logical_or = true || false;  // - : bool = true;
     let logical_not = !true;         // - : bool = false;
 
-    'a' > 'b'; // - bool : false
-    5 < 42;    // - bool : true
+    let char_comparison = 'a' > 'b'; // - bool : false
+    let number_comparison = 5 < 42;    // - bool : true
+
+    println!("{} {}", char_comparison, number_comparison);
 
     /*** Equality ***/
 
