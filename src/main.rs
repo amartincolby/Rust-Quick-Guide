@@ -1,4 +1,5 @@
 use core::num;
+use std::array;
 
 const _GREETING: &str = "Stay awhile. Stay foever.";
 
@@ -6,15 +7,37 @@ const _GREETING: &str = "Stay awhile. Stay foever.";
    and end with star-slash. */
 // Line comments begin with a double slash.
 
-/* The below is the main function which all Rust applications have. This quick
-    guide does not cover the structure of Rust applications. It focuses on the
-    syntax and semantics. For the purposes of this guide, it is sufficient to
-    know that Rust applications have a main function.
+/*** A note on the stack and heap: ***/
 
-    The syntax structures above the function are called attributes. They allow a
-    developer to specify how the function is the be handled by the compiler. In
-    these examples, three linting settings are being disabled. More attributes
-    will be covered later. */
+/* If you are coming from C or C++, the concepts of the stack and the heap are
+familiar and your knowledge perfectly translates to Rust. If you are coming from
+Go or TypeScript/JavaScript, some explanation may be required.
+
+Data is stored in memory in two ways. The first is called the "stack" and the
+name hints to its design. When a program or function is started, it gets a hunk
+of memory given to it. This memory space is clear, contiguous, and entirely
+owned by the program or function. The compiler knows how much memory space the
+stack will require based its analysis of the code. For example, if a function
+has five 32-bit integers in it, the compiler only reserves enough space in
+memory to store five 32-bit integers. When the program or function is complete,
+the memory is cleared.
+
+The heap is precisely that: a big pile of memory space. The primary
+differentiator between stack and heap entities is that anything on the stack
+must be of known and fixed size. Anything that can change in size must exist on
+the heap. */
+
+/*** The Main Function ***/
+
+/* The below is the main function which all Rust applications have. This quick
+guide does not cover the structure of Rust applications. It focuses on the
+syntax and semantics. For the purposes of this guide, it is sufficient to know
+that Rust applications have a main function.
+
+The syntax structures above the function are called attributes. They allow a
+developer to specify how the function is the be handled by the compiler. In
+these examples, three linting settings are being disabled. More attributes will
+be covered later. */
 
 #[allow(unused_variables)]
 #[allow(unused_assignments)]
@@ -194,7 +217,7 @@ fn main() {
     A pointer is also a form of identifier, but instead of identifying something
     in the symbolic structure of the program, it identifies something in the
     computer itself. This usually means that the pointer "points" to a specific
-    location in the computer's memory.
+    location in the computer's heap memory.
     
     This form of value access is extremely performant since it directly uses the
     computer instead of passing through the symbolic realm. But it is also very
@@ -203,12 +226,12 @@ fn main() {
     
     Except for library writing, unsafe Rust is something that the average
     developer will never do. "Safe" Rust's performance is already so good that
-    unsafe Rust is unecessary in all but the most demanding situations. Unsafe
-    Rust will be explored more fully later.
+    unsafe Rust is unnecessary in all but the most demanding situations. Unsafe
+    Rust will be explored fully later.
     
     Because pointers in Rust are deeply connected with Rust's patterns of
     memory management, a full explanation this early into the tutorial is not
-    tenable. A full explanation of pointers will happen later. */
+    ideal. As such, a full explanation of pointers will happen later. */
 
     /*----------------------------------------------
     * Primitive Types
@@ -272,31 +295,65 @@ fn main() {
 
     /*** > Array ***/
 
-    /* Arrays are being discussed early because, much like Lisp, Rust's
-    conception of data structures can often be broken down to lists, to wit
-    things that sit seriatim in memory. This is especially true for strings,
-    which will be discussed immediately after this.
-    
-    If you are coming from C or Go, then arrays in Rust will be immediately
-    familiar. If you are coming from TypeScript or JavaScript, they will be a
-    little different. Arrays in Rust are typed, fixed-length lists of entities.
-    Unlike TypeScript, you cannot simply push to an array because an array's
-    length must be set when it is instantiated. JavaScript runtimes hide this
-    complexity from you when using arrays. */
+    /* If you are coming from C, Java, or Go, then arrays in Rust will be
+    immediately familiar. If you are coming from TypeScript or JavaScript, they
+    will be a little different. Arrays in Rust are typed, fixed-length lists of
+    entities. Unlike TypeScript, you cannot simply push to an array because an
+    array's length must be set when it is instantiated. JavaScript runtimes hide
+    this complexity from you when using arrays. */
 
     // The length of an array is part of the identifier.
     let array_of_five: [i32; 5] = [1, 2, 3, 42, 5];
 
-    // Arrays cannot be instantied with no values.
-    // let array_of_ten: [i32; 10] = []; // This throws an error.
+    // Arrays cannot be instantied with no values. Unless the length is
+    // specified as zero. An element type is still required.
+    let array_of_none: [i32; 0] = [];
 
     // Arrays can be instantiated with the same value in all indices, though.
     let array_of_ten: [i32; 10] = [42; 10];
 
     /* The value syntax above is simply saying to create an array with the value
     of 42 set in 10 indices. */
+
+    // Arrays are index accessed.
+    let the_number_3 = array_of_five[2];
+
+    // Array lengths can obviously not be changed, but neither can values.
+    // Arrays must be declared as mutable to do this.
+    let mut mutable_array_of_five: [i32; 5] = [1, 2, 3, 42, 5];
+    mutable_array_of_five[2] = 314;
+
+    println!("{}", the_number_3);
     
     // TODO: Talk about arrays being on the stack instead of the heap.
+    // TODO: Talk about how accessing an index does not take ownership. Only the whole array access.
+
+    /*** > Slice ***/
+
+    /* Slices are the primary tool with which you will interact with arrays.
+    Slices are very similar to slices in C++ but notably different than in Go.
+    In Rust, a slice is simply a window into a preexisting sequence of data. For
+    the sake of this section, that sequence of data is an array.
+
+    Go's slices behave similarly to arrays in JavaScript or TypeScript, to wit
+    a slice can be instantiated independently of an array. The Go runtime will
+    instantiate an array behind the scenes that will grow or shrink based on the
+    slice. This makes the developer experience nicer but has performance
+    implications. */
+
+    // Referencing an array automatically creates a slice.
+    let slice_of_five = &array_of_five;
+
+    /* Slices are more generic in Rust than other languages, and as such they
+    can be used with more than just Arrays. Most importantly, slices can be
+    used with strings, which will be discussed now. */
+
+    /*** > Vector ***/
+
+    /* For Go developers accustomed to slices and JavaScript/TypeScript
+    developers accustomed to arrays, Rust has a "vector." Vector is not a true
+    primitive and is instead part of the standard library. Vectors are typed
+    lists, similar to arrays, but are dynamically sized and exist in the heap. */
 
     /*** > String ***/
 
@@ -828,5 +885,10 @@ fn main() {
     value assocaited with `catcher_in_the_rust` is the type of value that can be
     bound to it, in the above case `&str`. By using variable shdowing, the value
     that `catcher_in_the_rust` owns can change. */
+
+    /*----------------------------------------------
+    * Cargo
+    *----------------------------------------------
+    */
 
 }
