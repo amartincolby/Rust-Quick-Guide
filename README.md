@@ -1,3 +1,5 @@
+![Rust Logo](rust-social-wide.jpg)
+
 # Rust Quick Guide
 
 This will be a quick guide to learning Rust. I'm beginning work at the date of
