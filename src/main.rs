@@ -1,5 +1,6 @@
 use core::num;
 use std::array;
+use rand::prelude::*;
 
 const _GREETING: &str = "Stay awhile. Stay foever.";
 
@@ -110,13 +111,31 @@ fn main() {
     compile time. Constants cannot store a value that requires the program to
     run to determine. */
 
-    const THE_ANSWER: i32 = 42;
     const HALF_THE_ANSWER: i32 = THE_ANSWER / 2;
+    const THE_ANSWER: i32 = 42;
     // const RANDOM_NUMBER: i32 = generate_random_int(); // Fails.
 
-    /* These behaviors make sense. Constants exist to provide a high-performance
-    method for storing data of known, fixed size for sharing across parts of the
-    application. The global state should not be dynamic. */
+    /* Pay special attention to the constants HALF_THE_ANSWER and THE_ANSWER.
+    Notice how THE_ANSWER is referenced _before_ it is declared. Constants are
+    visible to everything within their scope, regardless of where they appear
+    lexically, that is to say within the code itself. */
+
+    /* Constants cannot be shadowed within the same scope, but they can be
+    shadowed in nested scopes. */
+
+    // const THE_ANSWER: f64 = 3.14; // This does not work.
+
+    let wrapper_scope = {
+        const THE_ANSWER: f64 = 3.14; // This does work.
+    };
+
+    /* These seemingly peculiar behaviors are explainable when you understand
+    what constants _are_, namely "items." Items are a special classification of
+    entity in Rust. Items will be discussed more fully later after some other
+    entities that are also items are introduced. For the time being, all that
+    needs to be understood is why constants exist, to wit they provide a
+    high-performance method for storing data of known, fixed size for sharing
+    across parts of the application. */
 
     /*** Type Inference ***/
 
@@ -229,9 +248,15 @@ fn main() {
     unsafe Rust is unnecessary in all but the most demanding situations. Unsafe
     Rust will be explored fully later.
     
-    Because pointers in Rust are deeply connected with Rust's patterns of
-    memory management, a full explanation this early into the tutorial is not
-    ideal. As such, a full explanation of pointers will happen later. */
+    For the time being, a cursory explanation of pointers will suffice. */
+
+    // The most common way to create a pointer is to bind the memory location of
+    // a reference.
+
+    let a_number_in_memory: i32 = 42;
+    let a_pointer_to_a_number: *const i32 = &a_number_in_memory;
+
+    /* Pointers are determined by the type signature of the identifier. */
 
     /*----------------------------------------------
     * Primitive Types
@@ -764,11 +789,11 @@ fn main() {
     semantics to avoid mixing up paradigms. Within evaluation blocks, only
     implicit returns are allowed, and Rust bars implicit early return.
     
-    Let's break the function to illustrate. if the `false` is uncommented,
-    the first false would lack a semicolon, and Rust's compiler would think that
-    it is thus meant to be the block's return. But since there is a statement
-    _after_ that, it knows that it cannot be the implicit return. It will thus
-    throw a missing semicolon error.
+    Let's break the function to illustrate. if the first `false` is uncommented,
+    it false would lack a semicolon, and Rust's compiler would think that it is
+    thus meant to be the block's return. But since there is a statement _after_
+    that, it knows that it cannot be the implicit return. It will thus throw a
+    missing semicolon error.
     
     If the second if/else is uncommented, a similar problem arises. The second
     if/else becomes the implicit return of the function block, and thus the
@@ -823,7 +848,51 @@ fn main() {
         (message, prefs)
     };
 
-    // Call a function with the standard syntax.
+    /* As mentioned, functions in Rust are notably different from many other
+    languages, and one of the most significant differences, if not the most, is
+    that function pointers cannot access values declared outside of their scope.
+    This is known as "capturing" a value. */
+
+    let outer_var = 42;
+
+    fn normal_function() -> i32 {
+        let inner_var = 42;
+        inner_var // This works.
+        // outer_var // This does not.
+    }
+
+    /* The above is not possible because a `let` binding is part of the
+    "dynamic" environment of the program. */
+
+    /* This is the second place where the concept of "items" comes into play.
+    Function pointers, just as constants, are a type of item. */
+
+    // Function pointers are "hoisted" to the top of the scope, a concer well known
+    // to JavaScript developers. Because of this, a function pointer would not
+    // know which binding to use if a `let` declaration had been shadowed.
+
+    // Similarly, all const declarations are technically global identifiers that
+    // are not globally visible. As such, if a const and a fn are declared
+    // within the same scope, they can see each other.
+
+    const OUTER_CONST: i32 = 42;
+
+    let test1 = |x: i32| x * 2;
+    let test1 = |x: i32| x * 2;
+
+    /* You will often see syntax like the above in Rust code. If coming from
+    TypeScript or JavaScript, it is semantically similar to:
+    
+    let test1 = (x : number) => x * 2;
+
+     */
+
+    let value_to_be_enclosed = 42;
+    let add_ints = |x: i32| x + value_to_be_enclosed;
+
+
+
+    // Call a function with the usual syntax.
     sign_up_to_newsletter("hello@rust_lovers.org");
 
 

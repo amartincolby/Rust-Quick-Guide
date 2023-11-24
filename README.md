@@ -25,8 +25,8 @@ The art of programming cannot be taught by just educating people in writing a
 React component or a Java class.
 
 These two goals, concise simplicity and broad context, are obviously at odds
-with one another. I hope that I find a middle ground that is approachable and
-easy to understand.
+with one another. This is especially true with a language as rich as Rust. I
+hope that I find a middle ground that is approachable and easy to understand.
 
 The Rust docs are very good but somewhat verbose. I like documentation that is
 simple enough to be a one-pager. I aim for
