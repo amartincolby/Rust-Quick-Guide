@@ -862,18 +862,35 @@ fn main() {
     }
 
     /* The above is not possible because a `let` binding is part of the
-    "dynamic" environment of the program. */
+    "dynamic" environment of the program. The dynamic environment is the part of
+    the program that can change based on how the program runs. The "static"
+    environment is the part of the program that is mostly identical every time
+    the program is run.
+    
+    It is at this point that "items" come back into the picture. Function
+    pointers, just as constants, are a type of item. As you will remember, const
+    values can be used _before_ they are declared, just like function pointers.
+    
+    If you are coming from TypeScript or JavaScript, you may recognize this as
+    sounding like hoisting, and while that is not entirely wrong, it is not
+    entirely right. The dangers in JavaScript can be best represented here:
+    
+        displayMessage();
 
-    /* This is the second place where the concept of "items" comes into play.
-    Function pointers, just as constants, are a type of item. */
+        const message = "a message for you";
 
-    // Function pointers are "hoisted" to the top of the scope, a concer well known
-    // to JavaScript developers. Because of this, a function pointer would not
-    // know which binding to use if a `let` declaration had been shadowed.
-
-    // Similarly, all const declarations are technically global identifiers that
-    // are not globally visible. As such, if a const and a fn are declared
-    // within the same scope, they can see each other.
+        function displayMessage() {
+            console.log(message);
+        }
+    
+    In the above JavaScript code, as with Rust, a function can be used before
+    its declaration. But this code will fail because the `displayMessage` call
+    is relying on `message`, which is declared after the call. If Rust tried to
+    allow the usage of functions with outside values, the function would not be
+    able to know where to find this value. Thus, Rust simply prevents this.
+    
+    There are exceptions to this rule, though, which will be discussed shortly
+    in the section on items. */
 
     const OUTER_CONST: i32 = 42;
 
@@ -895,7 +912,6 @@ fn main() {
     // Call a function with the usual syntax.
     sign_up_to_newsletter("hello@rust_lovers.org");
 
-
     /*** Unit ***/
 
     /* You may have noticed in the above example of less_than_42, that if you
@@ -908,8 +924,10 @@ fn main() {
     Unit is an interesting concept. It is the concept of a "thing" that is
     "nothing." It is different from `None` in that `None` is the state of
     nothing being where `Some()` could also have been. `Unit` is the state of
-    expected nothing. It is similar to `void` in other languages. Unit can be
-    declared with the `unit` type keyword or the `()` syntax. 
+    expected nothing. It is similar to `void` in other languages, but unlike
+    `void`, `unit` is actually a type, which is why the aforementioned unit
+    struct is called a unit struct: it is actually an alias for `unit`. Unit can
+    be declared with the `unit` type keyword or the `()` syntax. 
         
     From a mathematical perspective, it could be seen as the empty set, in
     that it is still a set, but it is a set of nothing. */
@@ -931,6 +949,11 @@ fn main() {
     /* The above function expects to return nothing and will throw a compile
     error if anything is returned. */
 
+    /*** Items ***/
+
+    // Similarly, all const declarations are technically global identifiers that
+    // are not globally visible. As such, if a const and a fn are declared
+    // within the same scope, they can see each other.
 
     /*----------------------------------------------
     * Ownership
