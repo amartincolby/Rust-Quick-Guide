@@ -17,14 +17,15 @@ Programming is the arrangement of symbols. Symbols only have meaning insofar as
 they are related to other symbols. Devoid of context, a symbol has no meaning
 and, arguably, does not exist. Human knowledge is likewise a web of related
 symbols, and to try to learn about one symbol separate from others is destined
-to fail. So it is with programming, if not more so. The art of symbolic
-arrangement cannot be taught without the context and history of the art. So many
-tutorials and classes fail to consistently and repeatedly bring into lessons the
-broader historical context for concepts, and this results in people either
-failing to learn or only learning the end result in a rote, robotic way. The
-high art of painting cannot be taught by just educating people in brush strokes.
-The art of programming cannot be taught by just educating people in writing a
-React component or a Java class.
+to fail. So it is with programming, if not more so.
+
+The art of symbolic arrangement cannot be taught without the context and history
+of the art. So many tutorials and classes fail to consistently and repeatedly
+bring into lessons the broader historical context for concepts, and this results
+in people either failing to learn or only learning the end result in a rote,
+robotic way. The high art of painting cannot be taught by just educating people
+in brush strokes. The art of programming cannot be taught by just educating
+people in writing a React component or a Java class.
 
 These two goals, concise simplicity and broad context, are obviously at odds
 with one another. This is especially true with a language as rich as Rust. I
