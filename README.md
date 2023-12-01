@@ -171,10 +171,17 @@ This was written in VSCode and using an interactive IDE with code linting and
 highlighting is recommended.
 
 ``` rust
+/* These imports should be familiar to most. The double-colon syntax represents
+the "path" to the entity. */
 use core::num;
 use std::array;
+use rand::prelude::*;
 
 const _GREETING: &str = "Stay awhile. Stay foever.";
+
+pub fn test_function() -> String {
+    String::from("test function")
+}
 
 /* Comment blocks start with slash-star,
    and end with star-slash. */
@@ -193,12 +200,15 @@ owned by the program or function. The compiler knows how much memory space the
 stack will require based its analysis of the code. For example, if a function
 has five 32-bit integers in it, the compiler only reserves enough space in
 memory to store five 32-bit integers. When the program or function is complete,
-the memory is cleared.
+the memory is cleared. One of the most common memory errors is when the program
+does something that exceeds the stack that was allocated, resulting in the
+famous _stack overflow_, from which the website gets its name.
 
 The heap is precisely that: a big pile of memory space. The primary
 differentiator between stack and heap entities is that anything on the stack
 must be of known and fixed size. Anything that can change in size must exist on
-the heap. */
+the heap. The dangers of the heap include classics like null pointers and
+memory leaks. */
 
 /*** The Main Function ***/
 
@@ -281,15 +291,34 @@ fn main() {
     Constant identifier names use all capital letters as convention. Finally,
     Constants must be the result of an expression that can be determined at
     compile time. Constants cannot store a value that requires the program to
-    run to determine. */
+    run to determine. If you are coming from C, constants should be very
+    familiar, only unlike C, the all-cap format is enforced. */
 
-    const THE_ANSWER: i32 = 42;
     const HALF_THE_ANSWER: i32 = THE_ANSWER / 2;
+    const THE_ANSWER: i32 = 42;
     // const RANDOM_NUMBER: i32 = generate_random_int(); // Fails.
 
-    /* These behaviors make sense. Constants exist to provide a high-performance
-    method for storing data of known, fixed size for sharing across parts of the
-    application. The global state should not be dynamic. */
+    /* Pay special attention to the constants HALF_THE_ANSWER and THE_ANSWER.
+    Notice how THE_ANSWER is referenced _before_ it is declared. Constants are
+    visible to everything within their scope, regardless of where they appear
+    lexically, that is to say within the code itself. */
+
+    /* Constants cannot be shadowed within the same scope, but they can be
+    shadowed in nested scopes. */
+
+    // const THE_ANSWER: f64 = 3.14; // This does not work.
+
+    let wrapper_scope = {
+        const THE_ANSWER: f64 = 3.14; // This does work.
+    };
+
+    /* These seemingly peculiar behaviors are explainable when you understand
+    what constants _are_, namely "items." Items are a special classification of
+    entity in Rust. Items will be discussed more fully later after some other
+    entities that are also items are introduced. For the time being, all that
+    needs to be understood is why constants exist, to wit they provide a
+    high-performance method for storing data of known, fixed size for sharing
+    across parts of the application. */
 
     /*** Type Inference ***/
 
@@ -305,8 +334,8 @@ fn main() {
     /*** Scope ***/
 
     /* Scope is the "space" in which entities exist and can thus be accessed.
-    Scope is especially important in Rust because it is how Rust's memory
-    management works. */
+    Scope is especially important in Rust because it is a key part of memory
+    management. */
 
     // Binding scopes are delineated by curly braces.
     if true {
@@ -319,9 +348,9 @@ fn main() {
         println!("{}", val1)
     };
 
-    // Blocks are expressions, meaning that the last statement in the block is
-    // implicitly returned. Notice how a semicolon defines the termination of an
-    // evaluation block, meaning that no semicolon indicates the final return.
+    /* Blocks are expressions, meaning that the last statement in the block is
+    implicitly returned. Notice how a semicolon defines the termination of an
+    evaluation block, meaning that no semicolon indicates the final return. */
     let my_block_value = { // Is set to 42.
         let x = 20;
         let y = 22;
@@ -402,9 +431,15 @@ fn main() {
     unsafe Rust is unnecessary in all but the most demanding situations. Unsafe
     Rust will be explored fully later.
     
-    Because pointers in Rust are deeply connected with Rust's patterns of
-    memory management, a full explanation this early into the tutorial is not
-    ideal. As such, a full explanation of pointers will happen later. */
+    For the time being, a cursory explanation of pointers will suffice. */
+
+    // The most common way to create a pointer is to bind the memory location of
+    // a reference.
+
+    let a_number_in_memory: i32 = 42;
+    let a_pointer_to_a_number: *const i32 = &a_number_in_memory;
+
+    /* Pointers are determined by the type signature of the identifier. */
 
     /*----------------------------------------------
     * Primitive Types
@@ -567,6 +602,11 @@ fn main() {
     // let name = "John " + "Wayne";
     // let email_subject = "Hi " + name + ", you're a valued customer";
 
+    /*** Enum ***/
+
+    // Talk about how it's similar to a type union in other languages.
+
+    /*** Union ***/
 
     /*** > Option ***/
 
@@ -728,6 +768,9 @@ fn main() {
         }
     }
 
+    /* Implementations are tied to the struct, meaning that anywhere that
+    `Square` is visible, the `area` method is also visible. */
+
     /*** Traits ***/
     
     let a_number = 42;
@@ -752,23 +795,44 @@ fn main() {
     is a set of primitive values in a shared space, sitting together in memory,
     then a classic tuple fits the bill. Just as with traditional structs */
 
-    /*** Modules ***/
+    /*** Modules & Crates ***/
 
     /* Modules are similar in conception to modules in other languages. In
     comparison to other, object-oriented languages, a module also has passing
-    similarities to classes. The primary purpose of modules is to hide structs
-    and/or functionality from other parts of the program. */
+    similarities to classes. The primary purpose of modules is to hide types
+    and/or functionality from other parts of the program.
 
-    mod stuff {
+    Crates are a unit of compilation. That is to say that a crate is the result
+    of a compilation. There is some syntactic similarities when interacting with
+    modules or crates. The imports at the top of this file reference a crate,
+    then use double-colons to traverse modules within that crate to reach
+    entities. The root of a crate is also a module.
+
+    Every file in Rust is a module. Modules can have nested modules within them.
+    Functions, too, can have modules in them. The visibility of modules, though,
+    can be confusing if this pattern is used, as will be explained.
+    
+    The semantics of the below module should be familiar to most. Entities in a
+    module are private by default, meaning they are not visible outside of it.
+    Prepending the `pub` modifier makes that entity public and thus visible.*/
+
+    pub mod stuff {
 
         struct PrivateStruct {
             x: i32,
             y: i32,
         }
+
         // Notice how the individual keys can be public or private.
         pub struct PublicStruct {
             pub x: i32,
             pub y: i32,
+        }
+
+        impl PublicStruct {
+            pub fn multiply(&self) -> i32 {
+                self.x * self.y
+            }
         }
 
         // Only public structs can be exposed.
@@ -776,18 +840,13 @@ fn main() {
             PublicStruct {
                 x: 42,
                 y: 2001,
-            }
+            } 
         }
     }
 
-    /* Neither PrivateStruct nor PublicStruct are accessible outside of that
+    /* Neither get_thing() nor PublicStruct are accessible outside of that
     module by simply calling their names, even though this module is a child of
-    the main() function. As such, this would fail.
-    
-    let new_thing = PublicStruct {
-        x: 42,
-        y: 2001,
-    };
+    the main() function.
 
     The only thing that exists within the scope of main() is the module itself.
     As such, any usage of that module must call the module. */
@@ -797,18 +856,37 @@ fn main() {
         y: 2001,
     };
 
-    /* Further, only public entities within the module can be consumed. In the
-    above example, just as with basically every class-based language in
-    existence, PrivateStruct cannot be consumed outside of the module. */
-
-    /* A key difference from class-based languages is that a module is entirely
-    defined by behavior. It contains no internal data. A function within a
-    module can instantiate data, but it does not persist and only exists within
-    the scope of the function. In the above example module, get_thing()
-    instantiates a public struct and returns it via implicit return. */
+    /* Remember, classes are not a perfect analog for modules. Modules are
+    static code organization and exist only at compile time. Modules contain no
+    internal data. */
 
     let i_got_a_thing = stuff::get_thing(); // type of PrivateStruct
+
+    /* As mentioned earlier, having modules sit next to one another can be
+    confusing because it makes it seem like they can see one another. They
+    cannot because they only exist next to each other in the code. See below. */
+
+    mod more_stuff {
+        pub struct MoreStuff {
+            x: i32,
+            y: i32,
+        }
+    }
+
+    mod even_more_stuff {
+        // impl more_stuff::MoreStuff {
+        //     fn area(&self) {
+        //         self.x * self.y
+        //     }
+        // }
+    }
+
+    /* `even_more_stuff` has no way to see `more_stuff`, even though it seems
+    like it should. The complete inability of them to see each other is
+    actually a side-effect of their being declared within a function.
     
+    Similar modules have been declared outside of the function at the bottom of
+    this file to illustrate how modules can interact. Go there now. */
     
     /*----------------------------------------------
     * Basic operators
@@ -850,7 +928,7 @@ fn main() {
     struct Author {
         name : String,
         age  : i32
-    };
+    }
 
     let author1 = Author {
         name : String::from("Charles Dickens"),
@@ -887,15 +965,14 @@ fn main() {
     /* Comparing Values */
 
     // The equality operators work differently for values instead of structures.
-    // Both `==` and `===` will become strict equality `===` when compiled to JavaScript.
     // Attempting to compare two different types will cause a compile error.
 
     let my_string_1 = "A world without string is chaos.";
     let my_string_2 = "A world without string is chaos.";
 
-    "A string" == "A string"; // - : bool = true
-    42 == 42;                 // - : bool = true
-    // 42 === "A string"      // Error
+    let compare_strings = "A string" == "A string"; // - : bool = true
+    let compare_integers = 42 == 42;                // - : bool = true
+    // let compare_number_string = 42 == "A string" ;     // Error
 
 
     /*----------------------------------------------
@@ -937,11 +1014,11 @@ fn main() {
     semantics to avoid mixing up paradigms. Within evaluation blocks, only
     implicit returns are allowed, and Rust bars implicit early return.
     
-    Let's break the function to illustrate. if the `false` is uncommented,
-    the first false would lack a semicolon, and Rust's compiler would think that
-    it is thus meant to be the block's return. But since there is a statement
-    _after_ that, it knows that it cannot be the implicit return. It will thus
-    throw a missing semicolon error.
+    Let's break the function to illustrate. if the first `false` is uncommented,
+    it false would lack a semicolon, and Rust's compiler would think that it is
+    thus meant to be the block's return. But since there is a statement _after_
+    that, it knows that it cannot be the implicit return. It will thus throw a
+    missing semicolon error.
     
     If the second if/else is uncommented, a similar problem arises. The second
     if/else becomes the implicit return of the function block, and thus the
@@ -984,6 +1061,8 @@ fn main() {
         format!("{} {}", String::from("Thanks for signing up"), email)
     };
 
+    sign_up_to_newsletter("hello@rust_lovers.org");
+
     /* Of note, the standard function declaration syntax is actually called
     function _pointer_ syntax. That's right. The `fn` keyword is actually what
     is known as a "smart" pointer that allows performance _and_ safety. Smart
@@ -996,24 +1075,69 @@ fn main() {
         (message, prefs)
     };
 
-    // Call a function with the standard syntax.
-    sign_up_to_newsletter("hello@rust_lovers.org");
+    /* As mentioned, functions in Rust are notably different from many other
+    languages, and one of the most significant differences, if not the most, is
+    that function pointers cannot access values declared outside of their scope.
+    This is known as "capturing" a value. If you are coming from TypeScript, the
+    common term is "enclosing," to wit you are writing a closure. */
 
+    let outer_var = 42;
+
+    fn normal_function() -> i32 {
+        let inner_var = 42;
+        inner_var // This works.
+        // outer_var // This does not.
+    }
+
+    /* The above is not possible because a `let` binding is part of the
+    "dynamic" environment of the program. The dynamic environment is the part of
+    the program that can change based on how the program runs. The "static"
+    environment is the part of the program that is the same whenever a section
+    of code is run.
+    
+    It is at this point that "items" come back into the picture. Function
+    pointers, just as constants, are a type of item. As you will remember, const
+    values can be used _before_ they are declared, just like function pointers.
+    
+    If you are coming from TypeScript or JavaScript, you may recognize this as
+    sounding like hoisting, and while that is not entirely wrong, it is not
+    entirely right. Functions do not get moved to the top of a scope, as they do
+    in JavaScript. But the nature of hoisting gives us a good illustration for
+    why Rust works as it does.
+
+        displayMessage();
+
+        let message = "a message for you";
+
+        function displayMessage() {
+            console.log(message);
+        }
+    
+    In the above JavaScript code, as with Rust, a function can be used before
+    its declaration. But this code will fail because the `displayMessage` call
+    is relying on `message`, which is declared after the call. If Rust tried to
+    allow the usage of functions with outside values, the function would not be
+    able to know where to find this value. Thus, Rust simply prevents this.
+    
+    There are exceptions to this rule, though, which will be discussed shortly
+    in the section on items. */
 
     /*** Unit ***/
 
     /* You may have noticed in the above example of less_than_42, that if you
     uncommented the second if/else block, the specific error that was displayed
-    was how () was expected, but a boolean was returned. In the previous
+    was how "()" was expected, but a boolean was returned. In the previous
     section, I used the term "caught" when describing that the first if/else was
     returning something to nothing. That lack of a catcher for the evaluation's
-    return means that Rust expected that block to return `unit`, or nothing.
+    return means that Rust expected that block to return `unit`, or nothing. If
+    there is no catcher, there should be nothing to catch.
    
     Unit is an interesting concept. It is the concept of a "thing" that is
     "nothing." It is different from `None` in that `None` is the state of
     nothing being where `Some()` could also have been. `Unit` is the state of
-    expected nothing. It is similar to `void` in other languages. Unit can be
-    declared with the `unit` type keyword or the `()` syntax. 
+    expected nothing. It is similar to `void` in other languages, but unlike
+    `void`, `unit` is actually a type, which is why the aforementioned unit
+    struct is called a unit struct: it is actually an alias for `unit`.
         
     From a mathematical perspective, it could be seen as the empty set, in
     that it is still a set, but it is a set of nothing. */
@@ -1024,16 +1148,71 @@ fn main() {
     }
 
     /* All functions necessarily return something, so if there is no expression
-    intended for return, such as in functions that only handle side-effects, then
-    that function will return `unit`. Functions that return `unit` can be
+    intended for return, such as in functions that only handle side-effects,
+    then that function will return `unit`. Functions that return `unit` can be
     explicitly typed. */
         
     fn no_return(input: String) -> () {
         println!("I just print {}", input)
+        // "bingpot!" // This fails.
     }
 
     /* The above function expects to return nothing and will throw a compile
     error if anything is returned. */
+
+    /*----------------------------------------------
+    * Items
+    *----------------------------------------------
+    */
+
+    /* We finally reach this mysterious class of entities known as items. Items
+    are the "hard" pieces of Rust code, the things that represent the structure
+    through which the logic flows. In fact, we have already discussed all items
+    by this point.
+    
+    - Constants
+    - Enums
+    - Function pointers
+    - Implementations
+    - Modules
+    - Statics
+    - Structs
+    - Traits
+    - Type aliases
+    - Unions
+
+    Now we can discuss why function pointers and constants behave similarly.
+    Items are things that are entirely determined at compile time. To continue
+    the analogy of items providing the structure, if we liken a program to a
+    building, what happens in the building can change over time, but what
+    happens in the building should not determine how many floors the building
+    has.
+
+    Further, items exist in read-only memory at single locations. When a
+    function pointer or constant is declared, it gets created outside of the
+    scope in which it was written. Items can be seen as existing in global
+    memory, but only being _visible_ in the scope in which they were written.
+
+    This helps to explain why functions can be used before they are declared.
+    When the scope is read by the compiler, since all items are created in
+    global memory, they can be called anywhere within the scope in which they
+    were written, exactly like using a key to access a value on an object in
+    JavaScript. */
+    
+    const OUTER_CONST: i32 = 42;
+
+    let test1 = |x: i32| x * 2;
+    let test1 = |x: i32| x * 2;
+
+    /* You will often see syntax like the above in Rust code. If coming from
+    TypeScript or JavaScript, it is semantically similar to:
+    
+    let test1 = (x : number) => x * 2;
+
+     */
+
+    let value_to_be_enclosed = 42;
+    let add_ints = |x: i32| x + value_to_be_enclosed;
 
 
     /*----------------------------------------------
@@ -1064,6 +1243,56 @@ fn main() {
     *----------------------------------------------
     */
 
+}
+
+/* This content is part of a section in the above function. Do not read it
+separately.
+
+These modules are not nested inside of a function. They are in the base scope of
+the file and thus exist on the module level. They can thus see each other. */
+
+mod more_stuff {
+    pub struct MoreStuff {
+        pub x: i32,
+        pub y: i32,
+    }
+}
+
+mod even_more_stuff {
+    // A use path that references the crate can be used, but since the modules
+    // are siblings, this is not necessary.
+    use crate::more_stuff::MoreStuff;
+
+    pub fn get_stuff() -> MoreStuff {
+        MoreStuff {
+            x: 42,
+            y: 2001,
+        }
+    }
+
+    // super:: can also be used. It references the _parent_ module, unlike the
+    // use crate:: above, which references the root of the project.
+    pub fn get_stuff_2() -> super::more_stuff::MoreStuff {
+        super::more_stuff::MoreStuff {
+            x: 42,
+            y: 2001,
+        }
+    }
+
+    mod nested_module {
+        pub struct EvenMoreStuff {
+            pub x: i32,
+            pub y: i32,
+        }
+    }
+
+    // To access sibling sub-modules, the self:: selector is used.
+    pub fn get_nested() -> self::nested_module::EvenMoreStuff {
+        self::nested_module::EvenMoreStuff {
+            x: 42,
+            y: 2001,
+        }
+    }
 }
 
 ```
