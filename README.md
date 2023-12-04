@@ -56,10 +56,10 @@ rigeur paradigm just as computing exploded into the general consciousness.
 Througout the 1980s and 1990s, the massive growth of the industry suppressed
 change, even as people on the proverbial edge started to realize that OOP had
 fundamental problems that were not easily soluble. These problems produced one
-of, if not the, greatest technical manuals in computing history: the legendary
-book _Design Patterns_ by the now-famous "Gang Of Four," a title they
-unfortunately share with Communist extremists from 1970s China, which you will
-learn if you try to Google that phrase.
+of the greatest, if not _the_ greatest, greatest technical manuals in computing
+history: the legendary book _Design Patterns_ by the now-famous "Gang Of Four,"
+a title they unfortunately share with Communist extremists from 1970s China,
+which you will learn if you try to Google that phrase.
 
 A critical analysis of _Design Patterns_ is outside the scope of this guide,
 suffice it to say that many analyses have shown the problems they solve are
@@ -103,7 +103,8 @@ languages are. C was specifically created to move only as far away from the
 machine as was necessary to fulfill the goal of code portability.
 
 Unfortunately, unlike symbols, which are pure and Platonic, the machine state is
-unpredictable and messy. One command can easily be incompatible with another.
+unpredictable and messy. One command can easily be incompatible with another,
+like having your car in reverse and drive simultaneously.
 
 I see the juxtaposition of C and Rust to be a microcosm, a synecdoche of sorts,
 for the whole of computer history. The famous book _Hackers: Heroes of The
