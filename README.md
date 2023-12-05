@@ -178,7 +178,7 @@ use core::num;
 use std::array;
 use rand::prelude::*;
 
-const _GREETING: &str = "Stay awhile. Stay foever.";
+const _GREETING: &str = "Stay awhile. Stay forever.";
 
 pub fn test_function() -> String {
     String::from("test function")
@@ -209,7 +209,13 @@ The heap is precisely that: a big pile of memory space. The primary
 differentiator between stack and heap entities is that anything on the stack
 must be of known and fixed size. Anything that can change in size must exist on
 the heap. The dangers of the heap include classics like null pointers and
-memory leaks. */
+memory leaks.
+
+There are significant performance implications in the stack versus the heap, but
+these are outside the scope of this tutorial. If you are coming from C or C++,
+these considerations are not new to you. If you are coming from TypeScript, then
+don't even worry about it. Rust written in even the most naive way is still an
+order of magnitude faster that JavaScript. */
 
 /*** The Main Function ***/
 
@@ -277,6 +283,11 @@ fn main() {
     This may seem like an esoteric restatement of what was already said, but it
     is important to understand this relationship to better grasp the later
     discussion of Rust's party piece, ownership. */
+
+    // In essence, the only permanent
+    // value assocaited with `catcher_in_the_rust` is the type of value that can be
+    // bound to it, in the above case `&str`. By using variable shdowing, the value
+    // that `catcher_in_the_rust` owns can change. 
 
     /* TODO: Talk about how variable names can reference earlier versions of the
     same name and how this pertains to ownership. */
@@ -349,14 +360,22 @@ fn main() {
         println!("{}", val1)
     };
 
+    // You can even create naked blocks of scope.
+    {
+        let scoped_value = 2001;
+    }
+
     /* Blocks are expressions, meaning that the last statement in the block is
     implicitly returned. Notice how a semicolon defines the termination of an
     evaluation block, meaning that no semicolon indicates the final return. */
+
     let my_block_value = { // Is set to 42.
         let x = 20;
         let y = 22;
         x + y
     };
+
+    /* Take note that naked blocks can have no return value. */
 
     /* The list of reserved words can be found here:
     https://doc.rust-lang.org/reference/keywords.html
@@ -1217,7 +1236,7 @@ fn main() {
 
 
     /*----------------------------------------------
-    * Ownership
+    * Ownership & Borrowing
     *----------------------------------------------
     */
 
@@ -1229,21 +1248,154 @@ fn main() {
     
     In Rust, every value has an "owner". This owner is the aforementioned
     catcher. An owner is also known as an identifier since only through the
-    identifier can a value be accessed. */
+    identifier can a value be accessed. When an owner goes out of scope, such as
+    when a function completes, the value is "dropped" from memory. Rust does
+    automatically, but it does support an explicit "drop" command. Again, if
+    coming from C++, all of this should be familiar through what is known as
+    RAII, but unlike C++, Rust does this automaically and by default. If you
+    write good, simple Rust, you will very likely never have to concern yourself
+    with the cleanup process. C and C++ engineers will like that, but it is
+    TypeScript engineers who should take most note, because it means that Rust
+    can _feel_ garbage collected, making it much more approachable.
+    
+    That said, Rust's system of ownership can be a little confusing, and the
+    compile errors that it produces can sometimes seem strange. But before that,
+    let us go over the basics. */
 
     let catcher_in_the_rust = "Holden Caulfield";
 
     /* In the above, the value of "Holden Caulfield" is owned by the entity
-    `catcher_in_the_rust`. They are "bound". In essence, the only permanent
-    value assocaited with `catcher_in_the_rust` is the type of value that can be
-    bound to it, in the above case `&str`. By using variable shdowing, the value
-    that `catcher_in_the_rust` owns can change. */
+    `catcher_in_the_rust`. They are "bound". That means that
+    `catcher_in_the_rust` _owns_ that value. The value is a string literal,
+    meaning a sequence of chars of known length, hard-coded into the binary, and
+    which sits on the stack and not the heap. In this scenario, "Holden
+    Caulfield" exists on the stack. Ownership gets interesting when using the
+    heap. */
+
+    // Using the String entity from the standard library allows us to create a
+    // string of unknown size on the heap.
+    let catcher_in_the_string = String::from(catcher_in_the_rust);
+
+    /* The identifier `character_name` now stores a pointer to the heap which
+    contains the string "Holden Caulfield". So here, things get interesting. */
+
+    let catcher_in_the_stack = catcher_in_the_rust;
+    let catcher_in_the_heap = catcher_in_the_string;
+
+    /* Both of these actions are copying from the previous variables, but _what_
+    is being copied is very different. `catcher_in_the_rust` is on the stack,
+    as such the string "Holden Caulfield is completely copied and a new instance
+    of it is placed on the stack with the identifier `catcher_in_the_stack`.
+    `catcher_in_the_heap`, meanwhile, is copying the _pointer_ to the value
+    "Holden Caulfield", which exists somewhere on the heap.
+    
+    So in the first scenario, a new value is created, but in the second, there
+    is only one value with two identifiers pointing to it. This can be dangerous
+    because a programmer could interact with both identifiers without realizing
+    that they point to the same data. Rust manages this problem with ownership.
+    Now that `catcher_in_the_heap` exists, it "moves" the value from
+    `catcher_in_the_string`. As such, a programmer is not allowed to interact
+    with the previous identifier. See below. */
+
+    // let attempted_move = catcher_in_the_string;
+
+    /* If you uncomment the above code, it will throw an error saying that the
+    value `catcher_in_the_string` has "moved". It has indeed. The identifier
+    that now owns that value is instead `catcher_in_the_heap`. As such, this
+    nearly identical line succeeds. */
+
+    let successful_move = catcher_in_the_heap;
+    // Now, `successful_move` owns the value.
+
+    /* Ownership tracking is Rust's safety net. Because remember, Rust clears
+    memory when an identifier goes out of scope. See below. */
+
+    let thats_what_i_want = String::from("Gimme money!");
+
+    {
+        let new_owner = thats_what_i_want;
+        // After this, `new_owner` falls out of scope, and thus its memory is
+        // cleared.
+    }
+
+    /* From this point forward, the value "Gimme money!" no longer exists
+    anywhere in memory. Rust tracks this and will throw an error if the below
+    line is uncommented. */
+    
+    // let money = thats_what_i_want;
+
+    /* This scenario extends beyond naked blocks and variable aliasing. At any
+    point where a heap value is moved, ownership and its associated memory
+    cleanup will occur. */
+
+    let istanbul = String::from("was Constantinople.");
+
+    fn memory_destroyer(x: String) {
+        println!("{}", x);
+        // x is now destroyed.
+    }
+
+    memory_destroyer(istanbul);
+    // "was Constantinople." is now destroyed.
+
+    // Thus this will not work.
+    // println!("{}", istanbul);
+
+    /* Obvously, being able to only use a value once will not take you far. To
+    allow values to be used without transferring ownership, Rust leverages the
+    concept of "borrowing".
+   
+    This process is called borrowing because ownership is not transferred. The
+    below is identical to the previous naked scope. */
+
+    let respect = String::from("Find out what it means to me.");
+
+    {
+        let new_owner = &respect;
+        /* Note the ampersand before the value, indicating that this is a
+        reference. After this, only the reference is destroyed. The value is
+        untouched. Because it is only a reference, multiple aliases to the
+        original value are possible. */
+        let another_new_owner = &respect;
+    }
+
+    /* Just as normal variable declarations are immutable by default, so are
+    references. References have two layers of protection in that both the
+    original value _and_ the reference must be tagged as mutable if the value is
+    to be changed. When mutable, references are treated more carefully by the
+    compiler. Any number of references can be _created_, but only one reference
+    can be _consumed_. See below.*/
+
+    let mut jeremiah = String::from("was a bullfrog.");
+
+    {
+        let new_owner = &mut jeremiah;
+        let another_new_owner = &mut jeremiah;
+        let yet_another_new_owner = &mut jeremiah;
+        // Uncomment this line to see errors.
+        // println!("{}", new_owner)
+
+        // Meanwhile this succeeds because it was the most recent borrow.
+        println!("{}", yet_another_new_owner);
+    }
+
+    /* The naked scope is now closed and all references are destroyed. */
+
+    let new_owner = &mut jeremiah;
+    println!("{}", new_owner);
+
+    /* The mechanism performing these checks is called the "borrow checker." The
+    point of the borrow checker is to prevent unexpected changes to values while
+    the program runs. For those coming from something more free-wheeling and
+    anarchic like JavaScript, this can initially feel overly restrictive, but
+    it is _critical_ to Rust's value. Whole classes of errors are eliminated by
+    this semantic decision. Learn it. Live it. Love it.*/
+
 
     /*----------------------------------------------
     * Cargo
     *----------------------------------------------
     */
-
 }
 
 /* This content is part of a section in the above function. Do not read it
@@ -1252,20 +1404,20 @@ separately.
 These modules are not nested inside of a function. They are in the base scope of
 the file and thus exist on the module level. They can thus see each other. */
 
-mod more_stuff {
-    pub struct MoreStuff {
+mod external_stuff {
+    pub struct Stuff {
         pub x: i32,
         pub y: i32,
     }
 }
 
-mod even_more_stuff {
+mod more_external_stuff {
     // A use path that references the crate can be used, but since the modules
     // are siblings, this is not necessary.
-    use crate::more_stuff::MoreStuff;
+    use crate::external_stuff::Stuff;
 
-    pub fn get_stuff() -> MoreStuff {
-        MoreStuff {
+    pub fn get_stuff() -> Stuff {
+        Stuff {
             x: 42,
             y: 2001,
         }
@@ -1273,27 +1425,25 @@ mod even_more_stuff {
 
     // super:: can also be used. It references the _parent_ module, unlike the
     // use crate:: above, which references the root of the project.
-    pub fn get_stuff_2() -> super::more_stuff::MoreStuff {
-        super::more_stuff::MoreStuff {
+    pub fn get_stuff_2() -> super::external_stuff::Stuff {
+        super::external_stuff::Stuff {
             x: 42,
             y: 2001,
         }
     }
 
     mod nested_module {
-        pub struct EvenMoreStuff {
+        pub struct NestedStuff {
             pub x: i32,
             pub y: i32,
         }
     }
 
     // To access sibling sub-modules, the self:: selector is used.
-    pub fn get_nested() -> self::nested_module::EvenMoreStuff {
-        self::nested_module::EvenMoreStuff {
+    pub fn get_nested() -> self::nested_module::NestedStuff {
+        self::nested_module::NestedStuff {
             x: 42,
             y: 2001,
         }
     }
 }
-
-```
