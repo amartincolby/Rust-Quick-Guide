@@ -1150,21 +1150,72 @@ fn main() {
     
     // let money = thats_what_i_want;
 
-    /* This 
-    
-    This process is called borrowing because ownership can revert back to
-    previous owners. Ownership follows the same rules as any other declaration.
-    That is to say that when a scope completes, anything that was borrowed in
-    that scope is given back. */
+    /* This scenario extends beyond naked blocks and variable aliasing. At any
+    point where a heap value is moved, ownership and its associated memory
+    cleanup will occur. */
 
-    let respect = "Find out what it means to me.";
+    let istanbul = String::from("was Constantinople.");
+
+    fn memory_destroyer(x: String) {
+        println!("{}", x);
+        // x is now destroyed.
+    }
+
+    memory_destroyer(istanbul);
+    // "was Constantinople." is now destroyed.
+
+    // Thus this will not work.
+    // println!("{}", istanbul);
+
+    /* Obvously, being able to only use a value once will not take you far. To
+    allow values to be used without transferring ownership, Rust leverages the
+    concept of "borrowing".
+   
+    This process is called borrowing because ownership is not transferred. The
+    below is identical to the previous naked scope. */
+
+    let respect = String::from("Find out what it means to me.");
 
     {
         let new_owner = &respect;
-        // After this, `new_owner` falls out of scope, and thus its memory is
-        // cleared.
+        /* Note the ampersand before the value, indicating that this is a
+        reference. After this, only the reference is destroyed. The value is
+        untouched. Because it is only a reference, multiple aliases to the
+        original value are possible. */
+        let another_new_owner = &respect;
     }
 
+    /* Just as normal variable declarations are immutable by default, so are
+    references. References have two layers of protection in that both the
+    original value _and_ the reference must be tagged as mutable if the value is
+    to be changed. When mutable, references are treated more carefully by the
+    compiler. Any number of references can be _created_, but only one reference
+    can be _consumed_. See below.*/
+
+    let mut jeremiah = String::from("was a bullfrog.");
+
+    {
+        let new_owner = &mut jeremiah;
+        let another_new_owner = &mut jeremiah;
+        let yet_another_new_owner = &mut jeremiah;
+        // Uncomment this line to see errors.
+        // println!("{}", new_owner)
+
+        // Meanwhile this succeeds because it was the most recent borrow.
+        println!("{}", yet_another_new_owner);
+    }
+
+    /* The naked scope is now closed and all references are destroyed. */
+
+    let new_owner = &mut jeremiah;
+    println!("{}", new_owner);
+
+    /* The mechanism performing these checks is called the "borrow checker." The
+    point of the borrow checker is to prevent unexpected changes to values while
+    the program runs. For those coming from something more free-wheeling and
+    anarchic like JavaScript, this can initially feel overly restrictive, but
+    it is _critical_ to Rust's value. Whole classes of errors are eliminated by
+    this semantic decision. Learn it. Live it. Love it.*/
 
 
     /*----------------------------------------------
