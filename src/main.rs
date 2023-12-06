@@ -292,23 +292,22 @@ fn main() {
     *----------------------------------------------
     */
 
-    /* At two points earlier in this tutorial, the concept of a return being
-    "caught" by something was discussed. Now we can talk about what is doing the
-    catching, which is the central concept to Rust's true party piece:
+    /* Before the more complex elements of Rust are explored, it will behoove us
+    to analyze Rust's true party piece.
     
     Ownership.
     
-    In Rust, every value has an "owner". This owner is the aforementioned
-    catcher. An owner is also known as an identifier since only through the
-    identifier can a value be accessed. When an owner goes out of scope, such as
-    when a function completes, the value is "dropped" from memory. Rust does
-    automatically, but it does support an explicit "drop" command. Again, if
-    coming from C++, all of this should be familiar through what is known as
-    RAII, but unlike C++, Rust does this automaically and by default. If you
-    write good, simple Rust, you will very likely never have to concern yourself
-    with the cleanup process. C and C++ engineers will like that, but it is
-    TypeScript engineers who should take most note, because it means that Rust
-    can _feel_ garbage collected, making it much more approachable.
+    In Rust, every value has an "owner". An owner is also known as an identifier
+    since only through the identifier can a value be accessed. When an owner
+    goes out of scope, such as when a function completes, the value is "dropped"
+    from memory. Rust does automatically, but it does support an explicit "drop"
+    command. Again, if coming from C++, all of this should be familiar through
+    what is known as RAII, but unlike C++, Rust does this automaically and by
+    default. If you write good, simple Rust, you will very likely never have to
+    concern yourself with the cleanup process. C and C++ engineers will like
+    that, but it is TypeScript engineers who should take most note, because it
+    means that Rust can _feel_ garbage collected, making it much more
+    approachable.
     
     That said, Rust's system of ownership can be a little confusing, and the
     compile errors that it produces can sometimes seem strange. But before that,
