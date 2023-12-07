@@ -56,8 +56,8 @@ inspired Rust's semantics.
 I believe that we stand on the precipice of a great shift in software
 engineering. The last shift was the rise of object-oriented languages over forty
 years ago. Emerging as it did from the ashes of structured programming and the
-spaghetti code of _The Mythical Man Month_, OOP, as it is known, was the de
-rigeur paradigm just as computing exploded into the general consciousness. 
+spaghetti code of _The Mythical Man Month_, OOP, as it is known, was the _de
+rigeur_ paradigm just as computing exploded into the general consciousness. 
 Througout the 1980s and 1990s, the massive growth of the industry suppressed
 change, even as people on the proverbial edge started to realize that OOP had
 fundamental problems that were not easily soluble. These problems produced one
@@ -71,18 +71,19 @@ suffice it to say that many analyses have shown the problems they solve are
 _linguistic_ problems and not implementation problems. To wit, the patterns
 described are band-aids over a broken paradigm. _Design Patterns_ was published
 in 1994, but work on it started in 1990. We are over thirty years into an
-industry-wide quest to put lipstick on a pig.[1]
+industry-wide effort to put lipstick on a pig.[1]
 
 But beautiful change is in the air. Now is the autumn of the old ways. To be
 clear, I do not speak of AI. Indeed, AI, or at least the AI that is generating
 excitement at the current moment, is firmly rooted in the old ways. It is not
 doing things _differently_, it is merely doing the same things more quickly. The
 new ways recognize that the fundamental tools at use must be built with the goal
-of symbolic integrity in mind. The foundations themselves must change. This
-means languages.
+of symbolic integrity in mind. The foundations themselves must change.
 
 Basically, it is time for the joke about good and bad programming languages to
 cease being true.
+
+---
 
 Programming languages exist on a spectrum. On one end is the realm of pure
 symbols. These are like mathematical formulae. They are relationships to be
@@ -90,7 +91,8 @@ computed and have no need to specify the machine on which they run. This sort of
 language is often called "academic" because they are usually the focus of
 esoteric computer science classes. On the other end of the spectrum is the
 direct representation of machine state. This is often called assembly language,
-where each statement represents a command going to the computer.
+where each statement represents a direct command going to the computer. It is
+fimly rooted in the physical world.
 
 Rust starts on the academic end of the spectrum of languages and moves toward
 the machine in search of maximum, real-world performance. Meanwhile Rust's
@@ -104,15 +106,13 @@ unimagineable. There were other higher-level languages available at the time,
 notably COBOL, Lisp, Fortran, PL/I, Algol, and Pascal, but none of them were
 simple enough to be easily usable for truly general tasks, and their performance
 was universaly much slower than hand-written assembly, as all highly symbolic
-languages are. C was specifically created to move only as far away from the
-machine as was necessary to fulfill the goal of code portability.
-
-Unfortunately, unlike symbols, which are pure and Platonic, the machine state is
-unpredictable and messy. One command can easily be incompatible with another,
-like having your car in reverse and drive simultaneously.
+languages were. C was specifically created to move only as far away from the
+machine as was necessary to fulfill the goal of code portability. This raw
+performance is why, even after all this time, C remains the _ne plus ultra_
+for lower-level code writing.
 
 I see the juxtaposition of C and Rust to be a microcosm, a synecdoche of sorts,
-for the whole of computer history. The famous book _Hackers: Heroes of The
+for the entirety of computer history. The famous book _Hackers: Heroes of The
 Computer Revolution_ captures it well. Even in the earliest days of computing,
 philosophers and academics were aware of how to robustly build symbolic
 machines. The problem was that representing these robust symbolic structures
@@ -121,13 +121,16 @@ short supply. As such, the excitement and successes of the real world were
 defined by the first "hackers," who were people less concerned with what symbols
 could do and more concerned with the cool things that could be achieved with
 direct control over the machine. This divide between the symbolic purists and
-the hackers would continue into every successive generation of geeks. The
-narrative thread connecting Rust and C even goes back to the very beginning of
-computing. The first people who could reasonably be called programmers, Ada
-Lovelace and Charles Babbage, separated along the same lines. Lovelace was a
-self-described metaphysician who recognized the philsophical possibilities in
-Babbage's machine, while Babbage himself cared about the machine itself and its
-ability to do mathematics.
+the hackers would continue into every successive generation of geeks.[2]
+
+Unfortunately, the consequence of this is an entire industry that never fully
+embraced either perspective. As computing power increased, higher-level
+languages became more common, such as COBOL in the 60's, BASIC in the 70's and
+80's, Java in the 90's, and perhaps the Dragonball Z-style Final Form of messy
+languages, JavaScript, in the 2000's. But these languages rarely came from
+academic research and were instead Frankenstein monsters that emerged from the
+needs of _business_ or simple creations aimed at educating laypeople.[3] Their
+_raison d'etre_ was neither geeky nor academic; it was purely human.[4]
 
 I see another thread running through modern computing that appears to be turning
 back on itself. While the hackers were the ones driving things, the eras of
@@ -162,6 +165,10 @@ extremely expensive. If an organization is genuinely only "paying for what you
 use," then a language that is twice as fast as another could result in a massive
 decrease in monthly cloud charges.
 
+Unfortunately, unlike symbols, which are pure and Platonic, the machine state is
+unpredictable and messy. One command can easily be incompatible with another,
+like having your car in reverse and drive simultaneously.
+
 (1) While _Design Patterns_ vis-a-vis languages is open to significant critique,
 the concepts discussed in the book are still valuable, especially as regards
 distributed systems. Solving problems of multi-service systems necessarily
@@ -170,6 +177,25 @@ implementation. The next great language may be one that turns archiectural
 concerns into linguistic concerns, yet again obviating the book, but for the
 time being, it remains a must-read.
 
+(2) The narrative thread connecting Rust and C even goes back to the very
+beginning of computing. The first people who could reasonably be called
+programmers, Ada Lovelace and Charles Babbage, separated along the same lines.
+Lovelace was a self-described metaphysician who recognized the philsophical
+possibilities in Babbage's machine, while Babbage himself cared about the
+machine itself and its ability to do mathematics.
+
+(3) We had one glorious moment where an academic language nearly achieved some
+degree of dominance in the 1980's with the rise of Lisp Machines. Ironically,
+the two main Lisp Machine companies that emerged from MIT left a drama so
+significant in their wake that it brought about the death of the hacker culture
+at the university and was the direct cause for the modern Open Source movement.
+
+[4] Indeed, JavaScript gives us perhaps the best example of this dynamic. An
+academic was given the task of creating a language for the web and he set out to
+create an academic language, namely a variant of Scheme. This plan was torpedoed
+by executives at Netscape who demanded that he instead make a language like Java
+simply because Java was popular. And also call it JavaScript, even though the
+languages are _completely_ different.
 
 The below text is valid Rust code. It is a copy of the code in the src directory.
 
