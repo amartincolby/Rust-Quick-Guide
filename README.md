@@ -61,8 +61,8 @@ rigeur_ paradigm just as computing exploded into the general consciousness.
 Througout the 1980s and 1990s, the massive growth of the industry suppressed
 change, even as people on the proverbial edge started to realize that OOP had
 fundamental problems that were not easily soluble. These problems produced one
-of the greatest, if not _the_ greatest, greatest technical manuals in computing
-history: the legendary book _Design Patterns_ by the now-famous "Gang Of Four,"
+of the greatest, if not _the_ greatest, technical manuals in computing history:
+the legendary book _Design Patterns_ by the now-famous "Gang Of Four,"
 a title they unfortunately share with Communist extremists from 1970s China,
 which you will learn if you try to Google that phrase.
 
@@ -95,7 +95,7 @@ where each statement represents a direct command going to the computer. It is
 fimly rooted in the physical world.
 
 Rust starts on the academic end of the spectrum of languages and moves toward
-the machine in search of maximum, real-world performance. Meanwhile Rust's
+the machine in search of maximum, real-world performance. Meanwhile, Rust's
 philsophical counterpart, C, starts from the machine and moves toward symbolic
 purity. Indeed, the entire purpose of C was to be "portable assembly": the
 thinnest possible symbolic layer over machine instruction to faciliate writing
@@ -105,14 +105,14 @@ of something like the x86 architecture dominating the CPU industry was mostly
 unimagineable. There were other higher-level languages available at the time,
 notably COBOL, Lisp, Fortran, PL/I, Algol, and Pascal, but none of them were
 simple enough to be easily usable for truly general tasks, and their performance
-was universaly much slower than hand-written assembly, as all highly symbolic
+was universally much slower than hand-written assembly, as all highly symbolic
 languages were. C was specifically created to move only as far away from the
 machine as was necessary to fulfill the goal of code portability. This raw
 performance is why, even after all this time, C remains the _ne plus ultra_
 for lower-level code writing.
 
 I see the juxtaposition of C and Rust to be a microcosm, a synecdoche of sorts,
-for the entirety of computer history. The famous book _Hackers: Heroes of The
+for the entirety of computing history. The famous book _Hackers: Heroes of The
 Computer Revolution_ captures it well. Even in the earliest days of computing,
 philosophers and academics were aware of how to robustly build symbolic
 machines. The problem was that representing these robust symbolic structures
@@ -126,11 +126,16 @@ the hackers would continue into every successive generation of geeks.[2]
 Unfortunately, the consequence of this is an entire industry that never fully
 embraced either perspective. As computing power increased, higher-level
 languages became more common, such as COBOL in the 60's, BASIC in the 70's and
-80's, Java in the 90's, and perhaps the Dragonball Z-style Final Form of messy
+80's, Java in the 90's, and perhaps the Frieza-style **Final Form** of messy
 languages, JavaScript, in the 2000's. But these languages rarely came from
 academic research and were instead Frankenstein monsters that emerged from the
-needs of _business_ or simple creations aimed at educating laypeople.[3] Their
-_raison d'etre_ was neither geeky nor academic; it was purely human.[4]
+needs of _business_ or were simple creations aimed at educating laypeople.[3]
+Their _raison d'etre_ was neither geeky nor academic; it was purely human.[4]
+
+C was popular precisely because it gave one of the opposing groups something
+they wanted: control. The geeks ate it up. This is why, after C was released,
+ALGOL, APL, PL/I, COBOL, Lisp, Fortran, and Pascal were all swept away by the
+rise of C. By 1990, C was thoroughly dominant.
 
 I see another thread running through modern computing that appears to be turning
 back on itself. While the hackers were the ones driving things, the eras of
