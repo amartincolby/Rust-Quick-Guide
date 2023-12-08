@@ -6,10 +6,6 @@ use rand::prelude::*;
 
 const _GREETING: &str = "Stay awhile. Stay forever.";
 
-pub fn test_function() -> String {
-    String::from("test function")
-}
-
 /* Comment blocks start with slash-star,
    and end with star-slash. */
 // Line comments begin with a double slash.

@@ -132,34 +132,27 @@ academic research and were instead Frankenstein monsters that emerged from the
 needs of _business_ or were simple creations aimed at educating laypeople.[3]
 Their _raison d'etre_ was neither geeky nor academic; it was purely human.[4]
 
-C was popular precisely because it gave one of the opposing groups something
-they wanted: control. The geeks ate it up. This is why, after C was released,
-ALGOL, APL, PL/I, COBOL, Lisp, Fortran, and Pascal were all swept away by the
-rise of C. By 1990, C was thoroughly dominant.
+These languages represent the third major historical thread running parallel to the
+struggle between the geeks and the academics. In the early days of computing,
+this thread was of minor significance simply because there were comparatively
+few computers and programmers in the world. But as the number of programmers
+increased, so did the cultural impact of the languages being used in the wild.
 
-I see another thread running through modern computing that appears to be turning
-back on itself. While the hackers were the ones driving things, the eras of
-computing have been defined by the symbolics of the age. The earliest computing
-was defined by languages intended to make computing more approachable for all
-and sundry. COBOL, Fortran, and especially Basic were intended to let people
-interact with computers in less arcane ways. They served a purely human purpose.
-
-These languages powered the usage of computers. That is to say that COBOL was
+These languages powered the _usage_ of computers. That is to say that COBOL was
 used by companies that used computers to write solutions to business problems.
-They were not used by the companies making software to sell or by companies
-making the computers themselves. For them, theirs was a world of assembly
-programming--high performance and directly tied to the machine.
+One of the key elements, if not _the_ key element, of this thread is that
+businesses were much less concerned with performance or symbolic purity; they
+wanted features, then more features, and they wanted them yesterday. To a great
+degree, C grew dominant because it was easier to transport code between
+computers, pleasing businesses.
 
-This era continued until the rise time sharing.
+As software exploded in importance, business concerns had an increasing effect
+on languages, tools, and culture. After C, the next stage of this process was when Java
+removed even the compile step, instead opting to run all code inside a virtual
+machine. The performance was abysmal, but that did not stop its ascent. 
 
-C was the first language that attempted to give the geeks a new language. C
-sacrificed some speed to make it easier to write for more machines. It was
-called "portable aseembly."
-
-Java took this one step further by eliminating the compile step and running
-programs in a virtual machine.
-
-JavaScript brought this process to its ultimate conclusion, which is why it is
+JavaScript brought this process to its ultimate conclusion, where code is not
+transpiled or compiled which is why it is
 everywhere.
 
 But now we are reverting. Performance is becoming important again.
@@ -215,10 +208,6 @@ use std::array;
 use rand::prelude::*;
 
 const _GREETING: &str = "Stay awhile. Stay forever.";
-
-pub fn test_function() -> String {
-    String::from("test function")
-}
 
 /* Comment blocks start with slash-star,
    and end with star-slash. */
