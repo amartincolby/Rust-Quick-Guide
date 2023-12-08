@@ -150,10 +150,11 @@ As software exploded in importance, business concerns had an increasing effect
 on languages, tools, and culture. After C, the next stage of this process was when Java
 removed even the compile step, instead opting to run all code inside a virtual
 machine. The performance was abysmal, but that did not stop its ascent. 
-
 JavaScript brought this process to its ultimate conclusion, where code is not
-transpiled or compiled which is why it is
-everywhere.
+compiled at all, but run as-is in a runtime. It can be run instaneously,
+anywhere that supports the runtime. Unsurprisingly, even with performance far
+worse than Java or C, JavaScript can now be found running in every corner of the
+world.
 
 But now we are reverting. Performance is becoming important again.
 
