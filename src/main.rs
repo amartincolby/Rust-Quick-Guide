@@ -289,7 +289,7 @@ fn main() {
     */
 
     /* Before the more complex elements of Rust are explored, it will behoove us
-    to analyze Rust's true party piece.
+    to analyze Rust's party piece.
     
     Ownership.
     
@@ -331,10 +331,11 @@ fn main() {
 
     /* Both of these actions are copying from the previous variables, but _what_
     is being copied is very different. `catcher_in_the_rust` is on the stack,
-    as such the string "Holden Caulfield is completely copied and a new instance
-    of it is placed on the stack with the identifier `catcher_in_the_stack`.
-    `catcher_in_the_heap`, meanwhile, is copying the _pointer_ to the value
-    "Holden Caulfield", which exists somewhere on the heap.
+    as such the string "Holden Caulfield" is completely copied and a new
+    instance of it is placed on the stack with the identifier
+    `catcher_in_the_stack`. `catcher_in_the_heap`, meanwhile, is copying the
+    _pointer_ to the value "Holden Caulfield", which exists somewhere on the
+    heap.
     
     So in the first scenario, a new value is created, but in the second, there
     is only one value with two identifiers pointing to it. This can be dangerous

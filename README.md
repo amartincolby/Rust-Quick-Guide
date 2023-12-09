@@ -109,7 +109,7 @@ was universally much slower than hand-written assembly, as all highly symbolic
 languages were. C was specifically created to move only as far away from the
 machine as was necessary to fulfill the goal of code portability. This raw
 performance is why, even after all this time, C remains the _ne plus ultra_
-for lower-level code writing.
+for lower-level code writing.[2]
 
 I see the juxtaposition of C and Rust to be a microcosm, a synecdoche of sorts,
 for the entirety of computing history. The famous book _Hackers: Heroes of The
@@ -121,7 +121,7 @@ short supply. As such, the excitement and successes of the real world were
 defined by the first "hackers," who were people less concerned with what symbols
 could do and more concerned with the cool things that could be achieved with
 direct control over the machine. This divide between the symbolic purists and
-the hackers would continue into every successive generation of geeks.[2]
+the hackers would continue into every successive generation of geeks.[3]
 
 Unfortunately, the consequence of this is an entire industry that never fully
 embraced either perspective. As computing power increased, higher-level
@@ -129,17 +129,18 @@ languages became more common, such as COBOL in the 60's, BASIC in the 70's and
 80's, Java in the 90's, and perhaps the Frieza-style **Final Form** of messy
 languages, JavaScript, in the 2000's. But these languages rarely came from
 academic research and were instead Frankenstein monsters that emerged from the
-needs of _business_ or were simple creations aimed at educating laypeople.[3]
-Their _raison d'etre_ was neither geeky nor academic; it was purely human.[4]
+needs of _business_ or simple creations aimed at educating laypeople.[4] Their
+_raison d'etre_ was neither geeky nor academic; it was purely human.[5]
 
-These languages represent the third major historical thread running parallel to the
-struggle between the geeks and the academics. In the early days of computing,
-this thread was of minor significance simply because there were comparatively
-few computers and programmers in the world. But as the number of programmers
-increased, so did the cultural impact of the languages being used in the wild.
+These languages represent the third major historical thread running parallel to
+the struggle between the geeks and the academics. In the early days of
+computing, this thread was of minor significance simply because there were
+comparatively few computers and programmers in the world. But as the number of
+programmers increased, so did the cultural impact of the languages being used in
+the wild.
 
 These languages powered the _usage_ of computers. That is to say that COBOL was
-used by companies that used computers to write solutions to business problems.
+used by companies that used computers to write solutions for business problems.
 One of the key elements, if not _the_ key element, of this thread is that
 businesses were much less concerned with performance or symbolic purity; they
 wanted features, then more features, and they wanted them yesterday. To a great
@@ -147,22 +148,11 @@ degree, C grew dominant because it was easier to transport code between
 computers, pleasing businesses.
 
 As software exploded in importance, business concerns had an increasing effect
-on languages, tools, and culture. After C, the next stage of this process was when Java
-removed even the compile step, instead opting to run all code inside a virtual
-machine. The performance was abysmal, but that did not stop its ascent. 
-JavaScript brought this process to its ultimate conclusion, where code is not
-compiled at all, but run as-is in a runtime. It can be run instaneously,
-anywhere that supports the runtime. Unsurprisingly, even with performance far
-worse than Java or C, JavaScript can now be found running in every corner of the
-world.
+on languages, tools, and culture. It is no surprise that C was not the end oflinguistic progress toward easier feature delivery and exploitation. Java, like C still among the most popular languages in the world, was introduced in 1990 and removed even the need to compile for specific architectures, instead opting to run all code inside a virtual machine. The performance was abysmal, but that did not stop its ascent. JavaScript brought this process to its ultimate conclusion, where code is not compiled at all, but run as-is in a runtime. It can be run instaneously, anywhere that supports the runtime. Unsurprisingly, even with performance far worse than Java or C, JavaScript can now be found running in every corner of the world. Features über alles.
 
-But now we are reverting. Performance is becoming important again.
+But as I said, things are changing. We spent decades focused almost entirely on faster delivery speed. We made industry-wide decisions in service of that goal. But just as a new generation of programmers is becoming dominant, notably having graduated into the smoldering wreckage of the dot-com bubble and thus having a natural skepticism for the status quo, so too are businesses realizing that prioritizing feature delivery over other concerns can have profoundly negative outcomes. There are moral consequences. A bad program can produce much more CO2 than a good program. A bad program can fail someone just when they need it most. A bad program actual cause harm to other systems. But I think the bigger motivation is because cloud computing is extremely expensive. If an organization is genuinely only "paying for what you use," then a language that is twice as fast as another could result in a massive decrease in monthly cloud charges. That is a performance difference that would not be excited anyone fifteen years ago, but today, the bean counters start paying attention to what the geeks are saying.
 
-There are moral reasons. A bad program can produce much more CO2 than a good
-program. But I think the bigger motivation is because cloud computing is
-extremely expensive. If an organization is genuinely only "paying for what you
-use," then a language that is twice as fast as another could result in a massive
-decrease in monthly cloud charges.
+And so we have Rust. Or perhaps I should say so we have the _popularity_ of Rust. Rust was going to be created regardless of the market, as is the wont of geeks, but it is the specifics of our sociocultural age, our techno-mores, that has allowed Rust to reach a stunning level of recognition and interest. Rust has even achieved what no other language could in over twenty-five years: be included in Linux's codebase. It has done all of this while being a stunningly academic language.
 
 Unfortunately, unlike symbols, which are pure and Platonic, the machine state is
 unpredictable and messy. One command can easily be incompatible with another,
@@ -175,6 +165,10 @@ cannot be solved with any current language and must be solved in the
 implementation. The next great language may be one that turns archiectural
 concerns into linguistic concerns, yet again obviating the book, but for the
 time being, it remains a must-read.
+
+[2] The ability of C to map to assembly in ways other languages simply couldn't
+is best exemplified in the famous Duff's Device, which literally just mashes
+together two syntax structures and somehow it works. Look it up. It's wild.
 
 (2) The narrative thread connecting Rust and C even goes back to the very
 beginning of computing. The first people who could reasonably be called
