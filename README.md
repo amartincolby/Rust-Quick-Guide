@@ -154,6 +154,8 @@ But as I said, things are changing. We spent decades focused almost entirely on 
 
 And so we have Rust. Or perhaps I should say so we have the _popularity_ of Rust. Rust was going to be created regardless of the market, as is the wont of geeks, but it is the specifics of our sociocultural age, our techno-mores, that has allowed Rust to reach a stunning level of recognition and interest. Rust has even achieved what no other language could in over twenty-five years: be included in Linux's codebase. It has done all of this while being an arguably academic language. Much like OCaml, its few concessions are related to operating in the "real world," and the language makes them grudgingly, putting many of them behind an explicit "unsafe" flag. Rust has learned all of the mistakes from the past and set out not to repeat them, and we finally live in a world where people in power care about that.
 
+Rust is not alone in this shift, nor do I think that Rust is the end goal of some grand historical arc. But for this moment, right now, I think that Rust is part of the future, and it is a future that should be encouraged. We as programmers are the midwives of a better world that struggles to be born. We hold it now in our hands. Make it breathe.
+
 (1) While _Design Patterns_ vis-a-vis languages is open to significant critique,
 the concepts discussed in the book are still valuable, especially as regards
 distributed systems. Solving problems of multi-service systems necessarily
