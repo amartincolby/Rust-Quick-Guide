@@ -83,7 +83,7 @@ of symbolic integrity in mind. The foundations themselves must change.
 Basically, it is time for the joke about good and bad programming languages to
 cease being true.
 
----
+--------------------------------------------------------------------------------
 
 Programming languages exist on a spectrum. On one end is the realm of pure
 symbols. These are like mathematical formulae. They are relationships to be
@@ -148,13 +148,52 @@ degree, C grew dominant because it was easier to transport code between
 computers, pleasing businesses.
 
 As software exploded in importance, business concerns had an increasing effect
-on languages, tools, and culture. It is no surprise that C was not the end oflinguistic progress toward easier feature delivery and exploitation. Java, like C still among the most popular languages in the world, was introduced in 1995 and removed even the need to compile for specific architectures, instead opting to run all code inside a virtual machine. The performance was initially abysmal, but that did not stop its ascent. JavaScript brought this process to its ultimate conclusion, where code is not compiled at all, but run as-is in a runtime. It can be run instaneously, anywhere that supports the runtime. Unsurprisingly, even with performance far worse than Java or C, JavaScript can now be found running in every corner of the world. Features über alles.
+on languages, tools, and culture. It is no surprise that C was not the end of
+linguistic progress toward easier feature delivery and exploitation. Java, like
+C still among the most popular languages in the world, was introduced in 1995
+and removed even the need to compile for specific architectures, instead opting
+to run all programs inside a virtual machine. The performance was initially
+abysmal, but that did not stop its ascent. JavaScript brought this process to
+its ultimate conclusion, where code is not compiled at all, but run as-is in a
+runtime. It can be run instaneously, anywhere that supports the runtime.
+Unsurprisingly, even with performance far worse than Java or C, JavaScript can
+now be found running in every corner of the world. Features über alles.
 
-But as I said, things are changing. We spent decades focused almost entirely on faster delivery speed. We made industry-wide decisions in service of that goal. But just as a new generation of programmers is becoming dominant, notably having graduated into the smoldering wreckage of the dot-com bubble and thus having a natural skepticism for the status quo, so too are businesses realizing that prioritizing feature delivery over other concerns can have profoundly negative outcomes. There are moral consequences. A bad program can produce much more CO2 than a good program. A bad program can fail someone just when they need it most. A bad program actual cause harm to other systems. But I think the bigger motivation is because cloud computing is extremely expensive. If an organization is genuinely only "paying for what you use," then a language that is twice as fast as another could result in a massive decrease in monthly cloud charges. That is a performance difference that would not be excited anyone fifteen years ago, but today, the bean counters start paying attention to what the geeks are saying.
+But as I said, things are changing. We spent decades focused almost entirely on
+faster delivery speed. We made industry-wide decisions in service of that goal.
+But just as a new generation of programmers is becoming dominant, notably having
+graduated into the smoldering wreckage of the dot-com bubble and thus having a
+natural skepticism for the status quo, so too are businesses realizing that
+prioritizing feature delivery over other concerns can have profoundly negative
+outcomes. There are moral consequences. A bad program can produce much more CO2
+than a good program. A bad program can fail someone just when they need it most.
+A bad program can expose users to hackers. But I think the bigger motivation is
+because cloud computing is extremely expensive. If an organization is genuinely
+only "paying for what you use," as all cloud providers pitch, then a language
+that is twice as fast as another could result in a massive decrease in monthly
+cloud charges. That is a performance difference that would not have excited
+anyone fifteen years ago, but today, the bean counters start paying attention
+to what the geeks are saying.
 
-And so we have Rust. Or perhaps I should say so we have the _popularity_ of Rust. Rust was going to be created regardless of the market, as is the wont of geeks, but it is the specifics of our sociocultural age, our techno-mores, that has allowed Rust to reach a stunning level of recognition and interest. Rust has even achieved what no other language could in over twenty-five years: be included in Linux's codebase. It has done all of this while being an arguably academic language. Much like OCaml, its few concessions are related to operating in the "real world," and the language makes them grudgingly, putting many of them behind an explicit "unsafe" flag. Rust has learned all of the mistakes from the past and set out not to repeat them, and we finally live in a world where people in power care about that.
+And so we have Rust. Or perhaps I should say so we have the _popularity_ of
+Rust. Rust was going to be created regardless of the market, as is the wont of
+geeks, but it is the specifics of our sociocultural age, our techno-mores, that
+has allowed Rust to reach a stunning level of recognition and interest. Rust has
+even achieved what no other language could in over twenty-five years: be
+included in Linux's codebase. It has done all of this while being an arguably
+academic language. Much like OCaml, its few concessions are related to operating
+in the "real world," and the language makes them grudgingly, putting many of
+them behind an explicit "unsafe" flag. Rust has learned all of the mistakes from
+the past and set out not to repeat them, and we finally live in a world where
+people in power care about that.
 
-Rust is not alone in this shift, nor do I think that Rust is the end goal of some grand historical arc. But for this moment, right now, I think that Rust is part of the future, and it is a future that should be encouraged. We as programmers are the midwives of a better world that struggles to be born. We hold it now in our hands. Make it breathe.
+Rust is not alone in this shift, nor do I think that Rust is the end goal of
+some grand historical arc. But for this moment, right now, I think that Rust is
+part of the future, and it is a future that should be encouraged. We as
+programmers are the midwives of a better world that struggles to be born. We
+hold it now in our hands. Make it breathe.
+
+--------------------------------------------------------------------------------
 
 (1) While _Design Patterns_ vis-a-vis languages is open to significant critique,
 the concepts discussed in the book are still valuable, especially as regards
@@ -187,6 +226,8 @@ create an academic language, namely a variant of Scheme. This plan was torpedoed
 by executives at Netscape who demanded that he instead make a language like Java
 simply because Java was popular. And also call it JavaScript, even though the
 languages are _completely_ different.
+
+--------------------------------------------------------------------------------
 
 The below text is valid Rust code. It is a copy of the code in the src directory.
 
