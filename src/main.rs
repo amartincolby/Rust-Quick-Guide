@@ -39,6 +39,20 @@ these considerations are not new to you. If you are coming from TypeScript, then
 don't even worry about it. Rust written in even the most naive way is still an
 order of magnitude faster that JavaScript. */
 
+/*** A note on macros ***/
+
+/* Throughtout this tutorial, you will see some commands appeneded with an
+exclamation mark, like `println!`. This mark indicates that this command is a
+"macro". Macros are _old_ in programming, having been first used in the 50's and
+added to Lisp in 1963. A macro is something that evaluates a string of
+characters and then interprets it. A programmer could genuinely implement their
+own programming language within a macro. Macros are one of the constructs in
+Rust that most programmers are not likely to have encountered. Macros are
+incredibly powerful and complex. If they are included in this tutorial, they
+will be at the very end. For the time being, just be aware that the exclamation
+mark simply means that the tool in use is a macro. */
+
+
 /*** The Main Function ***/
 
 /* The below is the main function which all Rust applications have. This quick
@@ -503,6 +517,15 @@ fn main() {
     let kannada_char = 'ಠ';
     let kannada_char_unicode = '\u{0ca0}';
 
+    
+    /*** > Option ***/
+
+    /* Option is not a true primitive but it so common in Rust that it is
+    reasonable to treat it as one. As mentioned, Rust was inspired by functional
+    languages, and one great thing in those languages is the ability to
+    reliably represent nothing, as with unit, and also the _possibility_ of
+    something or nothing. */
+
     /*** > Array ***/
 
     /* If you are coming from C, Java, or Go, then arrays in Rust will be
@@ -549,10 +572,13 @@ fn main() {
     a slice can be instantiated independently of an array. The Go runtime will
     instantiate an array behind the scenes that will grow or shrink based on the
     slice. This makes the developer experience nicer but has performance
-    implications. */
+    implications. Rust does not do this and a slice must have data behind it. */
 
-    // Referencing an array automatically creates a slice.
-    let slice_of_five = &array_of_five;
+    // Slices are created by providing bounds with indices.
+    let slice_of_three = &array_of_five[1..4];
+
+    // Slicing the entire array can be done by omitting the values
+    let slice_of_five = &array_of_five[..];
 
     /* Slices are more generic in Rust than other languages, and as such they
     can be used with more than just Arrays. Most importantly, slices can be
@@ -564,59 +590,98 @@ fn main() {
     developers accustomed to arrays, Rust has a "vector." Vector is not a true
     primitive and is instead part of the standard library. Vectors are typed
     lists, similar to arrays, but are dynamically sized and exist in the heap.
-    The Rust documentation calls them a "collection."
-    */
+    The Rust documentation calls them a "collection." Vectors are essentially
+    syntactic sugar over implementations and as such rely on "generics."
+    Generics are common in other languages like TypeScript or C++, so this
+    should not be too alien for anyone, but generics will also be discussed
+    later. */
 
-    let viktor: Vec<i32> = Vec::new();
+    // The generic type <i32> creates an empty vector that stores i32's.
+    let mut viktor: Vec<i32> = Vec::new();
+
+    // Vectors can infer types as well when created with the vector macro.
+    let mut v = vec![42, 2001, 314];
+
+    // Vectors behave similarly to arrays.
+    viktor.push(42);
+    viktor.push(2001);
+    viktor.push(314);
+    viktor.pop();
+    let the_answer = viktor[0];
+    // To combine vectors, they must both be mutable.
+    viktor.append(&mut v);
+
+    // Direct index access runs the risk of out-of-bounds errors.
+    // let invalid_index = viktor[9]; // This compiles but will fail to run.
+
+    // Using the get method safely returns an option.
+    let invalid_index = viktor.get(9);
+
+    // Borrowing any index from the vector will lock the entire vector.
+    // This is because when a vector is destroyed, all of its elements are too.
+    let index_1 = &viktor[1];
+    viktor.push(1999);
+    // println!("{}", index_1); // Causes borrowing error.
+
+    /* Slice syntax on vectors is identical to arrays. */
+    let rogue = &v[..];
+    let johnny = &v[1..3];
 
     /*** > String ***/
 
     /* Like vectors, strings in Rust are not true primitives in the sense that
     a primitive is a thing of known, fixed size. They are like C strings in that
     they are best described as an array of characters, with each character being
-    the true primitive.
+    the true primitive, and are again classified as a collection.
     
     The fundamental type, to wit the type that is part of the language itself,
-    is `str`, which is called a string slice. The `String` type is actually part
-    of the standard library and is best described as a wrapper around `str` that
-    provides helpful functionality. Because of the common usage of `String`, the
-    two types are often confused in conversation, with people using the term
-    "string" to refer to either `String` or `str`. This tutorial will be
-    explicit, unly using the word "string" to refer to `String` types.
-
-    This "string slice" terminology requires an understanding of slices, which will be explored fully later. For people coming from languages such as C++ or Go, slices in Rust are extremely similar. For the time being, just understand that a slice is a window into a contiguous sequence of entities in memory.
+    is `str`, which is called a string slice.
     
-    For example, "ABCDEFG" are chars sitting next to each other in memory. A
+    To illustrate, "ABCDEFG" are chars sitting next to each other in memory. A
     slice can represent all of them, some of them, or none of them. Rust does
     not have a type for representing the sequence of chars itself. */
 
     // Use double quotes for strings.
     let greeting = "Hello world!"; // type of &str
-    // let another_greeting = greeting + " Glad to be here.";
 
-    // Strings can span multiple lines. When compiled, new line characters are
-    // generated.
+    /* Notice how the type above is a _reference_. That is because, since Rust has no true string primitive, the identifier `greeting` is actually a reference to a collection of chars hard-coded into the binary and sitting on the stack. This means string slices never own the memory in which the chars exist. */
+
+    // Strings can span multiple lines.
     let a_longer_greeting = "Look at me,
     I'm a
     multi-line string";
 
-    // Concatenate strings with `+`.
-    // let name = "John " + "Wayne";
-    // let email_subject = "Hi " + name + ", you're a valued customer";
+    // The key difference is that str is of known length, while String is not.
 
+    // The `String` type that was used in earlier examples to create a string on the heap is actually part of the standard library and is fundamentally a wrapper around `str` that provides helpful functionality. Because of the common usage of `String`, the two types are often confused in conversation, with people using the term "string" to refer to either `String` or `str`.
+
+    /* To reiterate, using the String crate from the standard library creates a sequence of chars on the heap. This string can be added to and reduced, but as it is a collection, interactions with it are similar to a vector. Indeed, this is because under the covers, String _is_ a vector. */
+
+    let mut heap_of_chars = String::from("A few of my favorite things: ");
+    
+    heap_of_chars.push_str("raindrops on roses ");
+    heap_of_chars.push_str("whiskers on kittens ");
+
+    /* Because   */
+
+    let string_slice = &heap_of_chars[1..3];
+
+    /* String can also be coerced into &str via the type of a function parameter. */
+
+    fn str_coercer(s: &str) {
+        println!("{s}")
+    }
+
+    // It accepts the String.
+    str_coercer(&heap_of_chars);
+
+    
     /*** Enum ***/
 
     // Talk about how it's similar to a type union in other languages.
 
     /*** Union ***/
 
-    /*** > Option ***/
-
-    /* Option is not a true primitive but it so common in Rust that it is
-    reasonable to treat it as one. As mentioned, Rust was inspired by functional
-    languages, and one great thing in those languages is the ability to
-    reliably represent nothing, as with unit, and also the _possibility_ of
-    something or nothing. */
 
 
     /*----------------------------------------------
