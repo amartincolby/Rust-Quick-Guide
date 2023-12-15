@@ -600,7 +600,7 @@ fn main() {
     let mut viktor: Vec<i32> = Vec::new();
 
     // Vectors can infer types as well when created with the vector macro.
-    let mut v = vec![42, 2001, 314];
+    let v = vec![42, 2001, 314, 1999];
 
     // Vectors behave similarly to arrays.
     viktor.push(42);
@@ -609,7 +609,7 @@ fn main() {
     viktor.pop();
     let the_answer = viktor[0];
     // To combine vectors, they must both be mutable.
-    viktor.append(&mut v);
+    viktor.extend(&v);
 
     // Direct index access runs the risk of out-of-bounds errors.
     // let invalid_index = viktor[9]; // This compiles but will fail to run.
@@ -678,7 +678,7 @@ fn main() {
     
     /*** Enum ***/
 
-    // Talk about how it's similar to a type union in other languages.
+    // If you have any experience with OCaml, you will recognize enum as being equivalent to union, sometimes called discriminated union or tagged union. Union is a type that defines an identifier that can be bound to any of the unions consituent types. For example, a value could be a string _or_ a 32-bit integer, an enum allows that to be represented. The Rust type checker will then ensure that any code that consumes an enum must handle all possible cases.
 
     /*** Union ***/
 
