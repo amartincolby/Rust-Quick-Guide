@@ -672,16 +672,8 @@ fn main() {
         println!("{s}")
     }
 
-    // It accepts the String.
+    // In the below, a &String is being coerced into a &str.
     str_coercer(&heap_of_chars);
-
-    
-    /*** Enum ***/
-
-    // If you have any experience with OCaml, you will recognize enum as being equivalent to union, sometimes called discriminated union or tagged union. Union is a type that defines an identifier that can be bound to any of the unions consituent types. For example, a value could be a string _or_ a 32-bit integer, an enum allows that to be represented. The Rust type checker will then ensure that any code that consumes an enum must handle all possible cases.
-
-    /*** Union ***/
-
 
 
     /*----------------------------------------------
@@ -861,6 +853,44 @@ fn main() {
     /* Rust refers to tuples as a form of struct, which makes sense. If a struct
     is a set of primitive values in a shared space, sitting together in memory,
     then a classic tuple fits the bill. Just as with traditional structs */
+
+    /*** Enum ***/
+
+    // If you have any experience with OCaml, you will recognize enum as being equivalent to union, sometimes called discriminated union or tagged union. Enum is a type that defines an identifier that can be bound to any of the enum's consituent types. For example, a value could be a string _or_ a 32-bit integer, an enum allows that to be represented. The Rust type checker will then ensure that any code that consumes an enum must handle all possible cases.
+
+    struct Ford;
+    struct Toyota;
+    struct BMW;
+
+    enum Car {
+        Ford,
+        Toyota,
+        BMW,
+    }
+
+    let my_car: Car = Car::BMW;
+
+    /* Each possible state of an enum is called a variant, since they are the varied ways in which an enum can exist. The variants are distinguished from one another via the aforementioned tag or discriminant. The above Car enum has implicit discriminants, integers starting with 0. Thus, Ford is 0, Toyota is 1, and BMW is 2. This should be familiar to anyone coming from TypeScript, C, C++, or really any number of languages. Discriminants can be any integer. */
+
+    enum Truck {
+        F150 = 420,
+        Silverado = 42,
+        Tundra = 69,
+    }
+
+    /* Notice in the above enum how the three trucks were not declared as structs before. An enum necessarily contains other types, meaning that any variant that has not been previously declared is automatically declared as a unit struct. */
+    
+
+    /*** Union ***/
+
+    /* The reason for why Rust did not simply take OCaml's terminology is because Rust also took the union type from C. Unlike the enum, which can be understood separate from the machine state, a union requires an understanding of memory. A union is a section of memory that can store any of the value types as listed in the union. This means that the memory consumed will be whatever is the largest type. */
+
+    union IntUnion {
+        small_int: i8,
+        large_int: i64,
+    }
+
+    /* In the above union, 64 bits of space will be reserved because one possible value is a 64-bit integer. */
 
         
     /*----------------------------------------------
