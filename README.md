@@ -276,6 +276,20 @@ these considerations are not new to you. If you are coming from TypeScript, then
 don't even worry about it. Rust written in even the most naive way is still an
 order of magnitude faster that JavaScript. */
 
+/*** A note on macros ***/
+
+/* Throughtout this tutorial, you will see some commands appeneded with an
+exclamation mark, like `println!`. This mark indicates that this command is a
+"macro". Macros are _old_ in programming, having been first used in the 50's and
+added to Lisp in 1963. A macro is something that evaluates a string of
+characters and then interprets it. A programmer could genuinely implement their
+own programming language within a macro. Macros are one of the constructs in
+Rust that most programmers are not likely to have encountered. Macros are
+incredibly powerful and complex. If they are included in this tutorial, they
+will be at the very end. For the time being, just be aware that the exclamation
+mark simply means that the tool in use is a macro. */
+
+
 /*** The Main Function ***/
 
 /* The below is the main function which all Rust applications have. This quick
@@ -334,8 +348,8 @@ fn main() {
     /* At this point, it is important to discuss the relationship of values and
     identifiers. Both values and identifiers are entities existing in memory. It
     is the identifier that determines how the program will interact with the
-    value. Values are not inherently mutable or immutable -- again, they are
-    just 1's and 0's in memory somewhere -- it is whether the `mut` modifier is
+    value. Values are not inherently mutable or immutable (again, they are
+    just 1's and 0's in memory somewhere) it is whether the `mut` modifier is
     present that determines if the program will _treat_ that value as mutable or
     immutable.
     
@@ -405,8 +419,9 @@ fn main() {
     /*** Scope ***/
 
     /* Scope is the "space" in which entities exist and can thus be accessed.
-    Scope is especially important in Rust because it is a key part of memory
-    management. */
+    Scope should be pretty familiar to just about all programmers, but it is
+    especially important in Rust because of how critical it is for automatic
+    memory management. */
 
     // Binding scopes are delineated by curly braces.
     if true {
@@ -431,16 +446,13 @@ fn main() {
     let my_block_value = { // Is set to 42.
         let x = 20;
         let y = 22;
-        x + y
+        x + y // returns x + y
     };
 
     /* Take note that naked blocks can have no return value. */
 
     /* The list of reserved words can be found here:
     https://doc.rust-lang.org/reference/keywords.html
-
-    To see the unused variable warnings below, comment out
-    #[allow(unused_variables)] near the top of this file.
 
     Prefixing a variable name with an underscore creates a casual variable.
     These variables, if unused, will not trigger a compiler warning.
@@ -451,6 +463,9 @@ fn main() {
     There are two kinds of unused variable. A suspicious unused variable is one
     that has been bound with `let`. An innocuous variable is one that has not.*/
 
+    
+    // To see the unused variable warnings below, comment out
+    // #[allow(unused_variables)] near the top of this file.
     let block_scope = {
         let variable = 42;           // This triggers a warning.
         let _casual_variable = 2001; // This does not trigger a warning.
@@ -471,7 +486,7 @@ fn main() {
     
     The only major difference in Rust is an engineer can explicitly reference
     _any_ value, not just objects or arrays, by prepending an ampersand to the
-    variable name. */
+    value name. */
 
     let a_basic_number = 42; // type of i32
     let another_number = a_basic_number; // another i32
@@ -526,20 +541,20 @@ fn main() {
     */
 
     /* Before the more complex elements of Rust are explored, it will behoove us
-    to analyze Rust's true party piece.
+    to analyze Rust's party piece.
     
     Ownership.
     
     In Rust, every value has an "owner". An owner is also known as an identifier
     since only through the identifier can a value be accessed. When an owner
     goes out of scope, such as when a function completes, the value is "dropped"
-    from memory. Rust does automatically, but it does support an explicit "drop"
-    command. Again, if coming from C++, all of this should be familiar through
-    what is known as RAII, but unlike C++, Rust does this automaically and by
-    default. If you write good, simple Rust, you will very likely never have to
-    concern yourself with the cleanup process. C and C++ engineers will like
-    that, but it is TypeScript engineers who should take most note, because it
-    means that Rust can _feel_ garbage collected, making it much more
+    from memory. Rust does this automatically, but also supports an explicit
+    "drop" command. Again, if coming from C++, all of this should be familiar
+    through what is known as RAII, but unlike C++, Rust does this automaically
+    and by default. If you write good, simple Rust, you will very likely never
+    have to concern yourself with the cleanup process. C and C++ engineers will
+    like that, but it is TypeScript engineers who should take most note, because
+    it means that Rust can _feel_ garbage collected, making it much more
     approachable.
     
     That said, Rust's system of ownership can be a little confusing, and the
@@ -556,22 +571,24 @@ fn main() {
     Caulfield" exists on the stack. Ownership gets interesting when using the
     heap. */
 
-    // Using the String entity from the standard library allows us to create a
+    // Using the String crate from the standard library allows us to create a
     // string of unknown size on the heap.
     let catcher_in_the_string = String::from(catcher_in_the_rust);
 
-    /* The identifier `character_name` now stores a pointer to the heap which
-    contains the string "Holden Caulfield". So here, things get interesting. */
+    /* The identifier `catcher_in_the_string` now stores a pointer to the heap
+    which contains the string "Holden Caulfield". So here, things get
+    interesting. */
 
     let catcher_in_the_stack = catcher_in_the_rust;
     let catcher_in_the_heap = catcher_in_the_string;
 
     /* Both of these actions are copying from the previous variables, but _what_
     is being copied is very different. `catcher_in_the_rust` is on the stack,
-    as such the string "Holden Caulfield is completely copied and a new instance
-    of it is placed on the stack with the identifier `catcher_in_the_stack`.
-    `catcher_in_the_heap`, meanwhile, is copying the _pointer_ to the value
-    "Holden Caulfield", which exists somewhere on the heap.
+    as such the string "Holden Caulfield" is completely copied and a new
+    instance of it is placed on the stack with the identifier
+    `catcher_in_the_stack`. `catcher_in_the_heap`, meanwhile, is copying the
+    _pointer_ to the value "Holden Caulfield", which exists somewhere on the
+    heap.
     
     So in the first scenario, a new value is created, but in the second, there
     is only one value with two identifiers pointing to it. This can be dangerous
@@ -589,7 +606,8 @@ fn main() {
     nearly identical line succeeds. */
 
     let successful_move = catcher_in_the_heap;
-    // Now, `successful_move` owns the value.
+    // Now, `successful_move` owns the value and trying to reference 
+    // `catcher_in_the_heap` again would fail.
 
     /* Ownership tracking is Rust's safety net. Because remember, Rust clears
     memory when an identifier goes out of scope. See below. */
@@ -673,7 +691,7 @@ fn main() {
     the program runs. For those coming from something more free-wheeling and
     anarchic like JavaScript, this can initially feel overly restrictive, but
     it is _critical_ to Rust's value. Whole classes of errors are eliminated by
-    this semantic decision. Learn it. Live it. Love it.*/
+    this semantic decision. Learn it. Live it. Love it. */
 
 
     /*----------------------------------------------
@@ -736,6 +754,15 @@ fn main() {
     let kannada_char = 'ಠ';
     let kannada_char_unicode = '\u{0ca0}';
 
+    
+    /*** > Option ***/
+
+    /* Option is not a true primitive but it so common in Rust that it is
+    reasonable to treat it as one. As mentioned, Rust was inspired by functional
+    languages, and one great thing in those languages is the ability to
+    reliably represent nothing, as with unit, and also the _possibility_ of
+    something or nothing. */
+
     /*** > Array ***/
 
     /* If you are coming from C, Java, or Go, then arrays in Rust will be
@@ -782,10 +809,13 @@ fn main() {
     a slice can be instantiated independently of an array. The Go runtime will
     instantiate an array behind the scenes that will grow or shrink based on the
     slice. This makes the developer experience nicer but has performance
-    implications. */
+    implications. Rust does not do this and a slice must have data behind it. */
 
-    // Referencing an array automatically creates a slice.
-    let slice_of_five = &array_of_five;
+    // Slices are created by providing bounds with indices.
+    let slice_of_three = &array_of_five[1..4];
+
+    // Slicing the entire array can be done by omitting the values
+    let slice_of_five = &array_of_five[..];
 
     /* Slices are more generic in Rust than other languages, and as such they
     can be used with more than just Arrays. Most importantly, slices can be
@@ -796,60 +826,91 @@ fn main() {
     /* For Go developers accustomed to slices and JavaScript/TypeScript
     developers accustomed to arrays, Rust has a "vector." Vector is not a true
     primitive and is instead part of the standard library. Vectors are typed
-    lists, similar to arrays, but are dynamically sized and exist in the heap. */
+    lists, similar to arrays, but are dynamically sized and exist in the heap.
+    The Rust documentation calls them a "collection." Vectors are essentially
+    syntactic sugar over implementations and as such rely on "generics."
+    Generics are common in other languages like TypeScript or C++, so this
+    should not be too alien for anyone, but generics will also be discussed
+    later. */
+
+    // The generic type <i32> creates an empty vector that stores i32's.
+    let mut viktor: Vec<i32> = Vec::new();
+
+    // Vectors can infer types as well when created with the vector macro.
+    let v = vec![42, 2001, 314, 1999];
+
+    // Vectors behave similarly to arrays.
+    viktor.push(42);
+    viktor.push(2001);
+    viktor.push(314);
+    viktor.pop();
+    let the_answer = viktor[0];
+    // To combine vectors, they must both be mutable.
+    viktor.extend(&v);
+
+    // Direct index access runs the risk of out-of-bounds errors.
+    // let invalid_index = viktor[9]; // This compiles but will fail to run.
+
+    // Using the get method safely returns an option.
+    let invalid_index = viktor.get(9);
+
+    // Borrowing any index from the vector will lock the entire vector.
+    // This is because when a vector is destroyed, all of its elements are too.
+    let index_1 = &viktor[1];
+    viktor.push(1999);
+    // println!("{}", index_1); // Causes borrowing error.
+
+    /* Slice syntax on vectors is identical to arrays. */
+    let rogue = &v[..];
+    let johnny = &v[1..3];
 
     /*** > String ***/
 
-    /* Strings in Rust are not true primitives in the sense that a primitive is
-    a thing of known, fixed size. They are like C strings in that they are best
-    described as an array of characters, with each character being the true
-    primitive.
+    /* Like vectors, strings in Rust are not true primitives in the sense that
+    a primitive is a thing of known, fixed size. They are like C strings in that
+    they are best described as an array of characters, with each character being
+    the true primitive, and are again classified as a collection.
     
     The fundamental type, to wit the type that is part of the language itself,
-    is `str`, which is called a string slice. The `String` type is actually part
-    of the standard library and is best described as a wrapper around `str` that
-    provides helpful functionality. Because of the common usage of `String`, the
-    two types are often confused in conversation, with people using the term
-    "string" to refer to either `String` or `str`. This tutorial will be
-    explicit, unly using the word "string" to refer to `String` types.
-
-    But what will the `str` be called? Why "string slice" of course! This
-    terminology requires an understanding of slices, which will be explored
-    fully later. For people coming from languages such as C++ or Go, slices in
-    Rust are extremely similar. For the time being, just understand that a slice
-    is a window into a contiguous sequence of entities in memory.
+    is `str`, which is called a string slice.
     
-    For example, "ABCDEFG" are chars sitting next to each other in memory. A
+    To illustrate, "ABCDEFG" are chars sitting next to each other in memory. A
     slice can represent all of them, some of them, or none of them. Rust does
     not have a type for representing the sequence of chars itself. */
 
     // Use double quotes for strings.
     let greeting = "Hello world!"; // type of &str
-    // let another_greeting = greeting + " Glad to be here.";
 
-    // Strings can span multiple lines. When compiled, new line characters are
-    // generated.
+    /* Notice how the type above is a _reference_. That is because, since Rust has no true string primitive, the identifier `greeting` is actually a reference to a collection of chars hard-coded into the binary and sitting on the stack. This means string slices never own the memory in which the chars exist. */
+
+    // Strings can span multiple lines.
     let a_longer_greeting = "Look at me,
     I'm a
     multi-line string";
 
-    // Concatenate strings with `+`.
-    // let name = "John " + "Wayne";
-    // let email_subject = "Hi " + name + ", you're a valued customer";
+    // The key difference is that str is of known length, while String is not.
 
-    /*** Enum ***/
+    // The `String` type that was used in earlier examples to create a string on the heap is actually part of the standard library and is fundamentally a wrapper around `str` that provides helpful functionality. Because of the common usage of `String`, the two types are often confused in conversation, with people using the term "string" to refer to either `String` or `str`.
 
-    // Talk about how it's similar to a type union in other languages.
+    /* To reiterate, using the String crate from the standard library creates a sequence of chars on the heap. This string can be added to and reduced, but as it is a collection, interactions with it are similar to a vector. Indeed, this is because under the covers, String _is_ a vector. */
 
-    /*** Union ***/
+    let mut heap_of_chars = String::from("A few of my favorite things: ");
+    
+    heap_of_chars.push_str("raindrops on roses ");
+    heap_of_chars.push_str("whiskers on kittens ");
 
-    /*** > Option ***/
+    /* Because   */
 
-    /* Option is not a true primitive but it so common in Rust that it is
-    reasonable to treat it as one. As mentioned, Rust was inspired by functional
-    languages, and one great thing in those languages is the ability to
-    reliably represent nothing, as with unit, and also the _possibility_ of
-    something or nothing. */
+    let string_slice = &heap_of_chars[1..3];
+
+    /* String can also be coerced into &str via the type of a function parameter. */
+
+    fn str_coercer(s: &str) {
+        println!("{s}")
+    }
+
+    // In the below, a &String is being coerced into a &str.
+    str_coercer(&heap_of_chars);
 
 
     /*----------------------------------------------
@@ -1030,7 +1091,62 @@ fn main() {
     is a set of primitive values in a shared space, sitting together in memory,
     then a classic tuple fits the bill. Just as with traditional structs */
 
-    /*** Modules & Crates ***/
+    /*** Enum ***/
+
+    // If you have any experience with OCaml, you will recognize enum as being equivalent to union, sometimes called discriminated union or tagged union. Enum is a type that defines an identifier that can be bound to any of the enum's consituent types. For example, a value could be a string _or_ a 32-bit integer, an enum allows that to be represented. The Rust type checker will then ensure that any code that consumes an enum must handle all possible cases.
+
+    struct Ford;
+    struct Toyota;
+    struct BMW;
+
+    enum Car {
+        Ford,
+        Toyota,
+        BMW,
+    }
+
+    let my_car: Car = Car::BMW;
+
+    /* Each possible state of an enum is called a variant, since they are the varied ways in which an enum can exist. The variants are distinguished from one another via the aforementioned tag or discriminant. The above Car enum has implicit discriminants, integers starting with 0. Thus, Ford is 0, Toyota is 1, and BMW is 2. This should be familiar to anyone coming from TypeScript, C, C++, or really any number of languages. Discriminants can be any integer. */
+
+    enum Truck {
+        F150 = 420,
+        Silverado = 42,
+        Tundra = 69,
+    }
+
+    /* Notice in the above enum how the three trucks were not declared as structs before. An enum necessarily contains other types, meaning that any variant that has not been previously declared is automatically declared as a unit struct. */
+    
+
+    /*** Union ***/
+
+    /* The reason for why Rust did not simply take OCaml's terminology is because Rust also took the union type from C. Unlike the enum, which can be understood separate from the machine state, a union requires an understanding of memory. A union is a section of memory that can store any of the value types as listed in the union. This means that the memory consumed will be whatever is the largest type. */
+
+    union IntUnion {
+        small_int: i8,
+        large_int: i64,
+    }
+
+    /* In the above union, 64 bits of space will be reserved because one possible value is a 64-bit integer. */
+
+        
+    /*----------------------------------------------
+    * Generics
+    *-----------------------------------------------
+    */
+
+    /* If you are coming from C++ or TypeScript, generics should be very
+    familiar to you. Go only recently introduced them, but they are common
+    across most typed languages. Generics are essentially just entities that
+    can accept different types, and the type signature of that entity is
+    different based on those types. The syntax for this is broadly similar to
+    TypeScript, so it should be easy to pick up. */
+
+
+    /*----------------------------------------------
+    * Modules & Crates
+    *-----------------------------------------------
+    */
 
     /* Modules are similar in conception to modules in other languages. In
     comparison to other, object-oriented languages, a module also has passing
@@ -1186,10 +1302,14 @@ fn main() {
 
     println!("{} {} {}", authors_1, authors_2, authors_3);
 
+    /* Arrays support ordinal operators by default, but the arrays must be of
+    equal lengths, because remember, in Rust, the length of an array is
+    actually part of its type.  */
+
     let big_obj = [10, 10000000, 10000000];
     let small_obj = [11, 1, 1];
 
-    let big_array = big_obj > small_obj; // - : bool = false
+    let big_array = big_obj == small_obj; // - : bool = false
 
     println!("{}", big_array);
 
@@ -1211,7 +1331,7 @@ fn main() {
 
 
     /*----------------------------------------------
-    * Function
+    * Functions
     *----------------------------------------------
     */
 
@@ -1504,4 +1624,5 @@ mod more_external_stuff {
         }
     }
 }
+
 ```
