@@ -1527,6 +1527,7 @@ fn main() {
     
     - Constants
     - Enums
+    - Unions
     - Function pointers
     - Implementations
     - Modules
@@ -1534,7 +1535,6 @@ fn main() {
     - Structs
     - Traits
     - Type aliases
-    - Unions
 
     Now we can discuss why function pointers and constants behave similarly.
     Items are things that are entirely determined at compile time. To continue

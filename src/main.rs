@@ -852,7 +852,11 @@ fn main() {
 
     /* Rust refers to tuples as a form of struct, which makes sense. If a struct
     is a set of primitive values in a shared space, sitting together in memory,
-    then a classic tuple fits the bill. Just as with traditional structs */
+    then a classic tuple fits the bill. I am not a fan of it because I see a key element of structs as being key access Just as with traditional structs, names for tuples use CamelCase. Unlike traditional structs, they are accessed by order instead of key. None of this should be new to basically every programmer on Earth. */
+
+    struct Coordinate(f32, f32);
+
+    let treasure: Coordinate = (42, 2001);
 
     /*** Enum ***/
 
@@ -890,7 +894,12 @@ fn main() {
         large_int: i64,
     }
 
-    /* In the above union, 64 bits of space will be reserved because one possible value is a 64-bit integer. */
+    /* In the above union, 64 bits of space will be reserved because one possible value is a 64-bit integer.
+    
+    Chances are you will never use a union. Interacting with them is part of what is considered unsafe Rust and an enum will be a better choice in almost every case. The primary use case for unions is when extreme memory efficiency is needed and the safety of enums consumes memory. */
+
+
+
 
         
     /*----------------------------------------------
@@ -904,6 +913,23 @@ fn main() {
     can accept different types, and the type signature of that entity is
     different based on those types. The syntax for this is broadly similar to
     TypeScript, so it should be easy to pick up. */
+
+    struct LinkedList<T> {
+        head: LinkedListNode<T>,
+    }
+    
+    struct LinkedListNode<T> {
+        value: T,
+        next: Option<Box<LinkedListNode<T>>>,
+    }
+
+
+    /*** Type Aliases ***/
+
+    /* Rust enables aliasing of types to different names. Aliases are confusingly declared with the `type` keyword. This is one of the few areas of Rust's syntax with which I strongly disagree. `type` is from OCaml and they should have left it there. Aliases are intended to enable semantic naming of broad, generic types. For example, below a linked list representing stops on a trip can have the type aliased so the type of the list itself provides semantic information. */
+
+
+    type TripStops = LinkedList<String>;
 
 
     /*----------------------------------------------
@@ -1290,6 +1316,7 @@ fn main() {
     
     - Constants
     - Enums
+    - Unions
     - Function pointers
     - Implementations
     - Modules
@@ -1297,7 +1324,6 @@ fn main() {
     - Structs
     - Traits
     - Type aliases
-    - Unions
 
     Now we can discuss why function pointers and constants behave similarly.
     Items are things that are entirely determined at compile time. To continue
