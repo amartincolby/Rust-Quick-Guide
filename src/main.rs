@@ -76,6 +76,8 @@ fn main() {
     *-----------------------------------------------
     */
 
+    /*** Let ***/
+
     /* In the tradition of the ML language family that is Rust's inspiration,
     variables are not, by default, variable; they are bindings. As such, even
     though the term "variable" is commonly used, the more accurate term is
@@ -168,9 +170,23 @@ fn main() {
     high-performance method for storing data of known, fixed size for sharing
     across parts of the application. */
 
+    /*** Statics ***/
+
+    /* Statics are the third and final way to declare a value in Rust. Static values are very similar to constants and many of the same rules apply. The difference is that a constant represents a value, while a static represents a memory location. As such, a key difference is that statics can be tagged as mutable. Rust requires any interactions with a mutable static to be flagged as unsafe since the value at that memory address can change unpredictably.
+    
+    By and large, constants will be used far more often than statics. The primary use case for statics over constants is when large amounts of data is being referenced. Constants are "inlined" during compilation. This means that everywhere where a constant is referenced, the value behind that constant replaces the reference. If the constant represents a lot of data, or if the constant is referenced many times, that could cause a huge increase in the size of the compiled binary. Statics put the data in one location only. */
+
+    const CONST_VALUE: i32 = 42;
+    let const_copy = CONST_VALUE; // This is now a copy of 42.
+
+    static mut STATIC_VALUE: i32 = 42;
+    unsafe {
+        let static_copy = STATIC_VALUE; // This is a copy of a memory address.
+    }
+
     /*** Type Inference ***/
 
-    // Rust can usually infer types.
+    // Rust can often infer types.
 
     let x = 42;                // 32-bit unsigned integer.
     let y = 3.14;              // 64-bit float.
@@ -627,7 +643,7 @@ fn main() {
     let rogue = &v[..];
     let johnny = &v[1..3];
 
-    /*** > String ***/
+    /*** > String & str ***/
 
     /* Like vectors, strings in Rust are not true primitives in the sense that
     a primitive is a thing of known, fixed size. They are like C strings in that
@@ -635,7 +651,7 @@ fn main() {
     the true primitive, and are again classified as a collection.
     
     The fundamental type, to wit the type that is part of the language itself,
-    is `str`, which is called a string slice.
+    is `str`, which is a sequence of chars _somewhere_ in memory. It could be on the stack, it could be on the heap. What is important to know is that the compiler does not know the length of this sequence at compile time.
     
     To illustrate, "ABCDEFG" are chars sitting next to each other in memory. A
     slice can represent all of them, some of them, or none of them. Rust does
@@ -854,9 +870,9 @@ fn main() {
     is a set of primitive values in a shared space, sitting together in memory,
     then a classic tuple fits the bill. I am not a fan of it because I see a key element of structs as being key access Just as with traditional structs, names for tuples use CamelCase. Unlike traditional structs, they are accessed by order instead of key. None of this should be new to basically every programmer on Earth. */
 
-    struct Coordinate(f32, f32);
+    struct Coordinate(i32, i32);
 
-    let treasure: Coordinate = (42, 2001);
+    let treasure = Coordinate(42, 2001);
 
     /*** Enum ***/
 
