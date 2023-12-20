@@ -72,6 +72,45 @@ be covered later. */
 fn main() {
 
     /*----------------------------------------------
+    * Items
+    *----------------------------------------------
+    */
+
+    /* Items are entities that, whenever they are declared, they are analyzed and made global, even though their _visibility_ is restricted to the scope in which they were declared. The below is not a complete list of items, but represent the items important for this tutorial.
+    
+    - Constants
+    - Enums
+    - Unions
+    - Function pointers
+    - Implementations
+    - Modules
+    - Statics
+    - Structs
+    - Traits
+    - Type aliases
+
+    From the perspective of semantics, items are the "hard" pieces of Rust code, the things that represent the structure through which the logic flows. As such, items cannot be created dynamically. To continue this analogy, if we liken a program to a building, what happens in the building can change over time, but what happens in the building should not determine how many floors the building has.
+
+    Items are are entirely determined at compile time.
+
+    Items exist in read-only memory at single locations. */
+    
+    const OUTER_CONST: i32 = 42;
+
+    let test1 = |x: i32| x * 2;
+    let test1 = |x: i32| x * 2;
+
+    /* You will often see syntax like the above in Rust code. If coming from
+    TypeScript or JavaScript, it is semantically similar to:
+    
+    let test1 = (x : number) => x * 2;
+
+     */
+
+    let value_to_be_enclosed = 42;
+    let add_ints = |x: i32| x + value_to_be_enclosed;
+
+    /*----------------------------------------------
     * Variables, functions, and bindings
     *-----------------------------------------------
     */
@@ -151,7 +190,7 @@ fn main() {
     /* Pay special attention to the constants HALF_THE_ANSWER and THE_ANSWER.
     Notice how THE_ANSWER is referenced _before_ it is declared. Constants are
     visible to everything within their scope, regardless of where they appear
-    lexically, that is to say within the code itself. */
+    lexically. This is because they are one of the earlier-mentioned items. Since all items are created in global memory, they can be referenced anywhere within the scope in which they were written. */
 
     /* Constants cannot be shadowed within the same scope, but they can be
     shadowed in nested scopes. */
@@ -162,13 +201,7 @@ fn main() {
         const THE_ANSWER: f64 = 3.14; // This does work.
     };
 
-    /* These seemingly peculiar behaviors are explainable when you understand
-    what constants _are_, namely "items." Items are a special classification of
-    entity in Rust. Items will be discussed more fully later after some other
-    entities that are also items are introduced. For the time being, all that
-    needs to be understood is why constants exist, to wit they provide a
-    high-performance method for storing data of known, fixed size for sharing
-    across parts of the application. */
+    /* Constants provide a high-performance method for storing data of known, fixed size for sharing across parts of the application. */
 
     /*** Statics ***/
 
@@ -177,7 +210,7 @@ fn main() {
     By and large, constants will be used far more often than statics. The primary use case for statics over constants is when large amounts of data is being referenced. Constants are "inlined" during compilation. This means that everywhere where a constant is referenced, the value behind that constant replaces the reference. If the constant represents a lot of data, or if the constant is referenced many times, that could cause a huge increase in the size of the compiled binary. Statics put the data in one location only. */
 
     const CONST_VALUE: i32 = 42;
-    let const_copy = CONST_VALUE; // This is now a copy of 42.
+    let const_copy = CONST_VALUE; // This is a copy of the value 42.
 
     static mut STATIC_VALUE: i32 = 42;
     unsafe {
@@ -593,7 +626,7 @@ fn main() {
     // Slices are created by providing bounds with indices.
     let slice_of_three = &array_of_five[1..4];
 
-    // Slicing the entire array can be done by omitting the values
+    // Slicing the entire array can be done by omitting the values.
     let slice_of_five = &array_of_five[..];
 
     /* Slices are more generic in Rust than other languages, and as such they
@@ -624,7 +657,6 @@ fn main() {
     viktor.push(314);
     viktor.pop();
     let the_answer = viktor[0];
-    // To combine vectors, they must both be mutable.
     viktor.extend(&v);
 
     // Direct index access runs the risk of out-of-bounds errors.
@@ -651,7 +683,7 @@ fn main() {
     the true primitive, and are again classified as a collection.
     
     The fundamental type, to wit the type that is part of the language itself,
-    is `str`, which is a sequence of chars _somewhere_ in memory. It could be on the stack, it could be on the heap. What is important to know is that the compiler does not know the length of this sequence at compile time.
+    is `str`, which is a sequence of chars _somewhere_ in memory. It could be on the stack, it could be on the heap. What is important to know is that the compiler does not know the length of this sequence at compile time. As such, when creating str entities, they are almost always _referenced_. As such, they usually exist in slice form, to wit &str. The string slice does have a known length.
     
     To illustrate, "ABCDEFG" are chars sitting next to each other in memory. A
     slice can represent all of them, some of them, or none of them. Rust does
@@ -1320,59 +1352,7 @@ fn main() {
     /* The above function expects to return nothing and will throw a compile
     error if anything is returned. */
 
-    /*----------------------------------------------
-    * Items
-    *----------------------------------------------
-    */
-
-    /* We finally reach this mysterious class of entities known as items. Items
-    are the "hard" pieces of Rust code, the things that represent the structure
-    through which the logic flows. In fact, we have already discussed all items
-    by this point.
     
-    - Constants
-    - Enums
-    - Unions
-    - Function pointers
-    - Implementations
-    - Modules
-    - Statics
-    - Structs
-    - Traits
-    - Type aliases
-
-    Now we can discuss why function pointers and constants behave similarly.
-    Items are things that are entirely determined at compile time. To continue
-    the analogy of items providing the structure, if we liken a program to a
-    building, what happens in the building can change over time, but what
-    happens in the building should not determine how many floors the building
-    has.
-
-    Further, items exist in read-only memory at single locations. When a
-    function pointer or constant is declared, it gets created outside of the
-    scope in which it was written. Items can be seen as existing in global
-    memory, but only being _visible_ in the scope in which they were written.
-
-    This helps to explain why functions can be used before they are declared.
-    When the scope is read by the compiler, since all items are created in
-    global memory, they can be called anywhere within the scope in which they
-    were written, exactly like using a key to access a value on an object in
-    JavaScript. */
-    
-    const OUTER_CONST: i32 = 42;
-
-    let test1 = |x: i32| x * 2;
-    let test1 = |x: i32| x * 2;
-
-    /* You will often see syntax like the above in Rust code. If coming from
-    TypeScript or JavaScript, it is semantically similar to:
-    
-    let test1 = (x : number) => x * 2;
-
-     */
-
-    let value_to_be_enclosed = 42;
-    let add_ints = |x: i32| x + value_to_be_enclosed;
 
     /*----------------------------------------------
     * Cargo
