@@ -308,9 +308,36 @@ be covered later. */
 fn main() {
 
     /*----------------------------------------------
+    * Items
+    *----------------------------------------------
+    */
+
+    /* Items are entities that, whenever they are declared, they are analyzed and made global, even though their _visibility_ is restricted to the scope in which they were declared. They are "attached" to this scope like a key is attached to an object. This means that items can be referenced before they are declared. This is possible because items are entirely determined at compile time, meaning they exist before something like a function runs. In Rust parlance, items are "static" entities, with "dynamic" entities being their counterpart.
+    
+    The below is not a complete list of items, but represent the items important for this tutorial. All of these items will be discussed.
+    
+    - Constants
+    - Enums
+    - Unions
+    - Function pointers
+    - Implementations
+    - Modules
+    - Statics
+    - Structs
+    - Traits
+    - Type aliases
+
+    From the perspective of semantics, items are the "hard" pieces of Rust code, the things that represent the structure through which the logic flows. As such, items cannot be created dynamically. To continue this analogy, if we liken a program to a building, what happens in the building can change over time, but what happens in the building should not determine how many floors the building has. */
+
+    let value_to_be_enclosed = 42;
+    let add_ints = |x: i32| x + value_to_be_enclosed;
+
+    /*----------------------------------------------
     * Variables, functions, and bindings
     *-----------------------------------------------
     */
+
+    /*** Let ***/
 
     /* In the tradition of the ML language family that is Rust's inspiration,
     variables are not, by default, variable; they are bindings. As such, even
@@ -385,7 +412,7 @@ fn main() {
     /* Pay special attention to the constants HALF_THE_ANSWER and THE_ANSWER.
     Notice how THE_ANSWER is referenced _before_ it is declared. Constants are
     visible to everything within their scope, regardless of where they appear
-    lexically, that is to say within the code itself. */
+    lexically. This is because they are one of the earlier-mentioned items. Since all items are created in global memory, they can be referenced anywhere within the scope in which they were written. */
 
     /* Constants cannot be shadowed within the same scope, but they can be
     shadowed in nested scopes. */
@@ -396,17 +423,25 @@ fn main() {
         const THE_ANSWER: f64 = 3.14; // This does work.
     };
 
-    /* These seemingly peculiar behaviors are explainable when you understand
-    what constants _are_, namely "items." Items are a special classification of
-    entity in Rust. Items will be discussed more fully later after some other
-    entities that are also items are introduced. For the time being, all that
-    needs to be understood is why constants exist, to wit they provide a
-    high-performance method for storing data of known, fixed size for sharing
-    across parts of the application. */
+    /* Constants provide a high-performance method for storing data of known, fixed size for sharing across parts of the application. */
+
+    /*** Statics ***/
+
+    /* Statics are the third and final way to declare a value in Rust. Static values are very similar to constants and many of the same rules apply. The difference is that a constant represents a value, while a static represents a memory location. As such, a key difference is that statics can be tagged as mutable. Rust requires any interactions with a mutable static to be flagged as unsafe since the value at that memory address can change unpredictably.
+    
+    By and large, constants will be used far more often than statics. The primary use case for statics over constants is when large amounts of data is being referenced. Constants are "inlined" during compilation. This means that everywhere where a constant is referenced, the value behind that constant replaces the reference. If the constant represents a lot of data, or if the constant is referenced many times, that could cause a huge increase in the size of the compiled binary. Statics put the data in one location only. */
+
+    const CONST_VALUE: i32 = 42;
+    let const_copy = CONST_VALUE; // This is a copy of the value 42.
+
+    static mut STATIC_VALUE: i32 = 42;
+    unsafe {
+        let static_copy = STATIC_VALUE; // This is a copy of a memory address.
+    }
 
     /*** Type Inference ***/
 
-    // Rust can usually infer types.
+    // Rust can often infer types.
 
     let x = 42;                // 32-bit unsigned integer.
     let y = 3.14;              // 64-bit float.
@@ -813,7 +848,7 @@ fn main() {
     // Slices are created by providing bounds with indices.
     let slice_of_three = &array_of_five[1..4];
 
-    // Slicing the entire array can be done by omitting the values
+    // Slicing the entire array can be done by omitting the values.
     let slice_of_five = &array_of_five[..];
 
     /* Slices are more generic in Rust than other languages, and as such they
@@ -844,7 +879,6 @@ fn main() {
     viktor.push(314);
     viktor.pop();
     let the_answer = viktor[0];
-    // To combine vectors, they must both be mutable.
     viktor.extend(&v);
 
     // Direct index access runs the risk of out-of-bounds errors.
@@ -863,7 +897,7 @@ fn main() {
     let rogue = &v[..];
     let johnny = &v[1..3];
 
-    /*** > String ***/
+    /*** > String & str ***/
 
     /* Like vectors, strings in Rust are not true primitives in the sense that
     a primitive is a thing of known, fixed size. They are like C strings in that
@@ -871,7 +905,7 @@ fn main() {
     the true primitive, and are again classified as a collection.
     
     The fundamental type, to wit the type that is part of the language itself,
-    is `str`, which is called a string slice.
+    is `str`, which is a sequence of chars _somewhere_ in memory. It could be on the stack, it could be on the heap. What is important to know is that the compiler does not know the length of this sequence at compile time. As such, when creating str entities, they are almost always _referenced_. As such, they usually exist in slice form, to wit &str. The string slice does have a known length.
     
     To illustrate, "ABCDEFG" are chars sitting next to each other in memory. A
     slice can represent all of them, some of them, or none of them. Rust does
@@ -1088,7 +1122,11 @@ fn main() {
 
     /* Rust refers to tuples as a form of struct, which makes sense. If a struct
     is a set of primitive values in a shared space, sitting together in memory,
-    then a classic tuple fits the bill. Just as with traditional structs */
+    then a classic tuple fits the bill. I am not a fan of it because I see a key element of structs as being key access Just as with traditional structs, names for tuples use CamelCase. Unlike traditional structs, they are accessed by order instead of key. None of this should be new to basically every programmer on Earth. */
+
+    struct Coordinate(i32, i32);
+
+    let treasure = Coordinate(42, 2001);
 
     /*** Enum ***/
 
@@ -1126,7 +1164,12 @@ fn main() {
         large_int: i64,
     }
 
-    /* In the above union, 64 bits of space will be reserved because one possible value is a 64-bit integer. */
+    /* In the above union, 64 bits of space will be reserved because one possible value is a 64-bit integer.
+    
+    Chances are you will never use a union. Interacting with them is part of what is considered unsafe Rust and an enum will be a better choice in almost every case. The primary use case for unions is when extreme memory efficiency is needed and the safety of enums consumes memory. */
+
+
+
 
         
     /*----------------------------------------------
@@ -1140,6 +1183,23 @@ fn main() {
     can accept different types, and the type signature of that entity is
     different based on those types. The syntax for this is broadly similar to
     TypeScript, so it should be easy to pick up. */
+
+    struct LinkedList<T> {
+        head: LinkedListNode<T>,
+    }
+    
+    struct LinkedListNode<T> {
+        value: T,
+        next: Option<Box<LinkedListNode<T>>>,
+    }
+
+
+    /*** Type Aliases ***/
+
+    /* Rust enables aliasing of types to different names. Aliases are confusingly declared with the `type` keyword. This is one of the few areas of Rust's syntax with which I strongly disagree. `type` is from OCaml and they should have left it there. Aliases are intended to enable semantic naming of broad, generic types. For example, below a linked list representing stops on a trip can have the type aliased so the type of the list itself provides semantic information. */
+
+
+    type TripStops = LinkedList<String>;
 
 
     /*----------------------------------------------
@@ -1418,22 +1478,9 @@ fn main() {
     sign_up_to_newsletter("hello@rust_lovers.org");
 
     /* Of note, the standard function declaration syntax is actually called
-    function _pointer_ syntax. That's right. The `fn` keyword is actually what
-    is known as a "smart" pointer that allows performance _and_ safety. Smart
-    pointers will be discussed later. */
+    function _pointer_ syntax. This is because items like function pointers are only ever instantiated once, in a single place, meaning that any calls to that function do so through a pointer to the function's static location. */
 
-    let get_email_prefs = |email : String| -> (String, [String; 2]) {
-        let message = format!("{} {}", String::from("Update settings for"), email);
-        let prefs = [String::from("Weekly News"), String::from("Daily Notifications")];
-
-        (message, prefs)
-    };
-
-    /* As mentioned, functions in Rust are notably different from many other
-    languages, and one of the most significant differences, if not the most, is
-    that function pointers cannot access values declared outside of their scope.
-    This is known as "capturing" a value. If you are coming from TypeScript, the
-    common term is "enclosing," to wit you are writing a closure. */
+    /* As mentioned, function pointers in Rust are notably different from functions in many other languages, and one of the most significant differences, if not the most, is that function pointers cannot access values declared outside of their scope. This is known as "capturing" a value. If you are coming from TypeScript, the common term is "enclosing," to wit you are writing a closure. */
 
     let outer_var = 42;
 
@@ -1443,21 +1490,9 @@ fn main() {
         // outer_var // This does not.
     }
 
-    /* The above is not possible because a `let` binding is part of the
-    "dynamic" environment of the program. The dynamic environment is the part of
-    the program that can change based on how the program runs. The "static"
-    environment is the part of the program that is the same whenever a section
-    of code is run.
+    /* The above is not possible because a `let` binding is part of the "dynamic" environment of the program. The dynamic environment is the part of the program that can change based on how the program runs. The "static" environment is the part of the program that is the same whenever a section of code is run. Because function pointers are static items, they do not exist on the same level as let declarations.
     
-    It is at this point that "items" come back into the picture. Function
-    pointers, just as constants, are a type of item. As you will remember, const
-    values can be used _before_ they are declared, just like function pointers.
-    
-    If you are coming from TypeScript or JavaScript, you may recognize this as
-    sounding like hoisting, and while that is not entirely wrong, it is not
-    entirely right. Functions do not get moved to the top of a scope, as they do
-    in JavaScript. But the nature of hoisting gives us a good illustration for
-    why Rust works as it does.
+    If you are coming from TypeScript or JavaScript, you may recognize this as sounding like hoisting, and while that is not entirely wrong, it is not entirely right. Functions do not get moved to the top of a scope, as they do in JavaScript. Function pointers, like all items, are lifted into a different realm. That said, the concept of hoisting gives us a good illustration for why Rust works as it does.
 
         displayMessage();
 
@@ -1467,14 +1502,21 @@ fn main() {
             console.log(message);
         }
     
-    In the above JavaScript code, as with Rust, a function can be used before
-    its declaration. But this code will fail because the `displayMessage` call
-    is relying on `message`, which is declared after the call. If Rust tried to
-    allow the usage of functions with outside values, the function would not be
-    able to know where to find this value. Thus, Rust simply prevents this.
+    In the above JavaScript code, a function can be used before its declaration. But this code will fail because the `displayMessage` call is relying on `message`, which is declared after the call. If Rust tried to allow the usage of function pointers with outside values, the function would not be able to know where to find this value. Thus, Rust simply prevents this.
     
-    There are exceptions to this rule, though, which will be discussed shortly
-    in the section on items. */
+    There are many uses for this pattern, though, and Rust */
+
+    const OUTER_CONST: i32 = 42;
+
+    let test1 = |x: i32| x * 2;
+    let test1 = |x: i32| x * 2;
+
+    /* You will often see syntax like the above in Rust code. If coming from
+    TypeScript or JavaScript, it is semantically similar to:
+    
+    let test1 = (x : number) => x * 2;
+
+     */
 
     /*** Unit ***/
 
@@ -1514,59 +1556,7 @@ fn main() {
     /* The above function expects to return nothing and will throw a compile
     error if anything is returned. */
 
-    /*----------------------------------------------
-    * Items
-    *----------------------------------------------
-    */
-
-    /* We finally reach this mysterious class of entities known as items. Items
-    are the "hard" pieces of Rust code, the things that represent the structure
-    through which the logic flows. In fact, we have already discussed all items
-    by this point.
     
-    - Constants
-    - Enums
-    - Unions
-    - Function pointers
-    - Implementations
-    - Modules
-    - Statics
-    - Structs
-    - Traits
-    - Type aliases
-
-    Now we can discuss why function pointers and constants behave similarly.
-    Items are things that are entirely determined at compile time. To continue
-    the analogy of items providing the structure, if we liken a program to a
-    building, what happens in the building can change over time, but what
-    happens in the building should not determine how many floors the building
-    has.
-
-    Further, items exist in read-only memory at single locations. When a
-    function pointer or constant is declared, it gets created outside of the
-    scope in which it was written. Items can be seen as existing in global
-    memory, but only being _visible_ in the scope in which they were written.
-
-    This helps to explain why functions can be used before they are declared.
-    When the scope is read by the compiler, since all items are created in
-    global memory, they can be called anywhere within the scope in which they
-    were written, exactly like using a key to access a value on an object in
-    JavaScript. */
-    
-    const OUTER_CONST: i32 = 42;
-
-    let test1 = |x: i32| x * 2;
-    let test1 = |x: i32| x * 2;
-
-    /* You will often see syntax like the above in Rust code. If coming from
-    TypeScript or JavaScript, it is semantically similar to:
-    
-    let test1 = (x : number) => x * 2;
-
-     */
-
-    let value_to_be_enclosed = 42;
-    let add_ints = |x: i32| x + value_to_be_enclosed;
 
     /*----------------------------------------------
     * Cargo
