@@ -96,8 +96,7 @@ fimly rooted in the physical world.
 
 Rust starts on the academic end of the spectrum of languages and moves toward
 the machine in search of maximum, real-world performance. Meanwhile, Rust's
-philsophical counterpart, C, starts from the machine and moves toward symbolic
-purity. Indeed, the entire purpose of C was to be "portable assembly": the
+philsophical counterpart, C, starts from the machine and moves toward a more symbolic representation of concepts in search of easier use. Indeed, the stated purpose of C was to be "portable assembly": the
 thinnest possible symbolic layer over machine instruction to faciliate writing
 programs for the multitude of CPU architectures that existed in the late 1970s.
 There was basically an architecture for each company making commputers. The idea
