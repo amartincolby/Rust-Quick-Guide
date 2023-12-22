@@ -1241,17 +1241,14 @@ fn main() {
 
     sign_up_to_newsletter("hello@rust_lovers.org");
 
-    /* Of note, the standard function declaration syntax is actually called
-    function _pointer_ syntax. This is because items like function pointers are only ever instantiated once, in a single place, meaning that any calls to that function do so through a pointer to the function's static location. */
+    /* As mentioned, functions in Rust are notably different from functions in many other languages, and one of the most significant differences, if not the most, is that functions cannot access values declared outside of their scope. This is known as "capturing" a value. If you are coming from TypeScript, the common term is "enclosing," to wit you are writing a "closure", a concept I am sure many JavaScript developers remember from their job interviews. */
 
-    /* As mentioned, function pointers in Rust are notably different from functions in many other languages, and one of the most significant differences, if not the most, is that function pointers cannot access values declared outside of their scope. This is known as "capturing" a value. If you are coming from TypeScript, the common term is "enclosing," to wit you are writing a closure. */
-
-    let outer_var = 42;
+    let outer_var = 22;
 
     fn normal_function() -> i32 {
-        let inner_var = 42;
-        inner_var // This works.
-        // outer_var // This does not.
+        let inner_var = 22;
+        inner_var + 20 // This works.
+        // outer_var + 20 // This does not.
     }
 
     /* The above is not possible because a `let` binding is part of the "dynamic" environment of the program. The dynamic environment is the part of the program that can change based on how the program runs. The "static" environment is the part of the program that is the same whenever a section of code is run. Because function pointers are static items, they do not exist on the same level as let declarations.
