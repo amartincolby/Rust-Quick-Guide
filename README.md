@@ -1475,24 +1475,29 @@ fn main() {
         format!("{} {}", String::from("Thanks for signing up"), email)
     };
 
+    /* In JavaScript, the above would look like this:
+    
+        let sign_up_to_newsletter = (email: string) : string {
+            return(`Thanks for signing up ${email}``);
+        };
+
+     */
+
     sign_up_to_newsletter("hello@rust_lovers.org");
 
-    /* Of note, the standard function declaration syntax is actually called
-    function _pointer_ syntax. This is because items like function pointers are only ever instantiated once, in a single place, meaning that any calls to that function do so through a pointer to the function's static location. */
+    /* As mentioned, functions in Rust are notably different from functions in many other languages, and one of the most significant differences, if not the most, is that functions cannot access values declared outside of their scope. This is known as "capturing" a value. If you are coming from TypeScript, the common term is "enclosing," to wit you are writing a "closure", a concept I am sure many JavaScript developers remember from their job interviews. */
 
-    /* As mentioned, function pointers in Rust are notably different from functions in many other languages, and one of the most significant differences, if not the most, is that function pointers cannot access values declared outside of their scope. This is known as "capturing" a value. If you are coming from TypeScript, the common term is "enclosing," to wit you are writing a closure. */
-
-    let outer_var = 42;
+    let outer_var = 22;
 
     fn normal_function() -> i32 {
-        let inner_var = 42;
-        inner_var // This works.
-        // outer_var // This does not.
+        let inner_var = 22;
+        inner_var + 20 // This works.
+        // outer_var + 20 // This does not.
     }
 
-    /* The above is not possible because a `let` binding is part of the "dynamic" environment of the program. The dynamic environment is the part of the program that can change based on how the program runs. The "static" environment is the part of the program that is the same whenever a section of code is run. Because function pointers are static items, they do not exist on the same level as let declarations.
+    /* The above is not possible because a `let` binding is part of the "dynamic" environment of the program. The dynamic environment is the part of the program that can change based on how the program runs. The "static" environment is the part of the program that is the same whenever the application runs. Because functions are static items, they do not exist on the same level as let declarations.
     
-    If you are coming from TypeScript or JavaScript, you may recognize this as sounding like hoisting, and while that is not entirely wrong, it is not entirely right. Functions do not get moved to the top of a scope, as they do in JavaScript. Function pointers, like all items, are lifted into a different realm. That said, the concept of hoisting gives us a good illustration for why Rust works as it does.
+    If you are coming from TypeScript or JavaScript, you may interpret this as similar to hoisting, and while that is not entirely wrong, it is not entirely right. Functions do not get moved to the top of a scope, as they do in JavaScript. Functions, like all items, are lifted into a different realm. That said, the problems inherent to hoisting gives us a good illustration for why Rust works as it does.
 
         displayMessage();
 
@@ -1502,21 +1507,26 @@ fn main() {
             console.log(message);
         }
     
-    In the above JavaScript code, a function can be used before its declaration. But this code will fail because the `displayMessage` call is relying on `message`, which is declared after the call. If Rust tried to allow the usage of function pointers with outside values, the function would not be able to know where to find this value. Thus, Rust simply prevents this.
+    In the above JavaScript code, a function can be used before its declaration. But this code will fail because the `displayMessage` call is relying on `message`, which is declared _after_ the call. If Rust tried to allow the usage of functions with outside values, the function would not be able to know where to find this value. Thus, Rust simply prevents this.
     
-    There are many uses for this pattern, though, and Rust */
+    There are many uses for this pattern, though, and Rust allows it through the use of the aforementioned anonymous functions. Unlike JavaScript, where a function is only a closure if it encloses external values, Rust simply calls all anonymous functionS "closures" as a way to differentiate them from normal functions. */
+
+    let food = "cookies";
+
+    let closure = |x: i32| {
+        format!("You have {x} {food}")
+    };
+
+    /* Because closures are bound by let declarations, they are part of the dynamic environment along with the let values. As such, they can "see" each other.
+    
+    But that's not the whole story! Just as let values and closures are part of the dynamic environment, you may have wondered if functions can enclose other entities from the static environment, and you are 100% correct. Both the below static value and constant value exist in the same realm as the function, so the function can indeed "enclose" them. */
 
     const OUTER_CONST: i32 = 42;
+    static OUTER_STATIC: &str = "cookies";
 
-    let test1 = |x: i32| x * 2;
-    let test1 = |x: i32| x * 2;
-
-    /* You will often see syntax like the above in Rust code. If coming from
-    TypeScript or JavaScript, it is semantically similar to:
-    
-    let test1 = (x : number) => x * 2;
-
-     */
+    fn function_enclosure() -> String {
+        format!("You have {OUTER_CONST} {OUTER_STATIC}")
+    }
 
     /*** Unit ***/
 
