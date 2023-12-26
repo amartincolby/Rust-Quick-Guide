@@ -1170,15 +1170,15 @@ fn main() {
 
     All evaluation blocks, and thus all functions, _must_ return something. If
     no final value is present, the block will return the special value `unit`,
-    which will be discussed shortly.
+    which will be discussed shortly. (There is a special case known as the
+    `never` type that functions can also return, but this is esoteric and not
+    useful to discuss or learn in this tutorial)
 
     For example, the below function has one evaluation block: the if/else. As
-    such, this is the return of the function. The if/else is composed of two
-    evluation blocks that each return a value. Thus, the two booleans count as
-    the final return of the entire function. */
+    such, this entire block is actually the return of the function. The if/else is composed of two evaluation blocks that each return a value. Thus, the two booleans count as the final return value of the function. */
 
     fn greater_than_42(x: i32) -> bool {
-        if x > 42 {
+        if x <= 42 {
             false
         } else {
             true
@@ -1186,17 +1186,30 @@ fn main() {
     }
 
     /* It is important to note that, even though Rust has a return statement,
-    it applies only to the function level, and not the level of general
+    it applies only to the _function_ level, and not the level of general
     evaluation blocks. And only through the return statement can early return be
     achieved. To wit, while Rust allows a return statement, it restricts the
     semantics to avoid mixing up paradigms. Within evaluation blocks, only
     implicit returns are allowed, and Rust bars implicit early return.
     
-    Let's break the function to illustrate. if the first `false` is uncommented,
-    it false would lack a semicolon, and Rust's compiler would think that it is
-    thus meant to be the block's return. But since there is a statement _after_
-    that, it knows that it cannot be the implicit return. It will thus throw a
-    missing semicolon error.
+    Let's break the below function to illustrate. */
+
+    fn less_than_42(x: i32) -> bool {
+        if x >= 42 {
+            // false
+            false
+        } else {
+            // return true;
+            true
+        }
+        // if x < 42 {
+        //     false
+        // } else {
+        //     true
+        // }
+    }
+
+    /* if the first `false` is uncommented, it would lack a semicolon, and Rust's compiler would think that it is thus meant to be the block's return. But since there is a statement _after_ that, it knows that it cannot be the implicit return. It will thus throw a missing semicolon error.
     
     If the second if/else is uncommented, a similar problem arises. The second
     if/else becomes the implicit return of the function block, and thus the
@@ -1212,28 +1225,12 @@ fn main() {
     that all return values, and having the function itself finally evaluate to a
     final value, should be the ideal pattern. */
 
-    fn less_than_42(x: i32) -> bool {
-        if x < 42 {
-            // false
-            false
-        } else {
-            // return true;
-            true
-        }
-        // if x < 42 {
-        //     false
-        // } else {
-        //     true
-        // }
-    }
+    /*** Anonymous Functions ***/
 
-    /* Rust has two ways to declare functions which will again be very familiar
-    to TypeScript developers. The first is the obvious way as illustrated above,
-    but just like JavaScript and TypeScript, functions can be "anonymous",
+    /* Just like JavaScript and TypeScript, Rust functions can be "anonymous",
     meaning that the function itself has no identifier, but is instead bound to
-    an identifier. This allows a function to be passed around instead of
-    simply called. The syntax is slightly different but likely very familiar to
-    TypeScript developers who use fat arrow function syntax. */
+    an identifier. The syntax is slightly different but likely very familiar to
+    TypeScript developers who frequently use fat arrow function syntax. */
 
     let sign_up_to_newsletter = |email: &str| -> String {
         format!("{} {}", String::from("Thanks for signing up"), email)
@@ -1241,7 +1238,7 @@ fn main() {
 
     /* In JavaScript, the above would look like this:
     
-        let sign_up_to_newsletter = (email: string) : string {
+        let sign_up_to_newsletter = (email: string) : string => {
             return(`Thanks for signing up ${email}``);
         };
 
@@ -1249,7 +1246,7 @@ fn main() {
 
     sign_up_to_newsletter("hello@rust_lovers.org");
 
-    /* As mentioned, functions in Rust are notably different from functions in many other languages, and one of the most significant differences, if not the most, is that functions cannot access values declared outside of their scope. This is known as "capturing" a value. If you are coming from TypeScript, the common term is "enclosing," to wit you are writing a "closure", a concept I am sure many JavaScript developers remember from their job interviews. */
+    /* One of the most significant differences of Rust if coming from JavaScript/TypeScript or Go is that functions cannot access values declared outside of their scope. This is known as "capturing" a value. The common term is "enclosing," to wit you are writing a "closure", a concept I am sure many JavaScript developers remember from their job interviews. */
 
     let outer_var = 22;
 
@@ -1273,17 +1270,21 @@ fn main() {
     
     In the above JavaScript code, a function can be used before its declaration. But this code will fail because the `displayMessage` call is relying on `message`, which is declared _after_ the call. If Rust tried to allow the usage of functions with outside values, the function would not be able to know where to find this value. Thus, Rust simply prevents this.
     
-    There are many uses for this pattern, though, and Rust allows it through the use of the aforementioned anonymous functions. Unlike JavaScript, where a function is only a closure if it encloses external values, Rust simply calls all anonymous functionS "closures" as a way to differentiate them from normal functions. */
+    There are many uses for this pattern, though, and Rust allows it through the use of the aforementioned anonymous functions. Unlike JavaScript, where a function is only a closure if it encloses external values, Rust simply calls all anonymous functions "closures" as a way to differentiate them from normal functions. */
 
-    let food = "cookies";
+    let food = String::from("cookies");
 
     let closure = |x: i32| {
-        format!("You have {x} {food}")
+        println!("You have {x} {food}")
     };
+
+    // Any values captured by closures are borrowed, so the below would fail.
+    // let attempted_move = food;
+    closure(42);
 
     /* Because closures are bound by let declarations, they are part of the dynamic environment along with the let values. As such, they can "see" each other.
     
-    But that's not the whole story! Just as let values and closures are part of the dynamic environment, you may have wondered if functions can enclose other entities from the static environment, and you are 100% correct. Both the below static value and constant value exist in the same realm as the function, so the function can indeed "enclose" them. */
+    Just as let values and closures are part of the dynamic environment, functions can enclose other entities from the static environment. Both the below static value and constant value exist in the same realm as the function, so the function can indeed "enclose" them. */
 
     const OUTER_CONST: i32 = 42;
     static OUTER_STATIC: &str = "cookies";

@@ -8,7 +8,10 @@ this commit (10/23/23) and hope to have it complete by the end of 2023.
 This tutorial is not meant for people absolutely brand new to programming. It is
 intended for people with at least some degree of experience and makes frequent
 connections to the languages Go, C, C++, TypeScript, and JavaScript since I see
-those demographics as the people most likely to come here.
+those demographics as the people most likely to come here. I will focus slightly
+more on TypeScript and JavaScript since I see a move from that language to be of
+the greatest value and sense a readiness in the web development community to
+move to better languages.
 
 I think that the best docs are short, sweet, specific, and do not elide the
 fundamentals undergirding the syntax. I tried to achieve this educational
