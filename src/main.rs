@@ -445,8 +445,7 @@ fn main() {
     allow values to be used without transferring ownership, Rust leverages the
     concept of "borrowing".
    
-    This process is called borrowing because ownership is not transferred. The
-    below is identical to the previous naked scope. */
+    This process is called borrowing because ownership is not transferred but only one entity can borrow a value at a time. The below is identical to the previous naked scope. */
 
     let respect = String::from("Find out what it means to me.");
 
@@ -464,7 +463,7 @@ fn main() {
     original value _and_ the reference must be tagged as mutable if the value is
     to be changed. When mutable, references are treated more carefully by the
     compiler. Any number of references can be _created_, but only one reference
-    can be _consumed_. See below.*/
+    can be _consumed_. Rust does not call it this, but I call this a "strict" borrow in the sense that if someone borrows something, no one else can borrow it until it has been returned. Rust simply calls this a mutable borrow. I prefer higher-level terminology for linguistically fundamental concepts as this, though. As such, immutable borrows as mentioned previously are "casual" borrows, while mutable borrows are "strict". See below.*/
 
     let mut jeremiah = String::from("was a bullfrog.");
 
@@ -1273,18 +1272,32 @@ fn main() {
     There are many uses for this pattern, though, and Rust allows it through the use of the aforementioned anonymous functions. Unlike JavaScript, where a function is only a closure if it encloses external values, Rust simply calls all anonymous functions "closures" as a way to differentiate them from normal functions. */
 
     let food = String::from("cookies");
+    let closure_food = |x: i32| println!("You have {x} {food}");
 
-    let closure = |x: i32| {
-        println!("You have {x} {food}")
-    };
+    // Values captured by closures are borrowed by default.
+    // let attempted_move = food; // This fails.
+    // While a simple reference use succeeds.
+    println!("{food}");
+    closure_food(42);
 
-    // Any values captured by closures are borrowed, so the below would fail.
-    // let attempted_move = food;
-    closure(42);
+    /* Just as earlier, mutable borrows are treated more strictly. Any closure which mutates its mutable captured values must also be labeled with the `mut` keyword and no references can be created between the declaration of the closure and its use. */
 
-    /* Because closures are bound by let declarations, they are part of the dynamic environment along with the let values. As such, they can "see" each other.
-    
-    Just as let values and closures are part of the dynamic environment, functions can enclose other entities from the static environment. Both the below static value and constant value exist in the same realm as the function, so the function can indeed "enclose" them. */
+    let mut drink = String::from("coffee");
+    let mut closure_drink = |x: i32| drink.push('s');
+
+    // println!("{drink}"); // This fails.
+    closure_drink(42);
+
+    /* Borrowing is the default behavior but ownership can be transferred via the `move` keyword. The primary use of this is to transfer a closure to another thread. Multithreading will be discussed later. */
+
+    let dessert = String::from("cheesecakes");
+    let closure_dessert = move |x: i32| println!("You have {x} {dessert}");
+
+    // println!("{dessert}"); // This fails.
+
+    /* At this point, the value "cheesecakes" has not been destroyed. It is instead bound to the identifier for the closure `closure_dessert`. Only once `closure_dessert` falls out of scope will the value be destroyed. */
+
+    /* Because closures are bound by let declarations, they are part of the dynamic environment along with the let values. As such, they can "see" each other. Just as let values and closures are part of the dynamic environment, functions can enclose other entities from the static environment. Both the below static value and constant value exist in the same realm as the function, so the function can indeed "enclose" them. */
 
     const OUTER_CONST: i32 = 42;
     static OUTER_STATIC: &str = "cookies";
@@ -1292,6 +1305,23 @@ fn main() {
     fn function_enclosure() -> String {
         format!("You have {OUTER_CONST} {OUTER_STATIC}")
     }
+
+    /* Closures do not need type annotation. Since they exist within the lexical scope, the Rust compiler can infer types based on how the closure is used. This does not mean that the closure can be treated like a generic. The compiler will in fact harden the types after the first use. */
+
+    let adder_closure = |x, y| {
+        x + y
+    };
+
+    let answer_integer = adder_closure(20, 22);
+    // let answer_float = adder_closure(2.0, 1.4159);
+
+    /* If you uncomment the above, you will get a type error. This is because the usage of integers for `answer_integer` made the compiler infer the types of `adder_closure` to be integers. Thus, from that point forward, that is the type of `adder_closure`. This is true for all scopes in which `adder_closure` is visible. This is a hard restriction. Even if you pass `adder_closure` as a callback argument, the typing it acquires there will apply henceforth. */
+
+    /*** A Note On Idiomatic Rust ***/
+
+    /* The idiomatic use of closures in Rust is for small pieces of behavior that exist in small contexts. For example, a great many Rust libraries accept zero-parameter functions as arguments. These are usually written as inline, unbound closures. If coming from JavaScript, this will be exceedingly familiar with the .then() syntax.
+    
+    That said, the Rust compiler is intelligent. The ultimate difference between a closure with no captured values and a function is very small. While only using closures in restricted scenarios is considered idiomatic, if you want to use them in nearly every scenario, there is no real downside. */
 
     /*** Unit ***/
 
