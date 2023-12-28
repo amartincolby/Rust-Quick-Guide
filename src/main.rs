@@ -3,6 +3,7 @@ the "path" to the entity. */
 use core::num;
 use std::array;
 use rand::prelude::*;
+use std::thread;
 
 const _GREETING: &str = "Stay awhile. Stay forever.";
 
@@ -1360,6 +1361,48 @@ fn main() {
 
     /* The above function expects to return nothing and will throw a compile
     error if anything is returned. */
+
+    /*----------------------------------------------
+    * Multithreading/Concurrency
+    *----------------------------------------------
+    */
+
+    /* Rust was designed from the ground-up for concurrency. Many of its memory features were built with concurrent processes in mind. While concurrency is not as simple as something like Go, it is leagues simpler than either C or C++. Further, while Erlang, Elixir, or Go may be simpler, when done well, Rust's performance will be impossible for those other languages to match.
+    
+    To start, an important point is the nature of threads in Rust. Go and Java rely on "green" threads, which is a lightweight unit of concurrency that exists as a simple entity in memory that is controlled by the language. Because of this, Go can easily spawn tens of thousands of threads that the Go runtime juggles. Rust does not use green threads by default. It instead opts to use operating system threads. Spawning an OS thread is a significantly heavier and more complex operation than spawning a green thread but gives engineers more finely-grained control over how threads are created and managed.
+    
+    If you are coming from a higher-level languages like JavaScript, don't let this scare you. As I said, Rust is a great language because it gives programmers the _option_ to use lower-level functionality but provides libraries and tools that makes it surprisingly easy to use for the same goals as languages like JavaScript or Go. These libraries and tools are outside the scope of this tutorial. We will focus on Rust's basic concurrency model.
+    
+    Just as all Rust applications have the main function, so too does that function represent the main thread. It is also the parent thread to any threads it spawns. Threads can spawn their own child threads. */
+
+    /* All threads require a closure that encapsulates the desired behavior. Threads cannot borrow, though, so the below thread will fail to compile unless the `move` keyword is applied.*/
+    let external_value = String::from("nee");
+
+    thread::spawn(move || {
+        println!("We are the knights who say {external_value}!");
+    });
+
+    /* From this point forward in the main thread, `external_value` is no longer valid. The value "nee" has _not_ necessarily been destroyed, though. Only once the child thread terminates would the value be destroyed in memory, and when the thread starts or terminates is impossible for the main thread to predict. The main thread may finish before the child thread can finish, thus destroying the child thread before it finishes. To prevent a parent from terminating before its children, the children can be "joined" to the parent. The `join` command becomes a part of the parent thread's lexical flow, meaning that the parent thread will stop until the child thread is complete before continuing. You can control when the parent thread pauses by choosing where to place the `join`. */
+
+    let child_thread = thread::spawn(|| {
+        println!("We are the knights who say Ekke Ekke Ekke Ekke Ptang Zoo Boing!");
+    });
+
+    // The main thread will pause here.
+    child_thread.join();
+    // The main thread will now continue.
+
+    /* The above `join` command will trigger a warning about an unused "result". The result is the return of the child thread. The return is not a value per se, but a status. This is mostly about error handling. If a logic error happens in a thread, it "panics" and goes through a process called "unwinding" where its memory footprint is destroyed. When a thread is joined to its parent, the thread's status is monitored. 
+    
+    The status returned is a boxed value that is either "ok" or an error. The box can be unwrapped, and thus the value is dropped:
+    
+        child_thread.join().unwrap();
+
+    The value can also be bound to an identifier then simply ignored.
+    
+        let _ = child_thread.join();
+    
+    This tutorial ignores unused variables, but if it didn't, any identifier other than `_` would trigger a warning. */
 
     
 
