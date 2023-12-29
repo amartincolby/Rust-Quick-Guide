@@ -1367,6 +1367,19 @@ fn main() {
     *----------------------------------------------
     */
 
+    /*** A Note On Concurrent vs Parallel ***/
+
+    /* Concurrent and parallel are often used interchangeably, even in the Rust docs. Parallel is a subset of concurrent. Concurrent means that two processes are active simultaneously. Parallel means that the two processes are _also_ executing computations simultaneously. See the below visualization of processes A and B. Each "x" represents a unit of computation.
+    
+    A: x------x-----x-x----x---x---x------xxxx----x-x--x----x-|
+    B: ----x-x----x--x---x---x-------xx--x-----xx-----x----x--|
+
+    These are concurrent processes, but notice how the two lines never have moments of computational overlap. In parallel computing, there would, or at the very least could, be overlap. This usually means that there must be multiple computational units in the hardware. This could mean multiple cores, CPU-level multithreading, or specialized external processors such as audio chips, GPUs, NPUs, or in the olden days, math coprocessors.
+
+    When writing Rust, all you can write are _concurrent_ processes. Whether they happen in parallel or not is out of your control. To a large degree, this is best. As a programmer, you cannot (easily) know how the hardware can best run instructions simultaneously. For some interesting history on this, read about Intel's Itanium CPUs and their EPIC architecture. */
+
+    /*** Fearless Concurrency ***/
+
     /* Rust was designed from the ground-up for concurrency. Many of its memory features were built with concurrent processes in mind. While concurrency is not as simple as something like Go, it is leagues simpler than either C or C++. Further, while Erlang, Elixir, or Go may be simpler, when done well, Rust's performance will be impossible for those other languages to match.
     
     To start, an important point is the nature of threads in Rust. Go and Java rely on "green" threads, which is a lightweight unit of concurrency that exists as a simple entity in memory that is controlled by the language. Because of this, Go can easily spawn tens of thousands of threads that the Go runtime juggles. Rust does not use green threads by default. It instead opts to use operating system threads. Spawning an OS thread is a significantly heavier and more complex operation than spawning a green thread but gives engineers more finely-grained control over how threads are created and managed.
@@ -1404,7 +1417,18 @@ fn main() {
     
     This tutorial ignores unused variables, but if it didn't, any identifier other than `_` would trigger a warning. */
 
+    /*----------------------------------------------
+    * Async
+    *----------------------------------------------
+    */
+
+    /* Asynchronous Rust, henceforth called async, is a comparatively new addition to Rust semantics. As opposed to concurrent Rust, async simply means code that can run out of lexical order but remain in the same thread. This is perhaps a new concept to those coming from Go, C, C++, or Java, but for JavaScript developers, welcome home. Everything covered here will be very familiar. */
+
+    /*** Functions ***/
+
+    /* Async functions are extremely similar to JavaScript. When called, the function does no work. Instead, it returns a "future". This is synonymous to a "promise" in JavaScript. A promise in Rust is very similar to an option, in that the promise must be sort of "unwrapped". The term "unwrapped" is inaccurate, because what is actually happening is that the future must be "polled." Polling is done with the `await` keyword. This polling is what actually causes the function body to run. This is the first key difference between Rust and JavaScript, where JavaScript promises would run immediately. If you are coming from Python, a language to which I have paid little attention, this pattern should be familiar.
     
+    The second key difference is that async operations in Rust are not part of the language per se, but instead a standard syntax around multiple possible implementations from which you can choose. The most common async implementation is Tokio, but there are others. */
 
     /*----------------------------------------------
     * Cargo
