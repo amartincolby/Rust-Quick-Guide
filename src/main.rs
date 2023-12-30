@@ -1425,7 +1425,7 @@ async fn main() {
     
     As opposed to default concurrent Rust, async Rust uses what can be described as green threads. Async is perhaps a new concept to those coming from Go, C, C++, or Java, but for JavaScript developers, welcome home. Everything covered here will be very familiar. 
 
-    Writing async in Rust is extremely similar to JavaScript. When called, the function does no work. Instead, it returns a "future". This is synonymous to a "promise" in JavaScript. Unlike promises, which immediately return a boxed promise and begin running the function, futures return the box but do not run the function. The function must be "polled". Polling is done with the `await` keyword. If you are coming from Python, a language to which I have paid little attention, this pattern should be familiar. This means that Rust more strictly handles what can call an async function. Unlike JavaScript, where any function can call an async function, in Rust, _only_ async functions can call other async functions.
+    Async functions, when called, do no work. Instead, they return a "future". This is synonymous to a "promise" in JavaScript. Unlike promises, which immediately return a boxed promise _and_ begin running the function, futures return the box but do not run the function. The function must be "polled". Polling is done with the `await` keyword. If you are coming from Python, a language to which I have paid little attention, this pattern should be familiar. This means that Rust more strictly handles what can call an async function. Unlike JavaScript, where any function can call an async function, in Rust, _only_ async functions can call other async functions.
     
     The second key difference is that async operations in Rust are not part of the language per se, but instead a standard syntax around multiple possible implementations from which you can choose. The most common async implementation is Tokio, but there are others with different strengths. When using Tokio, the library creates a thread pool with which it handles your asynchronous behaviors. Basically, you are handing over thread management to someone else.
     
@@ -1435,14 +1435,19 @@ async fn main() {
 
     /* This will be the strangest part to developers from other languages like JavaScript. You must start your async runtime before using async.
     
-    Most of the time, if you are using async, it will be a key part of your application. As such, your main() function will be labeled as async. It requires the #[tokio::main] attribute, otherwise the compiler will throw an error. For this tutorial, I have labeled the main() function. */
+    Most of the time, if you are using async, it will be a key part of your application. As such, your main() function will be labeled as async. It requires the #[tokio::main] attribute, otherwise the compiler will throw an error. For this tutorial, I have labeled the main() function. Other runtimes may have other methods of initialization. */
 
+    /*** Functions ***/
 
     // Just like JavaScript, `async` indicates an async function.
     async fn async_function() -> String {
         // Do something asynchronously like maybe get some data.
         String::from("Here's some data")
     }
+
+    // Notice how the await is not a method. This is because a method implies a function call, while the await is not exactly that. It is a keyword and is semantically similar to the `await` being before the function call as in JavaScript. Under the covers, it transforms the code. The `.await` you see is syntactic sugar.
+    let some_data = async_function().await;
+    println!("{some_data}");
 
     // The below is technically unstable.
     // let async_closure = async || println!("Got data!");
