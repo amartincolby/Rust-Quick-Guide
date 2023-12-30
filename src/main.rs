@@ -1,9 +1,8 @@
 /* These imports should be familiar to most. The double-colon syntax represents
 the "path" to the entity. */
-use core::num;
-use std::array;
-use rand::prelude::*;
 use std::thread;
+use futures::*;
+use tokio::*;
 
 const _GREETING: &str = "Stay awhile. Stay forever.";
 
@@ -63,14 +62,14 @@ that Rust applications have a main function.
 
 The syntax structures above the function are called attributes. They allow a
 developer to specify how the function is the be handled by the compiler. In
-these examples, three linting settings are being disabled. More attributes will
-be covered later. */
+these examples, four linting settings are being disabled and an attribute for the library Tokio is being applied to enable async. Async will be discussed later. More attributes will be covered later. */
 
 #[allow(unused_variables)]
 #[allow(unused_assignments)]
 #[allow(dead_code)]
 #[allow(unused_mut)]
-fn main() {
+#[tokio::main]
+async fn main() {
 
     /*----------------------------------------------
     * Items
@@ -1376,11 +1375,11 @@ fn main() {
 
     These are concurrent processes, but notice how the two lines never have moments of computational overlap. In parallel computing, there would, or at the very least could, be overlap. This usually means that there must be multiple computational units in the hardware. This could mean multiple cores, CPU-level multithreading, or specialized external processors such as audio chips, GPUs, NPUs, or in the olden days, math coprocessors.
 
-    When writing Rust, all you can write are _concurrent_ processes. Whether they happen in parallel or not is out of your control. To a large degree, this is best. As a programmer, you cannot (easily) know how the hardware can best run instructions simultaneously. For some interesting history on this, read about Intel's Itanium CPUs and their EPIC architecture. */
+    When writing Rust, all you can write are _concurrent_ processes. Whether they happen in parallel or not is out of your control. To a large degree, this is for the best. As a programmer, you cannot (easily) know how the hardware can most effectively run instructions simultaneously. For some interesting history on this, read about Intel's Itanium CPUs and their EPIC architecture. */
 
     /*** Fearless Concurrency ***/
 
-    /* Rust was designed from the ground-up for concurrency. Many of its memory features were built with concurrent processes in mind. While concurrency is not as simple as something like Go, it is leagues simpler than either C or C++. Further, while Erlang, Elixir, or Go may be simpler, when done well, Rust's performance will be impossible for those other languages to match.
+    /* Rust was designed from the ground-up for concurrency. Many of its memory features were built with concurrent processes in mind. While concurrency is not as simple as something like Go, it is leagues simpler than either C or C++. Further, while Erlang, Elixir, or Go may be simpler, when done well, Rust's performance will be much better.
     
     To start, an important point is the nature of threads in Rust. Go and Java rely on "green" threads, which is a lightweight unit of concurrency that exists as a simple entity in memory that is controlled by the language. Because of this, Go can easily spawn tens of thousands of threads that the Go runtime juggles. Rust does not use green threads by default. It instead opts to use operating system threads. Spawning an OS thread is a significantly heavier and more complex operation than spawning a green thread but gives engineers more finely-grained control over how threads are created and managed.
     
@@ -1422,13 +1421,49 @@ fn main() {
     *----------------------------------------------
     */
 
-    /* Asynchronous Rust, henceforth called async, is a comparatively new addition to Rust semantics. As opposed to concurrent Rust, async simply means code that can run out of lexical order but remain in the same thread. This is perhaps a new concept to those coming from Go, C, C++, or Java, but for JavaScript developers, welcome home. Everything covered here will be very familiar. */
-
-    /*** Functions ***/
-
-    /* Async functions are extremely similar to JavaScript. When called, the function does no work. Instead, it returns a "future". This is synonymous to a "promise" in JavaScript. A promise in Rust is very similar to an option, in that the promise must be sort of "unwrapped". The term "unwrapped" is inaccurate, because what is actually happening is that the future must be "polled." Polling is done with the `await` keyword. This polling is what actually causes the function body to run. This is the first key difference between Rust and JavaScript, where JavaScript promises would run immediately. If you are coming from Python, a language to which I have paid little attention, this pattern should be familiar.
+    /* Asynchronous Rust, henceforth called async, is a comparatively new addition to Rust semantics. It is actually still technically in flux, with breaking changes being implemented, but it has been broadly stable for a couple of years.
     
-    The second key difference is that async operations in Rust are not part of the language per se, but instead a standard syntax around multiple possible implementations from which you can choose. The most common async implementation is Tokio, but there are others. */
+    As opposed to default concurrent Rust, async Rust uses what can be described as green threads. Async is perhaps a new concept to those coming from Go, C, C++, or Java, but for JavaScript developers, welcome home. Everything covered here will be very familiar. 
+
+    Writing async in Rust is extremely similar to JavaScript. When called, the function does no work. Instead, it returns a "future". This is synonymous to a "promise" in JavaScript. Unlike promises, which immediately return a boxed promise and begin running the function, futures return the box but do not run the function. The function must be "polled". Polling is done with the `await` keyword. If you are coming from Python, a language to which I have paid little attention, this pattern should be familiar. This means that Rust more strictly handles what can call an async function. Unlike JavaScript, where any function can call an async function, in Rust, _only_ async functions can call other async functions.
+    
+    The second key difference is that async operations in Rust are not part of the language per se, but instead a standard syntax around multiple possible implementations from which you can choose. The most common async implementation is Tokio, but there are others with different strengths. When using Tokio, the library creates a thread pool with which it handles your asynchronous behaviors. Basically, you are handing over thread management to someone else.
+    
+    The third key difference is that, because most everything in Rust is an evaluation, blocks can also be labeled as async. */
+
+    /*** Initializing the runtime ***/
+
+    /* This will be the strangest part to developers from other languages like JavaScript. You must start your async runtime before using async.
+    
+    Most of the time, if you are using async, it will be a key part of your application. As such, your main() function will be labeled as async. It requires the #[tokio::main] attribute, otherwise the compiler will throw an error. For this tutorial, I have labeled the main() function. */
+
+
+    // Just like JavaScript, `async` indicates an async function.
+    async fn async_function() -> String {
+        // Do something asynchronously like maybe get some data.
+        String::from("Here's some data")
+    }
+
+    // The below is technically unstable.
+    // let async_closure = async || println!("Got data!");
+    
+    /* The below is the accepted current solution but is fundamentally different to the above. In the above, the function is not run and thus no stack space is allocated. In the below, the function _does_ run, but it immediately returns a block wrapped with a future. The performance difference is likely tiny, but worth noting. */
+    let async_closure = || async { String::from("More data!") };
+    
+
+    /*** Blocks ***/
+
+    /* Because nearly everything in Rust is an evaluation, that means that entire code blocks can be tagged as async. Since async blocks necessarily return a future, naked scopes/blocks cannot be labeled as async. */
+
+    let async_block = async {
+        let some_data = String::from("Data from a block");
+        println!("{some_data}")
+    };
+
+    /*----------------------------------------------
+    * Channels
+    *----------------------------------------------
+    */    
 
     /*----------------------------------------------
     * Cargo
