@@ -15,7 +15,7 @@ more on TypeScript and JavaScript since I see a move from that language to be of
 the greatest value and sense a readiness in the web development community to
 move to better languages.
 
-I think that the best docs are short, sweet, specific, and do not elide the
+I think that the best docs are short, sweet, and specific, but do not elide the
 fundamentals undergirding the syntax. I tried to achieve this educational
 perfection with my [ReasonML Quick Guide](https://github.com/amartincolby/ReasonML-Quick-Guide),
 but ReasonML imploded with a community schism and thus caused me to abandon the
@@ -30,7 +30,7 @@ symbols, and to try to learn about one symbol separate from others is destined
 to fail. So it is with programming, if not more so.
 
 The art of symbolic arrangement cannot be taught without the context and history
-of the art. So many tutorials and classes fail to consistently and repeatedly
+of the art. Many tutorials and classes fail to consistently and repeatedly
 bring into lessons the broader historical context for concepts, and this results
 in people either failing to learn or only learning the end result in a rote,
 robotic way. The high art of painting cannot be taught by just educating people
@@ -41,11 +41,7 @@ These two goals, concise simplicity and broad context, are obviously at odds
 with one another. This is especially true with a language as rich as Rust. I
 hope that I find a middle ground that is approachable and easy to understand.
 
-The Rust docs are very good but somewhat verbose. I like documentation that is
-simple enough to be a one-pager. I aim for
-[the famous Smalltalk postcard](https://richardeng.medium.com/syntax-on-a-post-card-cb6d85fabf88).
-I did a previous quick guide for ReasonML, a syntax of OCaml, which profoundly
-inspired Rust's semantics.
+The Rust docs are good but verbose. I like documentation that is simple enough to be a one-pager. I aim for [the famous Smalltalk postcard](https://richardeng.medium.com/syntax-on-a-post-card-cb6d85fabf88). I did a previous quick guide for ReasonML, a syntax of OCaml, which profoundly inspired Rust's semantics.
 
 # Further Information
 - [The Official Learn Rust Online Book]([https://reasonml.org/](https://doc.rust-lang.org/book/title-page.html)) *The source of truth for learning Rust.*
@@ -63,7 +59,7 @@ engineering. The last shift was the rise of object-oriented languages over forty
 years ago. Emerging as it did from the ashes of structured programming and the
 spaghetti code of _The Mythical Man Month_, OOP, as it is known, was the _de
 rigeur_ paradigm just as computing exploded into the general consciousness. 
-Througout the 1980s and 1990s, the massive growth of the industry suppressed
+Throughout the 1980s and 1990s, the massive growth of the industry suppressed
 change, even as people on the proverbial edge started to realize that OOP had
 fundamental problems that were not easily soluble. These problems produced one
 of the greatest, if not _the_ greatest, technical manuals in computing history:
@@ -99,7 +95,7 @@ fimly rooted in the physical world.
 
 Rust starts on the academic end of the spectrum of languages and moves toward
 the machine in search of maximum, real-world performance. Meanwhile, Rust's
-philsophical counterpart, C, starts from the machine and moves toward a more symbolic representation of concepts in search of easier use. Indeed, the stated purpose of C was to be "portable assembly": the thinnest possible symbolic layer over machine instruction to faciliate writing programs for the multitude of CPU architectures that existed in the late 1970s. There was basically an architecture for each company making commputers. The idea of something like the x86 architecture dominating the CPU industry was mostly unimagineable. There were other higher-level languages available at the time, notably COBOL, Lisp, Fortran, PL/I, Algol, and Pascal, but none of them were simple enough to be easily usable for truly general tasks, and their performance was universally much slower than hand-written assembly, as all highly symbolic languages were. C was specifically created to move only as far away from the machine as was necessary to fulfill the goal of code portability. This raw performance is why, even after all this time, C remains the _ne plus ultra_ for lower-level code writing.[2]
+philsophical counterpart, C, starts from the machine and moves toward a more symbolic representation of concepts in search of easier use. Indeed, the stated purpose of C was to be "portable assembly": the thinnest possible symbolic layer over machine instruction to faciliate writing programs for the multitude of CPU architectures that existed in the late 1970s. There was basically an architecture for each company making computers. The idea of something like the x86 architecture dominating the CPU industry was unimagineable. There were other higher-level languages available at the time, notably COBOL, Lisp, Fortran, PL/I, Algol, and Pascal, but none of them were simple enough to be easily usable for truly general tasks, and their performance was universally much slower than hand-written assembly, as all highly symbolic languages were. C was specifically created to move only as far away from the machine as was necessary to fulfill the goal of code portability. This raw performance is why, even after all this time, C remains the _ne plus ultra_ for lower-level code writing.[2]
 
 I see the juxtaposition of C and Rust to be a microcosm, a synecdoche of sorts,
 for the entirety of computing history. The famous book _Hackers: Heroes of The
@@ -111,43 +107,30 @@ short supply. As such, the excitement and successes of the real world were
 defined by the first "hackers," who were people less concerned with what symbols
 could do and more concerned with the cool things that could be achieved with
 direct control over the machine. This divide between the symbolic purists and
-the hackers would continue into every successive generation of geeks.[3]
+the hackers would continue into every successive era of computation.[3]
 
 Unfortunately, the consequence of this is an entire industry that never fully
 embraced either perspective. As computing power increased, higher-level
-languages became more common, such as COBOL in the 60's, BASIC in the 70's and
+languages became more common, such as COBOL and Fortran in the 60's, BASIC and Pascal in the 70's, Ada in the
 80's, Java in the 90's, and perhaps the Frieza-style **Final Form** of messy
 languages, JavaScript, in the 2000's. But these languages rarely came from
 academic research and were instead Frankenstein monsters that emerged from the
-needs of _business_ or simple creations aimed at educating laypeople.[4] Their
-_raison d'etre_ was neither geeky nor academic; it was purely human.[5]
+needs of _business_ or simple creations aimed at educating laypeople.[4, 5, 6] Their
+_raison d'etre_ was neither geeky nor academic; it was purely human.[7]
 
 These languages represent the third major historical thread running parallel to
-the struggle between the geeks and the academics. In the early days of
-computing, this thread was of minor significance simply because there were
-comparatively few computers and programmers in the world. But as the number of
-programmers increased, so did the cultural impact of the languages being used in
-the wild.
+the struggle between the geeks and the academics: businesses. In the early days of computing, this thread was of minor significance simply because there were comparatively few computers and programmers in the world. But as the number of programmers increased, so did the cultural impact of the languages being used in the wild.
 
 These languages powered the _usage_ of computers. That is to say that COBOL was
 used by companies that used computers to write solutions for business problems.
 One of the key elements, if not _the_ key element, of this thread is that
 businesses were much less concerned with performance or symbolic purity; they
-wanted features, then more features, and they wanted them yesterday. To a great
-degree, C grew dominant because it was easier to transport code between
-computers, pleasing businesses.
+wanted features and they wanted them yesterday. To a great degree, C grew dominant because it was easier to transport code between computers, pleasing businesses.
 
 As software exploded in importance, business concerns had an increasing effect
-on languages, tools, and culture. It is no surprise that C was not the end of
-linguistic progress toward easier feature delivery and exploitation. Java, like
-C still among the most popular languages in the world, was introduced in 1995
-and removed even the need to compile for specific architectures, instead opting
-to run all programs inside a virtual machine. The performance was initially
-abysmal, but that did not stop its ascent. JavaScript brought this process to
-its ultimate conclusion, where code is not compiled at all, but run as-is in a
-runtime. It can be run instaneously, anywhere that supports the runtime.
-Unsurprisingly, even with performance far worse than Java or C, JavaScript can
-now be found running in every corner of the world. Features über alles.
+on languages, tools, and culture. Thus, it is no surprise that C was not the end of linguistic progress toward easier feature delivery and exploitation. Java, like C still among the most popular languages in the world, was introduced in 1995 and removed even the need to compile for specific architectures, instead opting to run all programs inside a "virtual machine." The performance was initially abysmal, but that did not stop its ascent. Languages like JavaScript, Python, and Ruby brought this process to its ultimate conclusion, where code is not compiled at all, but run as-is in a "runtime." It can be run instaneously, anywhere that supports the runtime. Unsurprisingly, even with performance far worse than Java or C, JavaScript can now be found running in every corner of the world.
+
+Features über alles.
 
 But as I said, things are changing. We spent decades focused almost entirely on
 faster delivery speed. We made industry-wide decisions in service of that goal.
@@ -155,15 +138,9 @@ But just as a new generation of programmers is becoming dominant, notably having
 graduated into the smoldering wreckage of the dot-com bubble and thus having a
 natural skepticism for the status quo, so too are businesses realizing that
 prioritizing feature delivery over other concerns can have profoundly negative
-outcomes. There are moral consequences. A bad program can produce much more CO2
-than a good program. A bad program can fail someone just when they need it most.
-A bad program can expose users to hackers. But I think the bigger motivation is
-because cloud computing is extremely expensive. If an organization is genuinely
-only "paying for what you use," as all cloud providers pitch, then a language
-that is twice as fast as another could result in a massive decrease in monthly
-cloud charges. That is a performance difference that would not have excited
-anyone fifteen years ago, but today, the bean counters start paying attention
-to what the geeks are saying.
+outcomes.
+
+There are moral consequences. A bad program can produce much more CO2 than a good program. A bad program can fail someone just when they need it most. A bad program can literally kill people.[8] A bad program can expose users to hackers. A bad program can fail society at large.[9] But I think the bigger motivation is because cloud computing is extremely expensive. If an organization is genuinely only "paying for what you use," as all cloud providers pitch, then a language that is twice as fast as another could result in a massive decrease in monthly cloud charges. That is a performance difference that would not have excited anyone fifteen years ago, but today, the bean counters start paying attention to what the geeks are saying.
 
 And so we have Rust. Or perhaps I should say so we have the _popularity_ of
 Rust. Rust was going to be created regardless of the market, as is the wont of
@@ -185,7 +162,7 @@ hold it now in our hands. Make it breathe.
 
 --------------------------------------------------------------------------------
 
-(1) While _Design Patterns_ vis-a-vis languages is open to significant critique,
+1: While _Design Patterns_ vis-a-vis languages is open to significant critique,
 the concepts discussed in the book are still valuable, especially as regards
 distributed systems. Solving problems of multi-service systems necessarily
 cannot be solved with any current language and must be solved in the
@@ -193,29 +170,39 @@ implementation. The next great language may be one that turns archiectural
 concerns into linguistic concerns, yet again obviating the book, but for the
 time being, it remains a must-read.
 
-[2] The ability of C to map to assembly in ways other languages simply couldn't
+2: The ability of C to map to assembly in ways other languages simply couldn't
 is best exemplified in the famous Duff's Device, which literally just mashes
 together two syntax structures and somehow it works. Look it up. It's wild.
 
-(2) The narrative thread connecting Rust and C even goes back to the very
+3: The narrative thread connecting Rust and C even goes back to the very
 beginning of computing. The first people who could reasonably be called
 programmers, Ada Lovelace and Charles Babbage, separated along the same lines.
-Lovelace was a self-described metaphysician who recognized the philsophical
-possibilities in Babbage's machine, while Babbage himself cared about the
-machine itself and its ability to do mathematics.
+Lovelace was a self-described metaphysician who recognized the philosophical
+possibilities in Babbage's machine, while Babbage cared about the machine itself
+and its ability to do mathematics.
 
-(3) We had one glorious moment where an academic language nearly achieved some
+4: We had one glorious moment where an academic language nearly achieved some
 degree of dominance in the 1980's with the rise of Lisp Machines. Ironically,
 the two main Lisp Machine companies that emerged from MIT left a drama so
 significant in their wake that it brought about the death of the hacker culture
 at the university and was the direct cause for the modern Open Source movement.
 
-[4] Indeed, JavaScript gives us perhaps the best example of this dynamic. An
+5: We had another moment where a rigidly defined language achieved huge success in the form of Ada. Sadly, real-world considerations again killed Ada as its compiler, which needed to verify its powerful type system, was cripplingly slow. Compilers back in the 80's were usually proprietary products, so vendors of compilers would concentrate efforts where there was money to be made. If Ada had come out during the era of online open-source, who knows what could have been.
+
+6: Even though I don't consider them academic in the sense that I defined, both
+Basic and Smalltalk emerged from academic settings. Their aim was education of
+people, and they succeeded while becoming popular as well.
+
+7: Indeed, JavaScript gives us perhaps the best example of this dynamic. An
 academic was given the task of creating a language for the web and he set out to
 create an academic language, namely a variant of Scheme. This plan was torpedoed
 by executives at Netscape who demanded that he instead make a language like Java
 simply because Java was popular. And also call it JavaScript, even though the
 languages are _completely_ different.
+
+8: The examples of this are too numerous to list, but some glaring examples are Toyota's unintended acceleration debacle, the Therac 25, the Boeing 737 MAX, Tesla's Autopilot, and the countless industiral accidents involving manufacturing robots.
+
+9: Deloitte and its multiple lawsuits over its disastrous failures to develop municipal services like DMV systems, or the famous dumpster fire that was the launch of Obamacare.
 
 --------------------------------------------------------------------------------
 
