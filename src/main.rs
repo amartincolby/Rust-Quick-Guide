@@ -1427,7 +1427,7 @@ async fn main() {
 
     Async functions, when called, do no work. Instead, they return a "future". This is synonymous to a "promise" in JavaScript. Unlike promises, which immediately return a boxed promise _and_ begin running the function, futures return the box but do not run the function. The function must be "polled". Polling is done with the `await` keyword. If you are coming from Python, a language to which I have paid little attention, this pattern should be familiar. This means that Rust more strictly handles what can call an async function. Unlike JavaScript, where any function can call an async function, in Rust, _only_ async functions can call other async functions.
     
-    The second key difference is that async operations in Rust are not part of the language per se, but instead a standard syntax around multiple possible implementations from which you can choose. The most common async implementation is Tokio, but there are others with different strengths. When using Tokio, the library creates a thread pool with which it handles your asynchronous behaviors. Basically, you are handing over thread management to someone else.
+    The second key difference is that async operations in Rust are not part of the language per se, but instead a standard syntax around multiple possible implementations from which you can choose. The most common async implementation is Tokio, but there are others with different strengths. When using Tokio, the library creates a thread pool with which it handles your asynchronous behaviors. Basically, you are handing over thread management to someone else. This mixes the benefits of Rust with the benefits of the chaotic JavaScript world, where many different implementations of a process can compete but still use a standard syntax. I see this as similar to the competition among package managers such as NPM, even though they all use nearly the same command structure.
     
     The third key difference is that, because most everything in Rust is an evaluation, blocks can also be labeled as async. */
 
@@ -1449,13 +1449,14 @@ async fn main() {
     let some_data = async_function().await;
     println!("{some_data}");
 
+    /*** Closures ***/
+
     // The below is technically unstable.
     // let async_closure = async || println!("Got data!");
     
     /* The below is the accepted current solution but is fundamentally different to the above. In the above, the function is not run and thus no stack space is allocated. In the below, the function _does_ run, but it immediately returns a block wrapped with a future. The performance difference is likely tiny, but worth noting. */
     let async_closure = || async { String::from("More data!") };
     
-
     /*** Blocks ***/
 
     /* Because nearly everything in Rust is an evaluation, that means that entire code blocks can be tagged as async. Since async blocks necessarily return a future, naked scopes/blocks cannot be labeled as async. */

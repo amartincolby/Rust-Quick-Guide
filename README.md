@@ -74,9 +74,7 @@ which you will learn if you try to Google that phrase.
 A critical analysis of _Design Patterns_ is outside the scope of this guide,
 suffice it to say that many analyses have shown the problems they solve are
 _linguistic_ problems and not implementation problems. To wit, the patterns
-described are band-aids over a broken paradigm. _Design Patterns_ was published
-in 1994, but work on it started in 1990. We are over thirty years into an
-industry-wide effort to put lipstick on a pig.[1]
+described are band-aids over a broken paradigm. Solving linguistic problems with structure is not new. The humorous maxim of Greenspun's Tenth Law specifically addresses this and he was talking about _Lisp and Fortran!_. _Design Patterns_ was published in 1994, but work on it started in 1990. We are over thirty years into an industry-wide effort to put lipstick on a pig.[1]
 
 But beautiful change is in the air. Now is the autumn of the old ways. To be
 clear, I do not speak of AI. Indeed, AI, or at least the AI that is generating
@@ -101,19 +99,7 @@ fimly rooted in the physical world.
 
 Rust starts on the academic end of the spectrum of languages and moves toward
 the machine in search of maximum, real-world performance. Meanwhile, Rust's
-philsophical counterpart, C, starts from the machine and moves toward a more symbolic representation of concepts in search of easier use. Indeed, the stated purpose of C was to be "portable assembly": the
-thinnest possible symbolic layer over machine instruction to faciliate writing
-programs for the multitude of CPU architectures that existed in the late 1970s.
-There was basically an architecture for each company making commputers. The idea
-of something like the x86 architecture dominating the CPU industry was mostly
-unimagineable. There were other higher-level languages available at the time,
-notably COBOL, Lisp, Fortran, PL/I, Algol, and Pascal, but none of them were
-simple enough to be easily usable for truly general tasks, and their performance
-was universally much slower than hand-written assembly, as all highly symbolic
-languages were. C was specifically created to move only as far away from the
-machine as was necessary to fulfill the goal of code portability. This raw
-performance is why, even after all this time, C remains the _ne plus ultra_
-for lower-level code writing.[2]
+philsophical counterpart, C, starts from the machine and moves toward a more symbolic representation of concepts in search of easier use. Indeed, the stated purpose of C was to be "portable assembly": the thinnest possible symbolic layer over machine instruction to faciliate writing programs for the multitude of CPU architectures that existed in the late 1970s. There was basically an architecture for each company making commputers. The idea of something like the x86 architecture dominating the CPU industry was mostly unimagineable. There were other higher-level languages available at the time, notably COBOL, Lisp, Fortran, PL/I, Algol, and Pascal, but none of them were simple enough to be easily usable for truly general tasks, and their performance was universally much slower than hand-written assembly, as all highly symbolic languages were. C was specifically created to move only as far away from the machine as was necessary to fulfill the goal of code portability. This raw performance is why, even after all this time, C remains the _ne plus ultra_ for lower-level code writing.[2]
 
 I see the juxtaposition of C and Rust to be a microcosm, a synecdoche of sorts,
 for the entirety of computing history. The famous book _Hackers: Heroes of The
