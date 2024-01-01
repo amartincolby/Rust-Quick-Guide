@@ -44,8 +44,11 @@ hope that I find a middle ground that is approachable and easy to understand.
 The Rust docs are good but verbose. I like documentation that is simple enough to be a one-pager. I aim for [the famous Smalltalk postcard](https://richardeng.medium.com/syntax-on-a-post-card-cb6d85fabf88). I did a previous quick guide for ReasonML, a syntax of OCaml, which profoundly inspired Rust's semantics.
 
 # Further Information
-- [The Official Learn Rust Online Book]([https://reasonml.org/](https://doc.rust-lang.org/book/title-page.html)) *The source of truth for learning Rust.*
+- [The Official Learn Rust Online Book](https://doc.rust-lang.org/book/title-page.html) *The source of truth for learning Rust.*
 - [The Learn Rust Interactive Book](https://rust-book.cs.brown.edu/)
+- [A great blog from a Rust consultancy](https://corrode.dev/blog/)
+- [The Rust Async Docs](https://rust-lang.github.io/async-book/) *These have been perpetually unfinished*
+- [The Tokio Docs](https://tokio.rs/tokio/tutorial) *Rust's most popular async runtime and what most people mean when they say async*
 
 # The Guide
 
@@ -157,7 +160,7 @@ people in power care about that.
 Rust is not alone in this shift, nor do I think that Rust is the end goal of
 some grand historical arc. But for this moment, right now, I think that Rust is
 part of the future, and it is a future that should be encouraged. We as
-programmers are the midwives of a better world that struggles to be born. We
+programmers are the midwives to a better world that struggles to be born. We
 hold it now in our hands. Make it breathe.
 
 --------------------------------------------------------------------------------
@@ -239,13 +242,16 @@ has five 32-bit integers in it, the compiler only reserves enough space in
 memory to store five 32-bit integers. When the program or function is complete,
 the memory is cleared. One of the most common memory errors is when the program
 does something that exceeds the stack that was allocated, resulting in the
-famous _stack overflow_, from which the website gets its name.
+famous _stack overflow_, from which the website gets its name. Entities on the
+stack are added to the "top" and removed from top in a "first-in-first-out", aka
+FIFO, pattern. Imagine plates stacked. You always take the top plate.
 
 The heap is precisely that: a big pile of memory space. The primary
 differentiator between stack and heap entities is that anything on the stack
 must be of known and fixed size. Anything that can change in size must exist on
 the heap. The dangers of the heap include classics like null pointers and
-memory leaks.
+memory leaks. Since the heap's structure is unknown, any access to an entity
+requires an address.
 
 There are significant performance implications in the stack versus the heap, but
 these are outside the scope of this tutorial. If you are coming from C or C++,
@@ -265,7 +271,6 @@ Rust that most programmers are not likely to have encountered. Macros are
 incredibly powerful and complex. If they are included in this tutorial, they
 will be at the very end. For the time being, just be aware that the exclamation
 mark simply means that the tool in use is a macro. */
-
 
 /*** The Main Function ***/
 

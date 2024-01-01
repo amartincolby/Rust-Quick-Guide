@@ -25,13 +25,16 @@ has five 32-bit integers in it, the compiler only reserves enough space in
 memory to store five 32-bit integers. When the program or function is complete,
 the memory is cleared. One of the most common memory errors is when the program
 does something that exceeds the stack that was allocated, resulting in the
-famous _stack overflow_, from which the website gets its name.
+famous _stack overflow_, from which the website gets its name. Entities on the
+stack are added to the "top" and removed from top in a "first-in-first-out", aka
+FIFO, pattern. Imagine plates stacked. You always take the top plate.
 
 The heap is precisely that: a big pile of memory space. The primary
 differentiator between stack and heap entities is that anything on the stack
 must be of known and fixed size. Anything that can change in size must exist on
 the heap. The dangers of the heap include classics like null pointers and
-memory leaks.
+memory leaks. Since the heap's structure is unknown, any access to an entity
+requires an address.
 
 There are significant performance implications in the stack versus the heap, but
 these are outside the scope of this tutorial. If you are coming from C or C++,
@@ -51,7 +54,6 @@ Rust that most programmers are not likely to have encountered. Macros are
 incredibly powerful and complex. If they are included in this tutorial, they
 will be at the very end. For the time being, just be aware that the exclamation
 mark simply means that the tool in use is a macro. */
-
 
 /*** The Main Function ***/
 
@@ -1421,9 +1423,9 @@ async fn main() {
     *----------------------------------------------
     */
 
-    /* Asynchronous Rust, henceforth called async, is a comparatively new addition to Rust semantics. It is actually still technically in flux, with breaking changes being implemented, but it has been broadly stable for a couple of years.
+    /* Asynchronous Rust, henceforth called async, is a comparatively new addition to Rust semantics. It is actually still technically in flux, with breaking changes being implemented, but it has been broadly stable for a couple of years. That said, _in my opinion_, unless you are using a library that relies on async such as Actix-Web, you should prefer using traditional threads.
     
-    As opposed to default concurrent Rust, async Rust uses what can be described as green threads. Async is perhaps a new concept to those coming from Go, C, C++, or Java, but for JavaScript developers, welcome home. Everything covered here will be very familiar. 
+    As opposed to default concurrent Rust, async Rust uses what can be described as green threads. Async is perhaps a new concept to those coming from Go, C, C++, or Java, but for JavaScript developers, welcome home. Everything covered here will be very familiar. There are implementation details, but those should arguably be hidden. You can read about them in the partially-completed async documentation.
 
     Async functions, when called, do no work. Instead, they return a "future". This is synonymous to a "promise" in JavaScript. Unlike promises, which immediately return a boxed promise _and_ begin running the function, futures return the box but do not run the function. The function must be "polled". Polling is done with the `await` keyword. If you are coming from Python, a language to which I have paid little attention, this pattern should be familiar. This means that Rust more strictly handles what can call an async function. Unlike JavaScript, where any function can call an async function, in Rust, _only_ async functions can call other async functions.
     
@@ -1465,6 +1467,10 @@ async fn main() {
         let some_data = String::from("Data from a block");
         println!("{some_data}")
     };
+
+    /*** Streams ***/
+
+    /* An interesting aspect to Rust's async is the inclusion of a few features that are found in libraries in other languages. This makes sense seeing as async is syntax over libraries like Tokio, but it is nonetheless notable. The feature that stands out to me are streams. A stream is a future that can return multiple values at unknown intervals. A stream can live for an arbitrary length of time. */
 
     /*----------------------------------------------
     * Channels
