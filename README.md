@@ -15,7 +15,7 @@ more on TypeScript and JavaScript since I see a move from that language to be of
 the greatest value and sense a readiness in the web development community to
 move to better languages.
 
-I think that the best docs are short, sweet, and specific, but do not elide the
+I think that the best docs are short, sweet, and specific, elide programming basics, but do not elide the symbolic
 fundamentals undergirding the syntax. I tried to achieve this educational
 perfection with my [ReasonML Quick Guide](https://github.com/amartincolby/ReasonML-Quick-Guide),
 but ReasonML imploded with a community schism and thus caused me to abandon the
@@ -211,15 +211,17 @@ languages are _completely_ different.
 
 The below text is valid Rust code. It is a copy of the code in the src directory.
 
+The various sub-sections of the code have been delineated with curly braces, thus allowing easier collapsing and expanding of the sections in an editor.
+
 This was written in VSCode and using an interactive IDE with code linting and
 highlighting is recommended.
 
 ``` rust
 /* These imports should be familiar to most. The double-colon syntax represents
 the "path" to the entity. */
-use core::num;
-use std::array;
-use rand::prelude::*;
+use std::thread;
+use futures::*;
+use tokio::*;
 
 const _GREETING: &str = "Stay awhile. Stay forever.";
 
@@ -281,20 +283,20 @@ that Rust applications have a main function.
 
 The syntax structures above the function are called attributes. They allow a
 developer to specify how the function is the be handled by the compiler. In
-these examples, three linting settings are being disabled. More attributes will
-be covered later. */
+these examples, four linting settings are being disabled and an attribute for the library Tokio is being applied to enable async. Async will be discussed later. More attributes will be covered later. */
 
 #[allow(unused_variables)]
 #[allow(unused_assignments)]
 #[allow(dead_code)]
 #[allow(unused_mut)]
-fn main() {
+#[tokio::main]
+async fn main() {    
 
     /*----------------------------------------------
     * Items
     *----------------------------------------------
     */
-
+    
     /* Items are entities that, whenever they are declared, they are analyzed and made global, even though their _visibility_ is restricted to the scope in which they were declared. They are "attached" to this scope like a key is attached to an object. This means that items can be referenced before they are declared. This is possible because items are entirely determined at compile time, meaning they exist before something like a function runs. In Rust parlance, items are "static" entities, with "dynamic" entities being their counterpart.
     
     The below is not a complete list of items, but represent the items important for this tutorial. All of these items will be discussed.
@@ -310,10 +312,8 @@ fn main() {
     - Traits
     - Type aliases
 
-    From the perspective of semantics, items are the "hard" pieces of Rust code, the things that represent the structure through which the logic flows. As such, items cannot be created dynamically. To continue this analogy, if we liken a program to a building, what happens in the building can change over time, but what happens in the building should not determine how many floors the building has. */
+    From the perspective of semantics, items are the "hard" pieces of Rust code, the things that represent the structure through which the logic flows. As such, items cannot be created dynamically. To continue this analogy, if we liken a program to a building, what happens in the building can change over time, but what happens in the building should not determine how many floors the building has. */ 
 
-    let value_to_be_enclosed = 42;
-    let add_ints = |x: i32| x + value_to_be_enclosed;
 
     /*----------------------------------------------
     * Variables, functions, and bindings
@@ -374,6 +374,7 @@ fn main() {
     /* TODO: Talk about how variable names can reference earlier versions of the
     same name and how this pertains to ownership. */
 
+
     /*** Constants ***/
 
     /* Rust's second method for declaring bindings is `const` for constant. If
@@ -408,6 +409,7 @@ fn main() {
 
     /* Constants provide a high-performance method for storing data of known, fixed size for sharing across parts of the application. */
 
+
     /*** Statics ***/
 
     /* Statics are the third and final way to declare a value in Rust. Static values are very similar to constants and many of the same rules apply. The difference is that a constant represents a value, while a static represents a memory location. As such, a key difference is that statics can be tagged as mutable. Rust requires any interactions with a mutable static to be flagged as unsafe since the value at that memory address can change unpredictably.
@@ -422,6 +424,7 @@ fn main() {
         let static_copy = STATIC_VALUE; // This is a copy of a memory address.
     }
 
+
     /*** Type Inference ***/
 
     // Rust can often infer types.
@@ -432,6 +435,7 @@ fn main() {
 
     // Functions cannot infer parameter and return types.
     fn add_ints(a: i32, b: i32) -> i32 { a + b }
+
 
     /*** Scope ***/
 
@@ -488,6 +492,58 @@ fn main() {
         let _casual_variable = 2001; // This does not trigger a warning.
         "Return string"
     };
+
+
+    /*** If ***/
+
+    /* Since if blocks are expressions, they can be bound to an identifier. */
+
+    let roll = 13;
+
+    let crit = if roll > 10 {
+        println!("Critical Hit!");
+        true
+    } else {
+        println!("Miss!");
+        false
+    };
+
+
+    /*** Destructuring ***/
+
+    /* Rust allows destructuring bindings, where identifiers are written in the same structure as the value. This pattern is increasingly common and should be very familiar if you are coming from almost anything save for C. */
+
+    let (first_value, second_value) = (2001, 42);
+
+    println!("{first_value}"); // Prints 2001
+    println!("{second_value}"); // Prints 42
+
+    /* All of the various forms of value access are allowed. */
+
+    // This ignores the first value.
+    let (_, only_value) = (2001, 42);
+
+    /* This assigns the identifiers to the indices, starting with index 0, it then ignores everything until the final two values, where it saves the sixth index and ignores the last. */
+    let [index_0, .., index_6, _] = [0, 1, 2, 3, 4, 5, 6, 7];
+
+    println!("{index_0}"); // Prints 0
+    println!("{index_6}"); // Prints 6
+
+    struct CustomStruct {
+        id: String,
+        value: i32,
+    }
+
+    let custom_value = CustomStruct{
+        id: String::from("the_answer"),
+        value: 42,
+    };
+
+    let CustomStruct{id: x, value: y} = custom_value;
+
+    println!("{x}"); // Prints "the_answer"
+    println!("{y}"); // Prints 42
+
 
     /*** References ***/
 
@@ -551,6 +607,7 @@ fn main() {
     let a_pointer_to_a_number: *const i32 = &a_number_in_memory;
 
     /* Pointers are determined by the type signature of the identifier. */
+
 
     /*----------------------------------------------
     * Ownership & Borrowing
@@ -779,6 +836,7 @@ fn main() {
     reliably represent nothing, as with unit, and also the _possibility_ of
     something or nothing. */
 
+
     /*** > Array ***/
 
     /* If you are coming from C, Java, or Go, then arrays in Rust will be
@@ -814,6 +872,7 @@ fn main() {
     // TODO: Talk about arrays being on the stack instead of the heap.
     // TODO: Talk about how accessing an index does not take ownership. Only the whole array access.
 
+
     /*** > Slice ***/
 
     /* Slices are the primary tool with which you will interact with arrays.
@@ -836,6 +895,7 @@ fn main() {
     /* Slices are more generic in Rust than other languages, and as such they
     can be used with more than just Arrays. Most importantly, slices can be
     used with strings, which will be discussed now. */
+
 
     /*** > Vector ***/
 
@@ -879,6 +939,7 @@ fn main() {
     let rogue = &v[..];
     let johnny = &v[1..3];
 
+
     /*** > String & str ***/
 
     /* Like vectors, strings in Rust are not true primitives in the sense that
@@ -913,8 +974,6 @@ fn main() {
     
     heap_of_chars.push_str("raindrops on roses ");
     heap_of_chars.push_str("whiskers on kittens ");
-
-    /* Because   */
 
     let string_slice = &heap_of_chars[1..3];
 
@@ -1011,6 +1070,7 @@ fn main() {
     is called an object literal. Rust also has the term "struct literal" but it
     denotes the entity created _by_ a struct usage. */
 
+
     /*** Unit Struct ***/
 
     /* One of the best aspects of OCaml was, since it separated the existence of
@@ -1035,6 +1095,7 @@ fn main() {
     implementations. */
 
     struct Kwyjibo;
+
 
     /*** Tuples ***/
 
@@ -1062,6 +1123,7 @@ fn main() {
     while structs cannot. My criticism is not with the implementation. It is
     with the term usage because terms are important. */
 
+
     /*** Struct Methods ***/
 
     /* As mentioned, structs are just grouped data. They are not like classic
@@ -1079,8 +1141,8 @@ fn main() {
         }
     }
 
-    /* Implementations are tied to the struct, meaning that anywhere that
-    `Square` is visible, the `area` method is also visible. */
+    /* Implementations written in the same module as the struct, in the lib.rs file, or in the main.rs file are available globally. Implementations written in any other module are visible only in that module. */
+
 
     /*** Traits ***/
     
@@ -1100,6 +1162,7 @@ fn main() {
 
     // TODO: Cover this subject. Cover traits.
 
+
     /*** Tuples ***/
 
     /* Rust refers to tuples as a form of struct, which makes sense. If a struct
@@ -1109,6 +1172,7 @@ fn main() {
     struct Coordinate(i32, i32);
 
     let treasure = Coordinate(42, 2001);
+
 
     /*** Enum ***/
 
@@ -1151,9 +1215,21 @@ fn main() {
     Chances are you will never use a union. Interacting with them is part of what is considered unsafe Rust and an enum will be a better choice in almost every case. The primary use case for unions is when extreme memory efficiency is needed and the safety of enums consumes memory. */
 
 
+    /*----------------------------------------------
+    * Pattern Matching
+    *-----------------------------------------------
+    */
 
+    /* ALong with the usual forms of control flow, Rust includes the positively divine semantics of pattern matching. Pattern matching is the use of a "pattern" that is used to analyze something and determine the next step in the logical flow. The basic matching concept is similar to a regex, but full-featured pattern matching is much more powerful. */
 
-        
+    let string_number = (String::from("A string"), 42);
+    
+    match string_number {
+        (x, i32) => println!("Has a string then a number"),
+        (i32, String) => println!("Has a number then a string"),
+    }
+
+    
     /*----------------------------------------------
     * Generics
     *-----------------------------------------------
@@ -1178,8 +1254,7 @@ fn main() {
 
     /*** Type Aliases ***/
 
-    /* Rust enables aliasing of types to different names. Aliases are confusingly declared with the `type` keyword. This is one of the few areas of Rust's syntax with which I strongly disagree. `type` is from OCaml and they should have left it there. Aliases are intended to enable semantic naming of broad, generic types. For example, below a linked list representing stops on a trip can have the type aliased so the type of the list itself provides semantic information. */
-
+    /* Rust enables aliasing of types to different names. Aliases are confusingly declared with the `type` keyword. This is one of the few areas of Rust's syntax with which I strongly disagree. `type` is from OCaml and they should have left it there. Aliases are intended to enable semantic naming of broad, generic types. For example, below a linked list representing stops on a trip can have the type aliased so the type of the list itself provides semantic information. Now, regardless of the identifier used, it could even be the dreaded "data", semantic information about what the identifier represents is not lost. */
 
     type TripStops = LinkedList<String>;
 
@@ -1280,6 +1355,7 @@ fn main() {
     Similar modules have been declared outside of the function at the bottom of
     this file to illustrate how modules can interact. Go there now. */
     
+
     /*----------------------------------------------
     * Basic operators
     *-----------------------------------------------
@@ -1305,6 +1381,7 @@ fn main() {
     let number_comparison = 5 < 42;    // - bool : true
 
     println!("{} {}", char_comparison, number_comparison);
+
 
     /*** Equality ***/
 
@@ -1443,6 +1520,7 @@ fn main() {
     that all return values, and having the function itself finally evaluate to a
     final value, should be the ideal pattern. */
 
+
     /*** Anonymous Functions ***/
 
     /* Just like JavaScript and TypeScript, Rust functions can be "anonymous",
@@ -1542,6 +1620,7 @@ fn main() {
     
     That said, the Rust compiler is intelligent. The ultimate difference between a closure with no captured values and a function is very small. While only using closures in restricted scenarios is considered idiomatic, if you want to use them in nearly every scenario, there is no real downside. */
 
+
     /*** Unit ***/
 
     /* You may have noticed in the above example of less_than_42, that if you
@@ -1580,7 +1659,128 @@ fn main() {
     /* The above function expects to return nothing and will throw a compile
     error if anything is returned. */
 
+
+    /*----------------------------------------------
+    * Multithreading/Concurrency
+    *----------------------------------------------
+    */
+
+    /*** A Note On Concurrent vs Parallel ***/
+
+    /* Concurrent and parallel are often used interchangeably, even in the Rust docs. Parallel is a subset of concurrent. Concurrent means that two processes are active simultaneously. Parallel means that the two processes are _also_ executing computations simultaneously. See the below visualization of processes A and B. Each "x" represents a unit of computation.
     
+    A: x------x-----x-x----x---x---x------xxxx----x-x--x----x-|
+    B: ----x-x----x--x---x---x-------xx--x-----xx-----x----x--|
+
+    These are concurrent processes, but notice how the two lines never have moments of computational overlap. In parallel computing, there would, or at the very least could, be overlap. This usually means that there must be multiple computational units in the hardware. This could mean multiple cores, CPU-level multithreading, or specialized external processors such as audio chips, GPUs, NPUs, or in the olden days, math coprocessors.
+
+    When writing Rust, all you can write are _concurrent_ processes. Whether they happen in parallel or not is out of your control. To a large degree, this is for the best. As a programmer, you cannot (easily) know how the hardware can most effectively run instructions simultaneously. For some interesting history on this, read about Intel's Itanium CPUs and their EPIC architecture. */
+
+
+    /*** Fearless Concurrency ***/
+
+    /* Rust was designed from the ground-up for concurrency. Many of its memory features were built with concurrent processes in mind. While concurrency is not as simple as something like Go, it is leagues simpler than either C or C++. Further, while Erlang, Elixir, or Go may be simpler, when done well, Rust's performance will be much better.
+    
+    To start, an important point is the nature of threads in Rust. Go and Java rely on "green" threads, which is a lightweight unit of concurrency that exists as a simple entity in memory that is controlled by the language. Because of this, Go can easily spawn tens of thousands of threads that the Go runtime juggles. Rust does not use green threads by default. It instead opts to use operating system threads. Spawning an OS thread is a significantly heavier and more complex operation than spawning a green thread but gives engineers more finely-grained control over how threads are created and managed.
+    
+    If you are coming from a higher-level languages like JavaScript, don't let this scare you. As I said, Rust is a great language because it gives programmers the _option_ to use lower-level functionality but provides libraries and tools that makes it surprisingly easy to use for the same goals as languages like JavaScript or Go. These libraries and tools are outside the scope of this tutorial. We will focus on Rust's basic concurrency model.
+    
+    Just as all Rust applications have the main function, so too does that function represent the main thread. It is also the parent thread to any threads it spawns. Threads can spawn their own child threads. */
+
+    /* All threads require a closure that encapsulates the desired behavior. Threads cannot borrow, though, so the below thread will fail to compile unless the `move` keyword is applied.*/
+    let external_value = String::from("nee");
+
+    thread::spawn(move || {
+        println!("We are the knights who say {external_value}!");
+    });
+
+    /* From this point forward in the main thread, `external_value` is no longer valid. The value "nee" has _not_ necessarily been destroyed, though. Only once the child thread terminates would the value be destroyed in memory, and when the thread starts or terminates is impossible for the main thread to predict. The main thread may finish before the child thread can finish, thus destroying the child thread before it finishes. To prevent a parent from terminating before its children, the children can be "joined" to the parent. The `join` command becomes a part of the parent thread's lexical flow, meaning that the parent thread will stop until the child thread is complete before continuing. You can control when the parent thread pauses by choosing where to place the `join`. */
+
+    let child_thread = thread::spawn(|| {
+        println!("We are the knights who say Ekke Ekke Ekke Ekke Ptang Zoo Boing!");
+    });
+
+    // The main thread will pause here.
+    child_thread.join();
+    // The main thread will now continue.
+
+    /* The above `join` command will trigger a warning about an unused "result". The result is the return of the child thread. The return is not a value per se, but a status. This is mostly about error handling. If a logic error happens in a thread, it "panics" and goes through a process called "unwinding" where its memory footprint is destroyed. When a thread is joined to its parent, the thread's status is monitored. 
+    
+    The status returned is a boxed value that is either "ok" or an error. The box can be unwrapped, and thus the value is dropped:
+    
+        child_thread.join().unwrap();
+
+    The value can also be bound to an identifier then simply ignored.
+    
+        let _ = child_thread.join();
+    
+    This tutorial ignores unused variables, but if it didn't, any identifier other than `_` would trigger a warning. */
+
+
+    /*----------------------------------------------
+    * Async
+    *----------------------------------------------
+    */
+
+    /* Asynchronous Rust, henceforth called async, is a comparatively new addition to Rust semantics. It is actually still technically in flux, with breaking changes being implemented, but it has been broadly stable for a couple of years. That said, _in my opinion_, unless you are using a library that relies on async such as Actix-Web, you should prefer using traditional threads. Hopefully, async will fully stabilize in the near future.
+    
+    As opposed to default concurrent Rust, async Rust uses what can be described as green threads. Async is perhaps a new concept to those coming from Go, C, C++, or Java, but for JavaScript developers, welcome home. Everything covered here will be very familiar. There are implementation details, but those should arguably be hidden. You can read about them in the partially-completed async documentation.
+
+    Async functions, when called, do no work. Instead, they return a "future". This is synonymous to a "promise" in JavaScript. Unlike promises, which immediately return a boxed promise _and_ begin running the function, futures return the box but do not run the function. The function must be "polled". Polling is done with the `await` keyword. If you are coming from Python, a language to which I have paid little attention, this pattern should be familiar. This means that Rust more strictly handles what can call an async function. Unlike JavaScript, where any function can call an async function, in Rust, _only_ async functions can call other async functions.
+    
+    The second key difference is that async operations in Rust are not part of the language per se, but instead a standard syntax around multiple possible implementations from which you can choose. The most common async implementation is Tokio, but there are others with different strengths. When using Tokio, the library creates a thread pool with which it handles your asynchronous behaviors. Basically, you are handing over thread management to a library and you should consider your use of async as you using a library and not "real" Rust.
+    
+    The third key difference is that, because most everything in Rust is an evaluation, blocks can also be labeled as async. */
+
+
+    /*** Initializing the runtime ***/
+
+    /* This will be the strangest part to developers from other languages like JavaScript. You must start your async runtime before using async.
+    
+    Most of the time, if you are using async, it will be a key part of your application. As such, your main() function will be labeled as async. It requires the #[tokio::main] attribute, otherwise the compiler will throw an error. For this tutorial, I have labeled the main() function. Other runtimes may have other methods of initialization. */
+
+
+    /*** Functions ***/
+
+    // Just like JavaScript, `async` indicates an async function.
+    async fn async_function() -> String {
+        // Do something asynchronously like maybe get some data.
+        String::from("Here's some data")
+    }
+
+    // Notice how the await is not a method. This is because a method implies a function call, while the await is not exactly that. It is a keyword and is semantically similar to the `await` being before the function call as in JavaScript. Under the covers, it transforms the code. The `.await` you see is syntactic sugar.
+    let some_data = async_function().await;
+    println!("{some_data}");
+
+
+    /*** Closures ***/
+
+    // The below is technically unstable.
+    // let async_closure = async || println!("Got data!");
+    
+    /* The below is the accepted current solution but is fundamentally different to the above. In the above, the function is not run and thus no stack space is allocated. In the below, the function _does_ run, but it immediately returns a block wrapped with a future. The performance difference is likely tiny, but worth noting. */
+    let async_closure = || async { String::from("More data!") };
+    
+
+    /*** Blocks ***/
+
+    /* Because nearly everything in Rust is an evaluation, that means that entire code blocks can be tagged as async. Since async blocks necessarily return a future, naked scopes/blocks cannot be labeled as async. */
+
+    let async_block = async {
+        let some_data = String::from("Data from a block");
+        println!("{some_data}")
+    };
+
+
+    /*** Streams ***/
+
+    /* Async in Rust, being fundamentally a library, unsurprisingly includes some features found in other language's libraries. The feature that stands out to me are streams. A stream is a future that can return multiple values at unknown intervals. A stream can live for an arbitrary length of time. */
+
+
+    /*----------------------------------------------
+    * Channels
+    *----------------------------------------------
+    */    
 
     /*----------------------------------------------
     * Cargo
@@ -1637,5 +1837,4 @@ mod more_external_stuff {
         }
     }
 }
-
 ```
