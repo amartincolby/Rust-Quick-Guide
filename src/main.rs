@@ -3,6 +3,7 @@ the "path" to the entity. */
 use std::thread;
 use futures::*;
 use tokio::*;
+use rand::prelude::*;
 
 const _GREETING: &str = "Stay awhile. Stay forever.";
 
@@ -608,15 +609,6 @@ async fn main() {
     let kannada_char = 'ಠ';
     let kannada_char_unicode = '\u{0ca0}';
 
-    
-    /*** > Option ***/
-
-    /* Option is not a true primitive but it so common in Rust that it is
-    reasonable to treat it as one. As mentioned, Rust was inspired by functional
-    languages, and one great thing in those languages is the ability to
-    reliably represent nothing, as with unit, and also the _possibility_ of
-    something or nothing. */
-
 
     /*** > Array ***/
 
@@ -795,6 +787,7 @@ async fn main() {
     signature, they are not truly an extension of the type per se. The type
     extension is incidental to the implementation. */
 
+
     /*** Structs ***/
     
     /* A struct is a grouping of entities under a single name and usually
@@ -922,7 +915,7 @@ async fn main() {
         }
     }
 
-    /* Implementations written in the same module as the struct, in the lib.rs file, or in the main.rs file are available globally. Implementations written in any other module are visible only in that module. */
+    /* Implementations written in the same module as the struct, in the lib.rs file, or in the main.rs file are available globally. Implementations written in any other module are visible only in that module, thus allowing a module to use a struct and have private functionality tied to that struct. */
 
 
     /*** Traits ***/
@@ -955,6 +948,20 @@ async fn main() {
     let treasure = Coordinate(42, 2001);
 
 
+    /*** Union ***/
+
+    /* The reason for why Rust did not simply take OCaml's terminology is because Rust also took the union type from C. Unlike the enum, which can be understood separate from the machine state, a union requires an understanding of memory. A union is a section of memory that can store any of the value types as listed in the union. This means that the memory consumed will be whatever is the largest type. */
+
+    union IntUnion {
+        small_int: i8,
+        large_int: i64,
+    }
+
+    /* In the above union, 64 bits of space will be reserved because one possible value is a 64-bit integer.
+    
+    Chances are you will never use a union. Interacting with them is part of what is considered unsafe Rust and an enum will be a better choice in almost every case. The primary use case for unions is when extreme memory efficiency is needed and the safety of enums consumes memory. */
+
+
     /*** Enum ***/
 
     // If you have any experience with OCaml, you will recognize enum as being equivalent to union, sometimes called discriminated union or tagged union. Enum is a type that defines an identifier that can be bound to any of the enum's consituent types. For example, a value could be a string _or_ a 32-bit integer, an enum allows that to be represented. The Rust type checker will then ensure that any code that consumes an enum must handle all possible cases.
@@ -979,21 +986,30 @@ async fn main() {
         Tundra = 69,
     }
 
-    /* Notice in the above enum how the three trucks were not declared as structs before. An enum necessarily contains other types, meaning that any variant that has not been previously declared is automatically declared as a unit struct. */
+    /* Notice in the above enum how the three trucks were not declared as structs before. An enum necessarily contains other types, meaning that any variant that has not been previously declared is automatically declared as a unit struct. More complex type structures can be represented as well. */
     
-
-    /*** Union ***/
-
-    /* The reason for why Rust did not simply take OCaml's terminology is because Rust also took the union type from C. Unlike the enum, which can be understood separate from the machine state, a union requires an understanding of memory. A union is a section of memory that can store any of the value types as listed in the union. This means that the memory consumed will be whatever is the largest type. */
-
-    union IntUnion {
-        small_int: i8,
-        large_int: i64,
+    enum Motorcycle {
+        Harley{exhaust: String},
+        Ducati{color: String},
+        Honda{has_vanilla_ice: bool},
     }
 
-    /* In the above union, 64 bits of space will be reserved because one possible value is a 64-bit integer.
-    
-    Chances are you will never use a union. Interacting with them is part of what is considered unsafe Rust and an enum will be a better choice in almost every case. The primary use case for unions is when extreme memory efficiency is needed and the safety of enums consumes memory. */
+
+    /*** > Option ***/
+
+    /* I originally had Option in the section on language primitives. That is how foundational it is to Rust's functioning. Option is discussed bere because it is actually an enum, but one so common it is included with the language itself. As mentioned, Rust was inspired by functional languages, and one great thing in them is the ability to reliably represent nothing, as with unit, and also the _possibility_ of something or nothing. Whenever an Option is used, what is actually passed is a "box" that either has the specified type or is empty. This pattern enforces robust null checks. */
+
+    fn generate_answer() -> Option<i32> {
+        if rand::random() {
+            Some(42)
+        } else {
+            None
+        }
+    }
+
+    let possible_answer = generate_answer();
+
+    /* Consumption of the Option is usually done with our next major subject, Pattern Matching. */
 
 
     /*----------------------------------------------
@@ -1001,15 +1017,18 @@ async fn main() {
     *-----------------------------------------------
     */
 
-    /* ALong with the usual forms of control flow, Rust includes the positively divine semantics of pattern matching. Pattern matching is the use of a "pattern" that is used to analyze something and determine the next step in the logical flow. The basic matching concept is similar to a regex, but full-featured pattern matching is much more powerful. */
-
-    let string_number = (String::from("A string"), 42);
+    /* ALong with the usual forms of control flow, Rust includes the positively divine semantics of pattern matching. Pattern matching is the use of a "pattern" that is used to analyze something and determine the next step in the logical flow. The basic matching concept is similar to a regex, but full-featured pattern matching is much more powerful. To initially illustrate, let's consume the Option from earlier. */
     
-    match string_number {
-        (x, i32) => println!("Has a string then a number"),
-        (i32, String) => println!("Has a number then a string"),
+    match possible_answer {
+        Some(x) => println!("There is an answer and it is {x}!"),
+        None => println!("There is no answer"),
     }
 
+    /* Notice how the `Some()` is unpacked and its contents are given an identifier? Options were common enough to be included in the language, so specialized syntax was also included for consuming them: the `if let`. `if let` allows for the `None` case to be silently ignored. If you delete the `None` part of the above `match`, you will get an error because the match cases are not exhaustive. */
+
+    if let Some(x) = possible_answer {
+        println!("There is an answer and it is {x}!")
+    }
     
     /*----------------------------------------------
     * Generics
