@@ -915,7 +915,7 @@ async fn main() {
         }
     }
 
-    /* Implementations written in the same module as the struct, in the lib.rs file, or in the main.rs file are available globally. Implementations written in any other module are visible only in that module, thus allowing a module to use a struct and have private functionality tied to that struct. */
+    /* Implementations written in the same module as the struct, in the lib.rs file, or in the main.rs file are available globally. Implementations written in any other module are visible only in that module, thus allowing a module to use a struct and have private functionality tied to that struct. If importing a struct from another module, visibility of the contents of an implementation block follow similar rules to modules, where methods to be labeled as public if they are to be used outside of the scope in which they are declared. */
 
 
     /*** Traits ***/
@@ -1000,7 +1000,7 @@ async fn main() {
     /* I originally had Option in the section on language primitives. That is how foundational it is to Rust's functioning. Option is discussed bere because it is actually an enum, but one so common it is included with the language itself. As mentioned, Rust was inspired by functional languages, and one great thing in them is the ability to reliably represent nothing, as with unit, and also the _possibility_ of something or nothing. Whenever an Option is used, what is actually passed is a "box" that either has the specified type or is empty. This pattern enforces robust null checks. */
 
     fn generate_answer() -> Option<i32> {
-        if rand::random() {
+        if rand::random::<bool>() {
             Some(42)
         } else {
             None
@@ -1029,6 +1029,46 @@ async fn main() {
     if let Some(x) = possible_answer {
         println!("There is an answer and it is {x}!")
     }
+
+    // The same syntax can be used to implement a while loop.
+
+    let random = Some(rand::random::<bool>());
+    while let Some(true) = random {
+        println!("It's true!")
+    }
+
+    /* The real power of pattern matching comes from more complex scenarios. */
+
+    enum Magic {
+        MagicMissile(i32),
+        Fireball(i32),
+        LightingBolt(i32),
+        ShockingGrasp(i32),
+    }
+
+    fn generate_spell(spell: Magic) {
+        match spell {
+            Magic::MagicMissile(x) => println!("You cast magic missile and do {x} damage"),
+            Magic::Fireball(x) => println!("You cast fireball and do {x} damage"),
+            Magic::LightingBolt(x) => println!("You cast lighthing bolt and do {x} damage"),
+            Magic::ShockingGrasp(x) => println!("You cast shocking grasp and do {x} damage"),
+        }
+    }
+
+    fn cast_spell() {
+        let mut rng = rand::thread_rng();
+        let spell = rng.gen_range(1..4);
+        let power = rng.gen_range(0..99);
+        match spell {
+            1 => generate_spell(Magic::MagicMissile(power)),
+            2 => generate_spell(Magic::Fireball(power)),
+            3 => generate_spell(Magic::LightingBolt(power)),
+            4 => generate_spell(Magic::ShockingGrasp(power)),
+            other => println!("You failed to do anything somehow"),
+        }
+    }
+
+    cast_spell();
     
     /*----------------------------------------------
     * Generics
