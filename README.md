@@ -219,7 +219,7 @@ highlighting is recommended.
 ``` rust
 /* These imports should be familiar to most. The double-colon syntax represents
 the "path" to the entity. */
-use std::thread;
+use std::{thread, result};
 use futures::*;
 use tokio::*;
 use rand::prelude::*;
@@ -980,7 +980,7 @@ async fn main() {
 
 
     /*----------------------------------------------
-    * Structs, Tuples, Enums, & Modules
+    * Type Structures
     *-----------------------------------------------
     */
 
@@ -1061,17 +1061,13 @@ async fn main() {
     TypeScript will infer an anonymous type that will then be used to type-check
     later uses of this object. This sort of entity in JavaScript and TypeScript
     is called an object literal. Rust also has the term "struct literal" but it
-    denotes the entity created _by_ a struct usage. */
+    denotes the entity created when instantiated with a struct. */
 
 
     /*** Unit Struct ***/
 
-    /* One of the best aspects of OCaml was, since it separated the existence of
-    an identifier and value in both the logic and the type structure, to have
-    _unbound_ type identifiers that had no values. These are known as _abstract_
-    types. In Rust, the language is a bit muddled and they instead refer to them
-    as "unit structs". Unit again rears its head, but you will have to wait
-    a little longer for a discussion on it.
+    /* One of the best aspects of OCaml, since it separated the existence of
+    an identifier and value in both the logic and the type structure, was to have _unbound_ type identifiers that had no values. These are known as _abstract_ types. In Rust, the language is a bit muddled and they instead refer to them as "unit structs". A discussion of `unit` will come later.
 
     The below struct is a unit struct. Any entity using this struct does not
     need to know its structure just so long as usage of the type is consistent.
@@ -1080,9 +1076,9 @@ async fn main() {
     The superpower of unit structs is to enable type-safe program structure
     experimentation and scaffolding. A developer can draw out a structure on a
     whiteboard, then code out the same structure, with unit structs being used
-    to connect the entities. Later, when behaviors are figured out, the struct
+    to connect the entities. Later, when behaviors are figured out, the structs
     can be built out while maintaining strict type security across all of the
-    struct's consumers. 
+    struct consumers. 
     
     Unit structs will be explored in detail in the sections on enums and
     implementations. */
@@ -1121,7 +1117,8 @@ async fn main() {
 
     /* As mentioned, structs are just grouped data. They are not like classic
     "objects" in the sense of having behavior and data. To add behaviors, aka
-    methods, to a struct, it must be "implemented". */
+    methods, to a struct, it must be "implemented". Implementations exist
+    separate from the struct in memory. */
 
     struct Square {
         width: f64,
@@ -1148,23 +1145,9 @@ async fn main() {
     double-colon syntax means it is a method on the type itself and will never
     change. A good analogy for those coming from other OO languages is to see
     the double-colon as calling static methods. The different syntax helps
-    provide clarity as to where and how method calls work.
-    
-    The functionality seems duplicated, and for the use case here it is, but the
-    underlying process is very different. These will be discussed later.  */
+    provide clarity as to where and how method calls work. */
 
-    // TODO: Cover this subject. Cover traits.
-
-
-    /*** Tuples ***/
-
-    /* Rust refers to tuples as a form of struct, which makes sense. If a struct
-    is a set of primitive values in a shared space, sitting together in memory,
-    then a classic tuple fits the bill. I am not a fan of it because I see a key element of structs as being key access Just as with traditional structs, names for tuples use CamelCase. Unlike traditional structs, they are accessed by order instead of key. None of this should be new to basically every programmer on Earth. */
-
-    struct Coordinate(i32, i32);
-
-    let treasure = Coordinate(42, 2001);
+    // TODO: Cover this subject. Cover traits. Cover how String::from() is different from .to_string(), even though they produce the same output.
 
 
     /*** Union ***/
@@ -1216,7 +1199,11 @@ async fn main() {
 
     /*** > Option ***/
 
-    /* I originally had Option in the section on language primitives. That is how foundational it is to Rust's functioning. Option is discussed bere because it is actually an enum, but one so common it is included with the language itself. As mentioned, Rust was inspired by functional languages, and one great thing in them is the ability to reliably represent nothing, as with unit, and also the _possibility_ of something or nothing. Whenever an Option is used, what is actually passed is a "box" that either has the specified type or is empty. This pattern enforces robust null checks. */
+    /* I originally had Option in the section on language primitives. That is how foundational it is to Rust's functioning. Option is discussed bere because it is actually an enum, but one so common it is included with the language itself.
+    
+    As mentioned, Rust was inspired by functional languages, and one great thing in them is the ability to reliably represent nothing, as with unit, and also the _possibility_ of something or nothing. Whenever an Option is used, what is actually passed is a "box" that either has the specified type or is empty. This pattern enforces robust null checks.
+    
+    Further, Rust does not support optional arguments as it is found in many other languages. Instead, Options are used to again enforce type safety. */
 
     fn generate_answer() -> Option<i32> {
         if rand::random::<bool>() {
@@ -1228,7 +1215,35 @@ async fn main() {
 
     let possible_answer = generate_answer();
 
-    /* Consumption of the Option is usually done with our next major subject, Pattern Matching. */
+    if possible_answer == Some(42) {
+        println!("The answer is 42")
+    }
+
+
+    /*** Result, aka Error Handling ***/
+
+    /* Result is another enum included in the language that serves a similar purpose to Option, but instead of Some/None, its containers are Ok/Err, for capturing a success or returning error information. This is Rust's structured way of handling errors as opposed to mechanisms like `throw/catch`. If you are coming from Go, you will notice some conceptual similarities in error handling, but while Go makes error handling optional, Rust enforces it.
+    
+    Rust also enforces a pattern that is simply considered "best practice" in other languages: no untyped errors. In languages such as JavaScript, it is common to simply log a string. Languages like Python encourage error objects, but their lax typing means that the actual error is often not captured by the error objects, resulting in actively inferior logging information. Rust's strict typing combined with error enforcement means errors will always be explanatory. */
+
+    enum ResultError {
+        ErrOne(String),
+        ErrTwo(String),
+    }
+
+    type TestResult = Result<i32, ResultError>;
+
+    fn generate_result() -> TestResult {
+        if rand::random::<bool>() {
+            Ok(42)
+        } else {
+            Err(ResultError::ErrTwo(String::from("There was no answer")))
+        }
+    }
+
+    let possible_result = generate_result();
+
+    /* The value of enums like Option and Result will become apparent in a later section on "Pattern Matching". */
 
 
     /*----------------------------------------------
@@ -1254,6 +1269,15 @@ async fn main() {
     let random = Some(rand::random::<bool>());
     while let Some(true) = random {
         println!("It's true!")
+    }
+
+    /* Just as Option has syntax shorthand, so does Result. Instead of having to chain `match` expressions, a call that could return an `Err()` can simply have ? appended to it. In the below, both `result` and `another_result` can return errors. Chaining matches results in deeply nested pyramids almost like the old "Callback Hell" of JavaScript. With the `?`, if the error occurs, the function simply returns that error. Think of this like shorthand for a try/catch block. */
+
+    fn check_result() -> TestResult {
+        let result: i32 = generate_result()?;
+        let another_result: i32 = generate_result()?;
+
+        Ok(result + another_result)
     }
 
     /* The real power of pattern matching comes from more complex scenarios. */
