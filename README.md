@@ -1086,6 +1086,13 @@ async fn main() {
     struct Kwyjibo;
 
 
+    /*** Type Aliases ***/
+
+    /* Rust enables aliasing of types to different names. Aliases are confusingly declared with the `type` keyword. This is one of the few areas of Rust's syntax with which I strongly disagree. `type` is from OCaml and they should have left it there. Aliases are intended to enable semantic naming of broad, generic types. For example, below, a linked list representing stops on a trip can have the type aliased so the type of the list itself provides semantic information. Now, regardless of the identifier used, it could even be the dreaded "data", semantic information about what the identifier represents is not lost. */
+
+    type JarJarBinksQuotes = GenericLinkedList<String>;
+
+
     /*** Tuples ***/
 
     /* In Rust, tuples are considered a form of struct. I disagree with this
@@ -1152,7 +1159,7 @@ async fn main() {
 
     /*** Union ***/
 
-    /* The reason for why Rust did not simply take OCaml's terminology is because Rust also took the union type from C. Unlike the enum, which can be understood separate from the machine state, a union requires an understanding of memory. A union is a section of memory that can store any of the value types as listed in the union. This means that the memory consumed will be whatever is the largest type. */
+    /* The reason for why Rust did not simply take OCaml's terminology is because Rust also took the union type from C. Unlike the enum, which can be understood separate from the machine state, a union requires an understanding of memory. A union is a section of memory that can store any of the value types as listed in the union. This means that the memory consumed upon instantiation will be whatever is required to fit the largest type in the union. */
 
     union IntUnion {
         small_int: i8,
@@ -1166,7 +1173,7 @@ async fn main() {
 
     /*** Enum ***/
 
-    // If you have any experience with OCaml, you will recognize enum as being equivalent to union, sometimes called discriminated union or tagged union. Enum is a type that defines an identifier that can be bound to any of the enum's consituent types. For example, a value could be a string _or_ a 32-bit integer, an enum allows that to be represented. The Rust type checker will then ensure that any code that consumes an enum must handle all possible cases.
+    // If you have any experience with OCaml, you will recognize `enum` as being equivalent to `union`, sometimes called discriminated union or tagged union. Enum is a type that defines an identifier that can be bound to any of the enum's consituent types. For example, a value could be a string _or_ a 32-bit integer, an enum allows that to be represented. The Rust type checker will then ensure that any code that consumes an enum must handle all pertinent cases.
 
     struct Ford;
     struct Toyota;
@@ -1203,7 +1210,7 @@ async fn main() {
     
     As mentioned, Rust was inspired by functional languages, and one great thing in them is the ability to reliably represent nothing, as with unit, and also the _possibility_ of something or nothing. Whenever an Option is used, what is actually passed is a "box" that either has the specified type or is empty. This pattern enforces robust null checks.
     
-    Further, Rust does not support optional arguments as it is found in many other languages. Instead, Options are used to again enforce type safety. */
+    Further, Rust does not support optional arguments as it is found in many other languages. Instead, Options are used to again enforce type safety. Implementing that requires pattern matching, which will be discussed shortly. */
 
     fn generate_answer() -> Option<i32> {
         if rand::random::<bool>() {
@@ -1218,7 +1225,6 @@ async fn main() {
     if possible_answer == Some(42) {
         println!("The answer is 42")
     }
-
 
     /*** Result, aka Error Handling ***/
 
@@ -1243,7 +1249,31 @@ async fn main() {
 
     let possible_result = generate_result();
 
-    /* The value of enums like Option and Result will become apparent in a later section on "Pattern Matching". */
+    /* The value of enums like Option and Result will become apparent shortly in the section on "Pattern Matching". */
+
+    /*** panic! ***/
+
+    /* While most errors will be handled with Results or Options, there are always scenarios where the failure should be terminal. For this situations, Rust has `panic!()`. panic is a macro that, when called, terminates the process in which it is called and "unwinds" its stack. Basically, everything in scope is destroyed and memory is freed. Since a panic exists the control flow of the program, the reason for the panic is likely unique, and thus the only information required by the compiler is a string. The key thing to remember is that if a function panics, the function that called the panic will also unwind. */
+
+    fn panics() -> i32 {
+        panic!("I panicked!")
+    }
+
+    fn is_relaxed() -> i32 {
+        42
+    }
+
+    fn maybe_panic() {
+        println!("I'm looking for an answer");
+        let what_im_looking_for = if rand::random() {
+            panics()
+        } else {
+            is_relaxed()
+        };
+        println!("I found what I'm looking for. It's {what_im_looking_for}")
+    }
+
+    maybe_panic();
 
 
     /*----------------------------------------------
@@ -1266,9 +1296,10 @@ async fn main() {
 
     // The same syntax can be used to implement a while loop.
 
-    let random = Some(rand::random::<bool>());
+    let mut random = Some(rand::random::<bool>());
     while let Some(true) = random {
-        println!("It's true!")
+        println!("It's true!");
+        random = Some(rand::random::<bool>());
     }
 
     /* Just as Option has syntax shorthand, so does Result. Instead of having to chain `match` expressions, a call that could return an `Err()` can simply have ? appended to it. In the below, both `result` and `another_result` can return errors. Chaining matches results in deeply nested pyramids almost like the old "Callback Hell" of JavaScript. With the `?`, if the error occurs, the function simply returns that error. Think of this like shorthand for a try/catch block. */
@@ -1280,13 +1311,27 @@ async fn main() {
         Ok(result + another_result)
     }
 
+    /* As mentioned earlier, optional arguments for functions require the use of Option(), which is best handled with pattern matching. Options _can_ be unsafely unwrapped, but since you shouldn't do that, I won't show you how.
+
+    Again, if coming from a more free-wheeling language, this inability to elide arguments may seem overly restrictive, but it is those very restrictions that provide the extreme safety that is Rust's party piece. Learn it, live it, love it. */
+
+    fn optional_args(op_arg: Option<i32>) {
+        if let Some(val) = op_arg {
+            println!("Found optional argument {val}")
+        } else {
+            println!("Found no argument")
+        }
+    }
+
+    optional_args(None);
+    optional_args(Some(42));
+
     /* The real power of pattern matching comes from more complex scenarios. */
 
     enum Magic {
         MagicMissile(i32),
         Fireball(i32),
         LightingBolt(i32),
-        ShockingGrasp(i32),
     }
 
     fn generate_spell(spell: Magic) {
@@ -1294,7 +1339,6 @@ async fn main() {
             Magic::MagicMissile(x) => println!("You cast magic missile and do {x} damage"),
             Magic::Fireball(x) => println!("You cast fireball and do {x} damage"),
             Magic::LightingBolt(x) => println!("You cast lighthing bolt and do {x} damage"),
-            Magic::ShockingGrasp(x) => println!("You cast shocking grasp and do {x} damage"),
         }
     }
 
@@ -1306,13 +1350,41 @@ async fn main() {
             1 => generate_spell(Magic::MagicMissile(power)),
             2 => generate_spell(Magic::Fireball(power)),
             3 => generate_spell(Magic::LightingBolt(power)),
-            4 => generate_spell(Magic::ShockingGrasp(power)),
+            // This catch-all is required since the compiler does not know that
+            // the value is within 1 and 4, it only knows i32.
             other => println!("You failed to do anything somehow"),
         }
     }
 
     cast_spell();
+
+
+    /*----------------------------------------------
+    * Smart Pointers
+    *-----------------------------------------------
+    */
     
+    /* Pointers are obviously a memory address at which data can be found. Rust's most common pointer is the reference, denoted by the ampersand. But Rust also has "smart" pointers, which are semantic structures that contain a pointer along with some extra capabilities. */
+
+    /*** Box ***/
+
+    /* Box is the standard smart pointer and is extremely common in Rust codebases. It is a simple "box" that contains data of unknown size. The box can then be filled. If coming from C, think of it like the more symbolic version of `malloc`. */
+
+    let boxed_int = Box::new(42);
+    // Uses of the box automatically, and safely, dereference the pointer.
+    println!("The box contains {boxed_int}");
+
+    /* Because pointers are fixed size, they can be used in data structures with values of unknown size. Like in a linked list. In the below, we cannot have a potentially infinite recursion of next nodes, so next simply points to another node. */
+
+    struct LinkedList {
+        head: LinkedListNode,
+    }
+    
+    struct LinkedListNode {
+        value: i32,
+        next: Option<Box<LinkedListNode>>, // If None, it's the end of the list.
+    }
+
     /*----------------------------------------------
     * Generics
     *-----------------------------------------------
@@ -1321,25 +1393,17 @@ async fn main() {
     /* If you are coming from C++ or TypeScript, generics should be very
     familiar to you. Go only recently introduced them, but they are common
     across most typed languages. Generics are essentially just entities that
-    can accept different types, and the type signature of that entity is
-    different based on those types. The syntax for this is broadly similar to
+    can accept different types. The syntax for this is broadly similar to
     TypeScript, so it should be easy to pick up. */
 
-    struct LinkedList<T> {
-        head: LinkedListNode<T>,
+    struct GenericLinkedList<T> {
+        head: GenericLinkedListNode<T>,
     }
     
-    struct LinkedListNode<T> {
+    struct GenericLinkedListNode<T> {
         value: T,
-        next: Option<Box<LinkedListNode<T>>>,
+        next: Option<Box<GenericLinkedListNode<T>>>,
     }
-
-
-    /*** Type Aliases ***/
-
-    /* Rust enables aliasing of types to different names. Aliases are confusingly declared with the `type` keyword. This is one of the few areas of Rust's syntax with which I strongly disagree. `type` is from OCaml and they should have left it there. Aliases are intended to enable semantic naming of broad, generic types. For example, below a linked list representing stops on a trip can have the type aliased so the type of the list itself provides semantic information. Now, regardless of the identifier used, it could even be the dreaded "data", semantic information about what the identifier represents is not lost. */
-
-    type TripStops = LinkedList<String>;
 
 
     /*----------------------------------------------
