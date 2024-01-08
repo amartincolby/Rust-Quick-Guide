@@ -4,6 +4,7 @@ use std::{thread, result};
 use futures::*;
 use tokio::*;
 use rand::prelude::*;
+use std::rc::Rc;
 
 const _GREETING: &str = "Stay awhile. Stay forever.";
 
@@ -1007,9 +1008,11 @@ async fn main() {
         println!("The answer is 42")
     }
 
-    /*** Result, aka Error Handling ***/
+    /*** Result and Error Handling ***/
 
-    /* Result is another enum included in the language that serves a similar purpose to Option, but instead of Some/None, its containers are Ok/Err, for capturing a success or returning error information. This is Rust's structured way of handling errors as opposed to mechanisms like `throw/catch`. If you are coming from Go, you will notice some conceptual similarities in error handling, but while Go makes error handling optional, Rust enforces it.
+    /* Rust differentiates its error types between "recoverable" and "unrecoverable" errors. Recoverable errors mean that the symbolic state of the program is correct, something expected but undesriable has occured, and later control flows will direct the program into a state intended to handle the error. This form of error is handled with `Result`. Unrecoverable errors mean that the symbolic state of the system has been violated and as such there is no way to direct the program into a useful state. Thus, the program terminates.
+    
+    Result is another enum included in the language that serves a similar purpose to Option, but instead of Some/None, its containers are Ok/Err, for capturing a success or returning error information. This is Rust's structured way of handling errors as opposed to mechanisms like `throw/catch`. If you are coming from Go, you will notice some conceptual similarities in error handling, but while Go makes error handling optional, Rust enforces it.
     
     Rust also enforces a pattern that is simply considered "best practice" in other languages: no untyped errors. In languages such as JavaScript, it is common to simply log a string. Languages like Python encourage error objects, but their lax typing means that the actual error is often not captured by the error objects, resulting in actively inferior logging information. Rust's strict typing combined with error enforcement means errors will always be explanatory. */
 
@@ -1031,6 +1034,7 @@ async fn main() {
     let possible_result = generate_result();
 
     /* The value of enums like Option and Result will become apparent shortly in the section on "Pattern Matching". */
+
 
     /*** panic! ***/
 
@@ -1055,6 +1059,10 @@ async fn main() {
     }
 
     maybe_panic();
+
+    /* If the above panics, the main thread is unwound and the rest of the program will not run. 
+    
+    Panic should be a relatively rare tool, because most of the time you want to catch and handle errors. Panics should be used when your logic determines that the program has entered an entirely unexpected state. In essense, panics in Rust are what exceptions in other languages _should_ be: the machine state has fallen out of alignment with the symbolic state. Panics are used to fail tests. */
 
 
     /*----------------------------------------------
@@ -1141,32 +1149,6 @@ async fn main() {
 
 
     /*----------------------------------------------
-    * Smart Pointers
-    *-----------------------------------------------
-    */
-    
-    /* Pointers are obviously a memory address at which data can be found. Rust's most common pointer is the reference, denoted by the ampersand. But Rust also has "smart" pointers, which are semantic structures that contain a pointer along with some extra capabilities. */
-
-    /*** Box ***/
-
-    /* Box is the standard smart pointer and is extremely common in Rust codebases. It is a simple "box" that contains data of unknown size. The box can then be filled. If coming from C, think of it like the more symbolic version of `malloc`. */
-
-    let boxed_int = Box::new(42);
-    // Uses of the box automatically, and safely, dereference the pointer.
-    println!("The box contains {boxed_int}");
-
-    /* Because pointers are fixed size, they can be used in data structures with values of unknown size. Like in a linked list. In the below, we cannot have a potentially infinite recursion of next nodes, so next simply points to another node. */
-
-    struct LinkedList {
-        head: LinkedListNode,
-    }
-    
-    struct LinkedListNode {
-        value: i32,
-        next: Option<Box<LinkedListNode>>, // If None, it's the end of the list.
-    }
-
-    /*----------------------------------------------
     * Generics
     *-----------------------------------------------
     */
@@ -1186,6 +1168,70 @@ async fn main() {
         next: Option<Box<GenericLinkedListNode<T>>>,
     }
 
+
+    /*----------------------------------------------
+    * Smart Pointers
+    *-----------------------------------------------
+    */
+    
+    /* Pointers are obviously a memory address at which data can be found. Rust's most common pointer is the reference, denoted by the ampersand. But Rust also has "smart" pointers, which are semantic structures that contain a pointer along with some extra capabilities. */
+
+    /*** Box ***/
+
+    /* Box is the standard smart pointer and is extremely common in Rust codebases. It is a simple "box" that contains data of unknown size. The box can then be filled. If coming from C, think of it like the more symbolic version of `malloc`. */
+
+    let boxed_int = Box::new(42);
+    // Uses of the box automatically, and safely, dereference the pointer.
+    println!("The box contains {boxed_int}");
+
+    /* Because pointers are fixed size, they can be used in data structures with values of unknown size, like in a linked list. In the below, we cannot have a potentially infinite recursion of next nodes, so `next` simply points to another node. */
+
+    struct LinkedList {
+        head: LinkedListNode,
+    }
+    
+    struct LinkedListNode {
+        value: i32,
+        next: Option<Box<LinkedListNode>>, // If None, it's the end of the list.
+    }
+
+    /* When data exists in a box and not as a literal, programmers can attach code to lower-level behaviors such as when the box is cleared from memory. This is complex and outside the scope of this tutorial, but it is one of the major reasons for using smart pointers like Box. */
+
+    
+    /* Reference Counter */
+
+    /* Because of Rust's concept of ownership being key to its benefit, Rust needs ways to enable _multiple_ ownership of an entity. For example, any graph where a node can be owned by multiple other nodes or edges. A node should only fall out of scope after _all_ owners are gone. Thus, when the count of references drops to zero, the node can be destroyed. A simple example is to just have two nodes pointing to one node.
+    
+    Look at the below struct. Only one node can have another node as its `next` value. Attempting to have two nodes point to the same node would cause an ownership error. */
+
+    struct SimpleNode<T> {
+        value: T,
+        next: Option<Box<SimpleNode<T>>>,
+    }
+
+    /* Implementing the reference counter has some slight differences to Box. Reference counters must be instantiated, meaning that they cannot be boxed inside of the nodes. Each node must be an independent counter. Below, all three nodes are instantiated as counters, thus allowing an arbitrary number of other nodes to point to them. The call to Rc::clone does not actually clone the data, it simply increments the counter. I don't know why they chose that word. Note that the value of `next` requires a reference, as denoted by the ampersand. */
+
+    struct SimpleRCNode<T> {
+        value: T,
+        next: Option<Rc<SimpleRCNode<T>>>,
+    }
+
+    let leaf_node = Rc::new(SimpleRCNode{
+        value: 42,
+        next: None,
+    });
+
+    let node_1 = Rc::new(SimpleRCNode{
+        value: 2001,
+        next: Some(Rc::clone(&leaf_node)),
+    });
+
+    let node_2 = Rc::new(SimpleRCNode{
+        value: 420,
+        next: Some(Rc::clone(&leaf_node)),
+    });
+
+    /* Uncomment the above to see the error "use of moved value: `leaf_node`" */
 
     /*----------------------------------------------
     * Modules & Crates
