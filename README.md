@@ -1450,7 +1450,6 @@ async fn main() {
         next: Some(Rc::clone(&leaf_node)),
     });
 
-    /* Uncomment the above to see the error "use of moved value: `leaf_node`" */
 
     /*----------------------------------------------
     * Modules & Crates
