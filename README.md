@@ -1259,20 +1259,12 @@ async fn main() {
 
     /* While most errors will be handled with Results or Options, there are always scenarios where the failure should be terminal. For this situations, Rust has `panic!()`. panic is a macro that, when called, terminates the process in which it is called and "unwinds" its stack. Basically, everything in scope is destroyed and memory is freed. Since a panic exists the control flow of the program, the reason for the panic is likely unique, and thus the only information required by the compiler is a string. The key thing to remember is that if a function panics, the function that called the panic will also unwind. */
 
-    fn panics() -> i32 {
-        panic!("I panicked!")
-    }
-
-    fn is_relaxed() -> i32 {
-        42
-    }
-
     fn maybe_panic() {
         println!("I'm looking for an answer");
         let what_im_looking_for = if rand::random() {
-            panics()
+            panic!("I panicked!")
         } else {
-            is_relaxed()
+            42
         };
         println!("I found what I'm looking for. It's {what_im_looking_for}")
     }
