@@ -1120,6 +1120,11 @@ async fn main() {
     while structs cannot. My criticism is not with the implementation. It is
     with the term usage because terms are important. */
 
+    /*Tuples can be dot-accessed with a zero-based index, similar to arrays or
+    lists in some other languages. */
+
+    let the_tuple_says = an_untyped_tuple.1; // 42
+
 
     /*** Struct Methods ***/
 
@@ -1141,6 +1146,7 @@ async fn main() {
 
     /* Implementations written in the same module as the struct, in the lib.rs file, or in the main.rs file are available globally. Implementations written in any other module are visible only in that module, thus allowing a module to use a struct and have private functionality tied to that struct. If importing a struct from another module, visibility of the contents of an implementation block follow similar rules to modules, where methods to be labeled as public if they are to be used outside of the scope in which they are declared. */
 
+    // TODO: Add struct merging
 
     /*** Traits ***/
     
@@ -1254,6 +1260,43 @@ async fn main() {
 
     /* The value of enums like Option and Result will become apparent shortly in the section on "Pattern Matching". */
 
+    /*----------------------------------------------
+    * Lifetimes
+    *-----------------------------------------------
+    */
+
+    /* All entities in Rust have lifetimes. The term seems self-explanatory, but there are some enlightening details. Lifetime is the segment of "time" in which an entity exists. This is a consideration in all programming languages. We have previously discussed it when entities "fall out of scope." This common understanding is called "lexical lifetime." For example, once a block ends, that is the end of life for all of its contents.
+
+    Rust's compiler is capable of sub-lexical lifetimes and allows entities to be in scope but at the end of their lives. The compiler can tell if a reference is declared and then used before the end of a scope. Thus, the lifetime of a reference is actually from the point at which it is declared to when it is finally used. This is a key part of the borrow checker. 
+    
+    This underlying behavior is not unique to Rust. What is unique is the concept of a "lifetime annotation." See below: */
+
+    struct IBelieve<'a> {
+        in_life: &'a str,
+    }
+
+    let when = "after love";
+
+    let cher = IBelieve{
+        in_life: when,
+    };
+
+    /* Whenever a value may be or will be a reference, such as in a struct or argument, it must have an explicit lifetime annotation. In the above struct, since a struct could be instantiated in a different lifetime block as its referenced values, the annotations specify that the struct instance has a lifetime of `a` and anything referenced in the struct must have _an equal or greater_ lifetime. */
+        
+    /* Lifetime annotations do not change an entity's lifetime. Instead, they are saving an entity's lifetime as an identifier. See the below: */
+
+    fn some_function<'a>(x: &'a str, y: &'a str) -> &'a str {
+        if rand::random::<bool>() {
+            x
+        } else {
+            y
+        }
+    }
+
+    /* In the above, lifetimes must be annotated because the compiler cannot infer the lifetimes of argument references passed in. The argument annotations declare a function lifetime of 'a. Using single letters is simply convention, not a requirement. Next, `x` and `y` must have the _same as or greater than_ the base lifetime of the function. lifetime, and that the return value will have that lifetime as well. */
+
+
+
 
     /*** panic! ***/
 
@@ -1261,7 +1304,7 @@ async fn main() {
 
     fn maybe_panic() {
         println!("I'm looking for an answer");
-        let what_im_looking_for = if rand::random() {
+        let what_im_looking_for = if rand::random::<bool>() {
             panic!("I panicked!")
         } else {
             42
@@ -1443,6 +1486,11 @@ async fn main() {
     });
 
 
+    /*** Memory Leaks ***/
+
+    /* Multiple ownership via reference counters allows for cyclical references, which will cause memory leaks. Basically, if A references B and B references A, neither of their counters will drop to zero. This is not prevented by Rust since there are scenarios where ciclical references are desirable. Chances are, you will never need this pattern, so while the Rust docs dedicate a significant amount of time to this scenario, and even specify a solution in the form of a "weak" reference, you should really just be aware of it so you can avoid it. */
+
+    
     /*----------------------------------------------
     * Modules & Crates
     *-----------------------------------------------
