@@ -991,7 +991,6 @@ async fn main() {
         Honda{has_vanilla_ice: bool},
     }
 
-
     /*** > Option ***/
 
     /* I originally had Option in the section on language primitives. That is how foundational it is to Rust's functioning. Option is discussed bere because it is actually an enum, but one so common it is included with the language itself.
@@ -1175,8 +1174,9 @@ async fn main() {
             2 => generate_spell(Magic::Fireball(power)),
             3 => generate_spell(Magic::LightingBolt(power)),
             // This catch-all is required since the compiler does not know that
-            // the value is within 1 and 4, it only knows i32.
-            other => println!("You failed to do anything somehow"),
+            // the value is within 1 and 4, it only knows i32. The choice of
+            // `other` is arbitrary.
+            other => println!("Invalid value of {other} submitted"),
         }
     }
 
