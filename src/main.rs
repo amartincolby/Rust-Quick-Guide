@@ -5,6 +5,8 @@ use futures::*;
 use tokio::*;
 use rand::prelude::*;
 use std::rc::Rc;
+use std::sync::Arc;
+use std::collections::HashMap;
 
 const _GREETING: &str = "Stay awhile. Stay forever.";
 
@@ -28,8 +30,8 @@ memory to store five 32-bit integers. When the program or function is complete,
 the memory is cleared. One of the most common memory errors is when the program
 does something that exceeds the stack that was allocated, resulting in the
 famous _stack overflow_, from which the website gets its name. Entities on the
-stack are added to the "top" and removed from top in a "first-in-first-out", aka
-FIFO, pattern. Imagine plates stacked. You always take the top plate.
+stack are added to the "top" and removed from top in a "first-in-last-out", aka
+FILO or LIFO, pattern. Imagine plates stacked. You always take the top plate.
 
 The heap is precisely that: a big pile of memory space. The primary
 differentiator between stack and heap entities is that anything on the stack
@@ -380,6 +382,8 @@ async fn main() {
     developer will never do. "Safe" Rust's performance is already so good that
     unsafe Rust is unnecessary in all but the most demanding situations. Unsafe
     Rust will be explored fully later.
+
+    There is a lot of unsafe geekery online and it is best to ignore this. Unsafe Rust can indeed be more performant, but it requires stepping outside of what makes Rust Rust. Further, most use cases where unsafe code is genuinely best are also very common, low-level operations, like swapping bytes in memory. These common use cases almost always have a module in the standard library.
     
     For the time being, a cursory explanation of pointers will suffice. */
 
@@ -390,7 +394,6 @@ async fn main() {
     let a_pointer_to_a_number: *const i32 = &a_number_in_memory;
 
     /* Pointers are determined by the type signature of the identifier. */
-
 
     /*----------------------------------------------
     * Ownership & Borrowing
@@ -761,6 +764,32 @@ async fn main() {
     str_coercer(&heap_of_chars);
 
 
+    /*** Hash Maps ***/
+
+    /* Hash maps in Rust are conceptually similar to objects in JavaScript. Whereas vectors store data by index, hash maps store data by key. They exist on the heap and can grow and shrink dynamically. Unlike vectors, hasp maps are not ambiently available like vectors and strings and must be imported to use. */
+
+    // Instantiate a map of default size.
+    let mut inventory = HashMap::new();
+
+    // Inserting accepts a key and value tuple.
+    inventory.insert("bread", 10);
+
+    // Interacting with a map, since keys are unknown, uses options.
+
+    // New values return the inserted value in Some().
+    let new_value = inventory.insert("cheddar", 5); // Some(5)
+
+    // Duplicate values return None.
+    let dupe_value = inventory.insert("bread", 10); // None
+
+    // Getting values relies on matching.
+    // Note the use of references for anything in the map.
+    match inventory.get(&"cheddar") {
+        Some(&amount) => println!("There are {amount} units of cheddar"),
+        _ => println!("There is no cheddar in stock"),
+    }
+
+
     /*----------------------------------------------
     * Type Structures
     *-----------------------------------------------
@@ -1040,6 +1069,7 @@ async fn main() {
 
     /* The value of enums like Option and Result will become apparent shortly in the section on "Pattern Matching". */
 
+    
     /*----------------------------------------------
     * Lifetimes
     *-----------------------------------------------
@@ -1074,8 +1104,6 @@ async fn main() {
     }
 
     /* In the above, lifetimes must be annotated because the compiler cannot infer the lifetimes of argument references passed in. The argument annotations declare a function lifetime of 'a. Using single letters is simply convention, not a requirement. Next, `x` and `y` must have the _same as or greater than_ the base lifetime of the function. lifetime, and that the return value will have that lifetime as well. */
-
-
 
 
     /*** panic! ***/
@@ -1265,6 +1293,12 @@ async fn main() {
         value: 420,
         next: Some(Rc::clone(&leaf_node)),
     });
+
+
+    /*** Atomic Reference Counter ***/
+
+    /* For allowing multiple owners across threads, Rust has the Atomic Reference Counter, Arc, as part of the standard library as well. See the section on concurrency for this description. */
+
 
 
     /*** Memory Leaks ***/
@@ -1727,7 +1761,27 @@ async fn main() {
     
         let _ = child_thread.join();
     
-    This tutorial ignores unused variables, but if it didn't, any identifier other than `_` would trigger a warning. */
+    This tutorial's main() ignores unused variables, but if it didn't, any identifier other than `_` would trigger a warning. */
+
+
+    /*** Arc ***/
+
+    /* Just as mentioned earlier, sharing a value among multiple owners requires a reference counter. For sharing across multiple threads, the "Arc" type is required, for Atomic Reference Counter. */
+
+    // Creation and cloning syntax is identical to Rc.
+    let thing_1 = Arc::new("Thing 1");
+
+    for i in 0..10 {
+        let thing_1 = Arc::clone(&thing_1);
+
+        let thread_1 = thread::spawn(move || {
+            println!("{thing_1} from thread {i}");
+        });
+
+        let _ = thread_1.join();
+    }
+    
+    /* After this point, `thing_1` is destroyed. */
 
 
     /*----------------------------------------------
@@ -1739,7 +1793,7 @@ async fn main() {
     
     As opposed to default concurrent Rust, async Rust uses what can be described as green threads. Async is perhaps a new concept to those coming from Go, C, C++, or Java, but for JavaScript developers, welcome home. Everything covered here will be very familiar. There are implementation details, but those should arguably be hidden. You can read about them in the partially-completed async documentation.
 
-    Async functions, when called, do no work. Instead, they return a "future". This is synonymous to a "promise" in JavaScript. Unlike promises, which immediately return a boxed promise _and_ begin running the function, futures return the box but do not run the function. The function must be "polled". Polling is done with the `await` keyword. If you are coming from Python, a language to which I have paid little attention, this pattern should be familiar. This means that Rust more strictly handles what can call an async function. Unlike JavaScript, where any function can call an async function, in Rust, _only_ async functions can call other async functions.
+    Async functions, when called, do no work. Instead, they return a "future". This is synonymous to a "promise" in JavaScript. Unlike promises, which immediately return a boxed promise _and_ begin running the function, futures return the box but do not run the function. The function must be "polled". Polling is done with the `await` keyword. If you are coming from Python, a language to which I have paid little attention, this pattern should be familiar. This means that Rust more strictly enforces what can call an async function. Unlike JavaScript, where any function can call an async function, in Rust, _only_ async functions can call other async functions.
     
     The second key difference is that async operations in Rust are not part of the language per se, but instead a standard syntax around multiple possible implementations from which you can choose. The most common async implementation is Tokio, but there are others with different strengths. When using Tokio, the library creates a thread pool with which it handles your asynchronous behaviors. Basically, you are handing over thread management to a library and you should consider your use of async as you using a library and not "real" Rust.
     
@@ -1807,6 +1861,9 @@ separately.
 These modules are not nested inside of a function. They are in the base scope of
 the file and thus exist on the module level. They can thus see each other. */
 
+#[allow(unused_variables)]
+#[allow(unused_assignments)]
+#[allow(dead_code)]
 mod external_stuff {
     pub struct Stuff {
         pub x: i32,
