@@ -75,7 +75,8 @@ these examples, four linting settings are being disabled and an attribute for th
 #[allow(dead_code)]
 #[allow(unused_mut)]
 #[tokio::main]
-async fn main() {    
+async fn main() {
+    #![feature(impl_trait_in_assoc_type)]
 
     /*----------------------------------------------
     * Items
@@ -903,6 +904,8 @@ async fn main() {
 
     type JarJarBinksQuotes = GenericLinkedList<String>;
 
+    /* Type aliasing has a second use for creating entities called "opaque types." These are addressed later. */
+
 
     /*** Tuples ***/
 
@@ -1103,7 +1106,16 @@ async fn main() {
         }
     }
 
-    /* In the above, lifetimes must be annotated because the compiler cannot infer the lifetimes of argument references passed in. The argument annotations declare a function lifetime of 'a. Using single letters is simply convention, not a requirement. Next, `x` and `y` must have the _same as or greater than_ the base lifetime of the function. lifetime, and that the return value will have that lifetime as well. */
+    /* In the above, lifetimes must be annotated because the compiler cannot infer the lifetimes of argument references passed in. The argument annotations declare a function lifetime of 'a. Using single letters is simply convention, not a requirement. Next, `x` and `y` must have the _same as or greater than_ the base lifetime of the function. lifetime, and that the return value will have that lifetime as well. Essentially identical syntax is applied to implementation blocks.
+    
+    Lifetime annotations are not needed in many scenarios. The compiler will hold your hand. */
+
+
+    /*** Static ***/
+
+    /* Rust has one fixed and explicit lifetime: static. As you can guess from previous subjects, this lifetime applies to all items like the aptly named statics. The static lifetime means an entity exists for the entirety of the program's run. The only notable addition to this is that any string literal also has a static lifetime. This is because literals are part of the binary and are thus necessarily always in memory. */
+
+    let static_string: &'static str = "Getting nothing but static on channel Z";
 
 
     /*** panic! ***/
@@ -1230,6 +1242,21 @@ async fn main() {
         value: T,
         next: Option<Box<GenericLinkedListNode<T>>>,
     }
+
+    /*----------------------------------------------
+    * Opaque Types
+    *-----------------------------------------------
+    */
+
+    /* An opaque type is not really a type; it is a restriction. I like to call opaque types "specifics" to contrast them with generics. A generic means that a struct or function accepts one of all possible types, while a specific restricts the accepted type to a subset of all possible types. Opaque types can be bound to an identifier with the `type` keyword, but this is considered "unstable". This will be implemented at some point in the future. */
+
+    fn specific_function(x : impl ToString) -> impl ToString {
+        "This is a string" // success
+        // 42 // success
+        // [42] // fail
+    }
+
+    /* In the above function, the parameter `x` is restricted to all types that implement the `ToString` trait. The function then returns any type that likewise implements ToString. The returned &str implements ToString, so this works, as does the integer below it. The array below that does not implement this and thus fails. Similar logic applies to calling the function and passing in an argument. */
 
 
     /*----------------------------------------------
