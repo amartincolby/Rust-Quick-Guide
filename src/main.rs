@@ -68,15 +68,33 @@ that Rust applications have a main function.
 
 The syntax structures above the function are called attributes. They allow a
 developer to specify how the function is the be handled by the compiler. In
-these examples, four linting settings are being disabled and an attribute for the library Tokio is being applied to enable async. Async will be discussed later. More attributes will be covered later. */
+these examples, four linting settings are being disabled and an attribute for the library Tokio is being applied to enable async. Async will be discussed later. More attributes will be covered shortly. */
 
-#[allow(unused_variables)]
 #[allow(unused_assignments)]
 #[allow(dead_code)]
 #[allow(unused_mut)]
 #[tokio::main]
 async fn main() {
-    #![feature(impl_trait_in_assoc_type)]
+
+    /*----------------------------------------------
+    * Attributes
+    *----------------------------------------------
+    */
+
+    /* Attributes, as seen at the top of the main() function, are simply metadata for the compiler. They let you ignore certain errors, transform code, generate code, communicate with 3rd party tools, or enable features that are not active by default.
+    
+    There are two forms of attributes: outer and inner. Outer attributes are like the examples above main(). They affect the thing they are declared directly before. Inner attributes affect the thing in which they exist. Inner attributes do not work lexically. They apply to the entire entity in which they are declared. The primary use of inner attributes is for being declared at the top of a module or file, thus affecting all of its members. */
+
+    /* The below applies to all children of main(). It could have easily been declared as an outer attribute as well. */
+    #![allow(unused_variables)]
+    
+    // Attributes in Rust have similar abilities to some code hygiene and linting tools. 
+    
+    /* While attributes can be used to generate code and turn off warnings, they cannot be used to break the type system or suppress errors. */
+
+    #[allow(non_camel_case_types)]
+    type the_answer = i32; // Only works for this.
+
 
     /*----------------------------------------------
     * Items
@@ -1876,10 +1894,33 @@ async fn main() {
     *----------------------------------------------
     */    
 
+
     /*----------------------------------------------
     * Cargo
     *----------------------------------------------
     */
+
+
+    /*----------------------------------------------
+    * Rustdoc
+    *----------------------------------------------
+    */
+
+    /* Rustdoc is similar in intent to JSDoc for those coming from JavaScript. Unlike JS, though, the tool is included in the standard Rust distribution. Rustdoc will take the documentation blocks at the top of functions and objects and generate a web page that allows people to explore the code. */
+
+
+    /*----------------------------------------------
+    * Actix-Web
+    *----------------------------------------------
+    */
+
+    /* It may seem initially strange to include an external library as part of a tutorial, but I want to capture the people who may be coming here from Go, Java, or Node and are interested in Rust primarily as a tool for developing n-tier applications.
+    
+    A common refrain from programmers online is that Rust and Go are different languages and shouldn't be considered in opposition. I disagree with this. Rust does indeed have a higher learning curve than Go, but once learned its semantics make perfect sense. Further, Rust's libraries mean that it can easily be cantilevered into most use cases while maintaining development speed.
+    
+    The ne plus ultra exemplar of this can be found in Actix-Web. Rust was already well known, but the emergence of Actix-Web was one of the most salient moments driving Rust's fame and recognition. When a new framework comes out of nowhere and promptly tops every benchmark, people take notice. This early fame means that Actix has become the default framework. I am including this section here to show how easy n-tier development can be and how familiar it can feel. Also of note, Actix relies on Tokio for its async runtime and the previous section on async nicely connects here. */
+
+
 }
 
 /* This content is part of a section in the above function. Do not read it
