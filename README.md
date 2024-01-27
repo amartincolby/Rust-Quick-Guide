@@ -40,11 +40,14 @@ hope that I find a middle ground that is approachable and easy to understand.
 The Rust docs are good but verbose. I like documentation that is simple enough to be a one-pager. I aim for [the famous Smalltalk postcard](https://richardeng.medium.com/syntax-on-a-post-card-cb6d85fabf88). I did a previous quick guide for ReasonML, a syntax of OCaml, which profoundly inspired Rust's semantics.
 
 # Further Information
-- [The Official Learn Rust Online Book](https://doc.rust-lang.org/book/title-page.html) *The source of truth for learning Rust.*
+- [The Official Learn Rust Online Book](https://doc.rust-lang.org/book/title-page.html) *The source of truth for learning Rust*
 - [The Learn Rust Interactive Book (includes helpful quizes)](https://rust-book.cs.brown.edu/)
 - [A great blog from a Rust consultancy](https://corrode.dev/blog/)
 - [The Rust Async Docs](https://rust-lang.github.io/async-book/) *These have been perpetually unfinished*
 - [The Tokio Docs](https://tokio.rs/tokio/tutorial) *Rust's most popular async runtime and what most people mean when they say async*
+- [The official docs for Rustdoc](https://doc.rust-lang.org/rustdoc/index.html)
+- [The official docs for Cargo](https://doc.rust-lang.org/cargo/index.html)
+- [The official docs for Actix-Web](https://actix.rs/docs) *Rust's most popular web framework. Relies on Tokio.*
 
 # The Guide
 
