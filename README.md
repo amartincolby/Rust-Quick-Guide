@@ -73,7 +73,7 @@ which you will learn if you try to Google that phrase.
 A critical analysis of _Design Patterns_ is outside the scope of this guide,
 suffice it to say that many analyses have shown the problems they solve are
 _linguistic_ problems and not implementation problems. To wit, the patterns
-described are band-aids over a broken paradigm. Solving linguistic problems with structure is not new. The humorous maxim of Greenspun's Tenth Law specifically addresses this and he was talking about _Lisp and Fortran!_. _Design Patterns_ was published in 1994, but work on it started in 1990. We are over thirty years into an industry-wide effort to put lipstick on a pig.[1]
+described are band-aids over a broken paradigm. Solving linguistic problems with structure is not new. The humorous maxim of Greenspun's Tenth Rule[0] specifically addresses this and he was talking about _Lisp and Fortran!_. _Design Patterns_ was published in 1994, but work on it started in 1990. We are over thirty years into an industry-wide effort to put lipstick on a pig.[1]
 
 But beautiful change is in the air. Now is the autumn of the old ways. To be
 clear, I do not speak of AI. Indeed, AI, or at least the AI that is generating
@@ -143,7 +143,7 @@ natural skepticism for the status quo, so too are businesses realizing that
 prioritizing feature delivery over other concerns can have profoundly negative
 outcomes.
 
-There are moral consequences. A bad program can produce much more CO2 than a good program. A bad program can fail someone just when they need it most. A bad program can literally kill people.[8] A bad program can expose users to hackers. A bad program can fail society at large.[9] But I think the bigger motivation is because cloud computing is extremely expensive. If an organization is genuinely only "paying for what you use," as all cloud providers pitch, then a language that is twice as fast as another could result in a massive decrease in monthly cloud charges. That is a performance difference that would not have excited anyone fifteen years ago, but today, the bean counters start paying attention to what the geeks are saying.
+There are moral consequences. A bad program can produce much more CO2 than a good program. A bad program can fail someone just when they need it most. A bad program can literally kill people.[8] A bad program can expose users to hackers. A bad program can fail society at large.[9] There are business consequences if confidence in a product falls. There are even organizational consequences, with burnt-out engineers quitting. But I think the biggest motivation is because cloud computing is _extremely_ expensive. If an organization is genuinely only "paying for what you use," as all cloud providers pitch, then a language that is twice as fast as another could result in a massive decrease in monthly cloud charges. That is a performance difference that would not have excited anyone fifteen years ago, but today, the bean counters start paying attention to what the geeks are saying.
 
 And so we have Rust. Or perhaps I should say so we have the _popularity_ of
 Rust. Rust was going to be created regardless of the market, as is the wont of
@@ -164,6 +164,9 @@ programmers are the midwives to a better world that struggles to be born. We
 hold it now in our hands. Make it breathe.
 
 --------------------------------------------------------------------------------
+
+0: "Any sufficiently complicated C or Fortran program contains an ad hoc,
+informally-specified, bug-ridden, slow implementation of half of Common Lisp."
 
 1: While _Design Patterns_ vis-a-vis languages is open to significant critique,
 the concepts discussed in the book are still valuable, especially as regards
