@@ -47,6 +47,7 @@ The Rust docs are good but verbose. I like documentation that is simple enough t
 - [The Tokio Docs](https://tokio.rs/tokio/tutorial) *Rust's most popular async runtime and what most people mean when they say async*
 - [The official docs for Rustdoc](https://doc.rust-lang.org/rustdoc/index.html)
 - [The official docs for Cargo](https://doc.rust-lang.org/cargo/index.html)
+- [The official docs for Clippy](https://doc.rust-lang.org/clippy/)
 - [The official docs for Actix-Web](https://actix.rs/docs) *Rust's most popular web framework. Relies on Tokio.*
 
 # The Guide
@@ -218,13 +219,17 @@ highlighting is recommended.
 ``` rust
 /* These imports should be familiar to most. The double-colon syntax represents
 the "path" to the entity. */
-use std::{thread, result};
+use std::{thread};
 use futures::*;
 use tokio::*;
+use async_stream::stream;
 use rand::prelude::*;
 use std::rc::Rc;
 use std::sync::Arc;
 use std::collections::HashMap;
+
+// use futures_util::pin_mut;
+// use futures_util::stream::StreamExt;
 
 const _GREETING: &str = "Stay awhile. Stay forever.";
 
@@ -286,14 +291,43 @@ that Rust applications have a main function.
 
 The syntax structures above the function are called attributes. They allow a
 developer to specify how the function is the be handled by the compiler. In
-these examples, four linting settings are being disabled and an attribute for the library Tokio is being applied to enable async. Async will be discussed later. More attributes will be covered later. */
+these examples, four linting settings are being disabled and an attribute for the library Tokio is being applied to enable async. Async will be discussed later. More attributes will be covered shortly. */
 
-#[allow(unused_variables)]
 #[allow(unused_assignments)]
 #[allow(dead_code)]
 #[allow(unused_mut)]
 #[tokio::main]
-async fn main() {    
+async fn main() {
+
+    /*----------------------------------------------
+    * Attributes
+    *----------------------------------------------
+    */
+
+    /* Attributes, as seen at the top of the main() function, are simply metadata for the compiler. They let you ignore certain errors, transform code, generate code, communicate with 3rd party tools, or enable features that are not active by default. They cannot be used to break the type system or suppress errors. Many attributes will be shown in thie tutorial.
+    
+    There are two forms of attributes: outer and inner. Outer attributes are like the examples above main(). They affect the thing they are declared directly before. Inner attributes affect the thing in which they exist. Inner attributes do not work lexically. They apply to the entire entity in which they are declared. The primary use of inner attributes is for being declared at the top of a module or file, thus affecting all of its members. */
+
+    /* The below applies to all children of main(). It could have easily been declared as an outer attribute as well. */
+    #![allow(unused_variables)]
+    
+    /* Attributes in Rust have similar abilities to some code hygiene and linting tools. The standard linting implementation is called Clippy in a cheeky nod to Microsoft's gone-but-not-forgotten Office helper. Custom lints can be developed. */
+
+    #[allow(non_camel_case_types)]
+    type the_answer = i32; // Only works for this.
+
+    /* Attributes can denote deprecated functionality. When compiled, warnings will appear whenever deprecated code is called or otherwise used. */
+
+    #[deprecated]
+    fn deprecated_function() {
+        println!("This is deprecated")
+    }
+
+    // This will throw a warning and have a visual strike-through in IDEs.
+    deprecated_function();
+
+    /* Attributes are used to denote functions that are tests. This allows easy co-location of tests with their implementations. Testing will be discussed in a dedicated section. */
+
 
     /*----------------------------------------------
     * Items
@@ -487,7 +521,6 @@ async fn main() {
     There are two kinds of unused variable. A suspicious unused variable is one
     that has been bound with `let`. An innocuous variable is one that has not.*/
 
-    
     // To see the unused variable warnings below, comment out
     // #[allow(unused_variables)] near the top of this file.
     let block_scope = {
@@ -1121,6 +1154,8 @@ async fn main() {
 
     type JarJarBinksQuotes = GenericLinkedList<String>;
 
+    /* Type aliasing has a second use for creating entities called "opaque types." These are addressed later. */
+
 
     /*** Tuples ***/
 
@@ -1321,7 +1356,16 @@ async fn main() {
         }
     }
 
-    /* In the above, lifetimes must be annotated because the compiler cannot infer the lifetimes of argument references passed in. The argument annotations declare a function lifetime of 'a. Using single letters is simply convention, not a requirement. Next, `x` and `y` must have the _same as or greater than_ the base lifetime of the function. lifetime, and that the return value will have that lifetime as well. */
+    /* In the above, lifetimes must be annotated because the compiler cannot infer the lifetimes of argument references passed in. The argument annotations declare a function lifetime of 'a. Using single letters is simply convention, not a requirement. Next, `x` and `y` must have the _same as or greater than_ the base lifetime of the function. lifetime, and that the return value will have that lifetime as well. Essentially identical syntax is applied to implementation blocks.
+    
+    Lifetime annotations are not needed in many scenarios. The compiler will hold your hand. */
+
+
+    /*** Static ***/
+
+    /* Rust has one fixed and explicit lifetime: static. As you can guess from previous subjects, this lifetime applies to all items like the aptly named statics. The static lifetime means an entity exists for the entirety of the program's run. The only notable addition to this is that any string literal also has a static lifetime. This is because literals are part of the binary and are thus necessarily always in memory. */
+
+    let static_string: &'static str = "Getting nothing but static on channel Z";
 
 
     /*** panic! ***/
@@ -1448,6 +1492,21 @@ async fn main() {
         value: T,
         next: Option<Box<GenericLinkedListNode<T>>>,
     }
+
+    /*----------------------------------------------
+    * Opaque Types
+    *-----------------------------------------------
+    */
+
+    /* An opaque type is not really a type; it is a restriction. I like to call opaque types "specifics" to contrast them with generics. A generic means that a struct or function accepts one of all possible types, while a specific restricts the accepted type to a subset of all possible types. Opaque types can be bound to an identifier with the `type` keyword, but this is considered "unstable". This will be implemented at some point in the future. */
+
+    fn specific_function(x : impl ToString) -> impl ToString {
+        "This is a string" // success
+        // 42 // success
+        // [42] // fail
+    }
+
+    /* In the above function, the parameter `x` is restricted to all types that implement the `ToString` trait. The function then returns any type that likewise implements ToString. The returned &str implements ToString, so this works, as does the integer below it. The array below that does not implement this and thus fails. Similar logic applies to calling the function and passing in an argument. */
 
 
     /*----------------------------------------------
@@ -2059,7 +2118,22 @@ async fn main() {
 
     /*** Streams ***/
 
-    /* Async in Rust, being fundamentally a library, unsurprisingly includes some features found in other language's libraries. The feature that stands out to me are streams. A stream is a future that can return multiple values at unknown intervals. A stream can live for an arbitrary length of time. */
+    /* Async in Rust, being fundamentally a library, unsurprisingly includes some features found in other language's libraries. The feature that stands out to me are streams. A stream is a future that can return multiple values at unknown intervals. A stream can live for an arbitrary length of time. The below examples use the Futures library and a simple async stream implementation developed by the Tokio team. Other libraries and rutimes will have broadly similar syntax. Especially if coming from JavaScript, all of this will be familiar. */
+
+    let cross_the = stream!{
+        let v = vec![42, 2001, 314, 1999];
+
+        for val in v {
+            yield val;
+        }
+    };
+
+    /* This macro is an easy way to "pin" a value. A pinned value means that it will remain in the same memory location for its entire lifetime. Since async code runs at indeterminate intervals, ensuring it is reliably positioned is necessary. */
+    pin_mut!(cross_the);
+
+    while let Some(value) = cross_the.next().await {
+        println!("{value} is an important number");
+    }
 
 
     /*----------------------------------------------
@@ -2067,10 +2141,39 @@ async fn main() {
     *----------------------------------------------
     */    
 
+
     /*----------------------------------------------
     * Cargo
     *----------------------------------------------
     */
+
+
+    /*----------------------------------------------
+    * Rustdoc
+    *----------------------------------------------
+    */
+
+    /* Rustdoc is similar in intent to JSDoc for those coming from JavaScript. Unlike JS, though, the tool is included in the standard Rust distribution. Rustdoc will take the documentation blocks at the top of functions and objects and generate a web page that allows people to explore the code. */
+
+
+    /*----------------------------------------------
+    * Testing
+    *----------------------------------------------
+    */
+
+
+    /*----------------------------------------------
+    * Actix-Web
+    *----------------------------------------------
+    */
+
+    /* It may seem initially strange to include an external library as part of a tutorial, but I want to capture the people who may be coming here from Go, Java, or Node and are interested in Rust primarily as a tool for developing n-tier applications.
+    
+    A common refrain from programmers online is that Rust and Go are different languages and shouldn't be considered in opposition. I disagree with this. Rust does indeed have a higher learning curve than Go, but once learned its semantics make perfect sense. Further, Rust's libraries mean that it can easily be cantilevered into most use cases while maintaining development speed.
+    
+    The ne plus ultra exemplar of this can be found in Actix-Web. Rust was already well known, but the emergence of Actix-Web was one of the most salient moments driving Rust's fame and recognition. When a new framework comes out of nowhere and promptly tops every benchmark, people take notice. This early fame means that Actix has become the default framework. I am including this section here to show how easy n-tier development can be and how familiar it can feel. Also of note, Actix relies on Tokio for its async runtime and the previous section on async nicely connects here. */
+
+
 }
 
 /* This content is part of a section in the above function. Do not read it
@@ -2125,5 +2228,15 @@ mod more_external_stuff {
         }
     }
 }
+
+/* This section is dedicated to testing since tests cannot be nested. They must be direct descendents of a module. They are wrapped in their own module here because how the test attribute is interpreted is based on what imports are found in the module. The conflict for this tutorial comes from the Tokio import. */
+
+mod testing_stuff {
+    #[test]
+    fn testing_testing_123() {
+        println!("This is only a test")
+    }
+}
+
 
 ```
