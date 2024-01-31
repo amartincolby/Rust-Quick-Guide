@@ -1,12 +1,16 @@
 /* These imports should be familiar to most. The double-colon syntax represents
 the "path" to the entity. */
-use std::{thread, result};
+use std::{thread};
 use futures::*;
 use tokio::*;
+use async_stream::stream;
 use rand::prelude::*;
 use std::rc::Rc;
 use std::sync::Arc;
 use std::collections::HashMap;
+
+// use futures_util::pin_mut;
+// use futures_util::stream::StreamExt;
 
 const _GREETING: &str = "Stay awhile. Stay forever.";
 
@@ -81,19 +85,29 @@ async fn main() {
     *----------------------------------------------
     */
 
-    /* Attributes, as seen at the top of the main() function, are simply metadata for the compiler. They let you ignore certain errors, transform code, generate code, communicate with 3rd party tools, or enable features that are not active by default.
+    /* Attributes, as seen at the top of the main() function, are simply metadata for the compiler. They let you ignore certain errors, transform code, generate code, communicate with 3rd party tools, or enable features that are not active by default. They cannot be used to break the type system or suppress errors. Many attributes will be shown in thie tutorial.
     
     There are two forms of attributes: outer and inner. Outer attributes are like the examples above main(). They affect the thing they are declared directly before. Inner attributes affect the thing in which they exist. Inner attributes do not work lexically. They apply to the entire entity in which they are declared. The primary use of inner attributes is for being declared at the top of a module or file, thus affecting all of its members. */
 
     /* The below applies to all children of main(). It could have easily been declared as an outer attribute as well. */
     #![allow(unused_variables)]
     
-    // Attributes in Rust have similar abilities to some code hygiene and linting tools. 
-    
-    /* While attributes can be used to generate code and turn off warnings, they cannot be used to break the type system or suppress errors. */
+    /* Attributes in Rust have similar abilities to some code hygiene and linting tools. The standard linting implementation is called Clippy in a cheeky nod to Microsoft's gone-but-not-forgotten Office helper. Custom lints can be developed. */
 
     #[allow(non_camel_case_types)]
     type the_answer = i32; // Only works for this.
+
+    /* Attributes can denote deprecated functionality. When compiled, warnings will appear whenever deprecated code is called or otherwise used. */
+
+    #[deprecated]
+    fn deprecated_function() {
+        println!("This is deprecated")
+    }
+
+    // This will throw a warning and have a visual strike-through in IDEs.
+    deprecated_function();
+
+    /* Attributes are used to denote functions that are tests. This allows easy co-location of tests with their implementations. Testing will be discussed in a dedicated section. */
 
 
     /*----------------------------------------------
@@ -288,7 +302,6 @@ async fn main() {
     There are two kinds of unused variable. A suspicious unused variable is one
     that has been bound with `let`. An innocuous variable is one that has not.*/
 
-    
     // To see the unused variable warnings below, comment out
     // #[allow(unused_variables)] near the top of this file.
     let block_scope = {
@@ -1886,7 +1899,22 @@ async fn main() {
 
     /*** Streams ***/
 
-    /* Async in Rust, being fundamentally a library, unsurprisingly includes some features found in other language's libraries. The feature that stands out to me are streams. A stream is a future that can return multiple values at unknown intervals. A stream can live for an arbitrary length of time. */
+    /* Async in Rust, being fundamentally a library, unsurprisingly includes some features found in other language's libraries. The feature that stands out to me are streams. A stream is a future that can return multiple values at unknown intervals. A stream can live for an arbitrary length of time. The below examples use the Futures library and a simple async stream implementation developed by the Tokio team. Other libraries and rutimes will have broadly similar syntax. Especially if coming from JavaScript, all of this will be familiar. */
+
+    let cross_the = stream!{
+        let v = vec![42, 2001, 314, 1999];
+
+        for val in v {
+            yield val;
+        }
+    };
+
+    /* This macro is an easy way to "pin" a value. A pinned value means that it will remain in the same memory location for its entire lifetime. Since async code runs at indeterminate intervals, ensuring it is reliably positioned is necessary. */
+    pin_mut!(cross_the);
+
+    while let Some(value) = cross_the.next().await {
+        println!("{value} is an important number");
+    }
 
 
     /*----------------------------------------------
@@ -1907,6 +1935,12 @@ async fn main() {
     */
 
     /* Rustdoc is similar in intent to JSDoc for those coming from JavaScript. Unlike JS, though, the tool is included in the standard Rust distribution. Rustdoc will take the documentation blocks at the top of functions and objects and generate a web page that allows people to explore the code. */
+
+
+    /*----------------------------------------------
+    * Testing
+    *----------------------------------------------
+    */
 
 
     /*----------------------------------------------
@@ -1973,5 +2007,14 @@ mod more_external_stuff {
             x: 42,
             y: 2001,
         }
+    }
+}
+
+/* This section is dedicated to testing since tests cannot be nested. They must be direct descendents of a module. They are wrapped in their own module here because how the test attribute is interpreted is based on what imports are found in the module. The conflict for this tutorial comes from the Tokio import. */
+
+mod testing_stuff {
+    #[test]
+    fn testing_testing_123() {
+        println!("This is only a test")
     }
 }
