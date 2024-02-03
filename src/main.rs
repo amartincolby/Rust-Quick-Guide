@@ -125,7 +125,9 @@ async fn main() {
     // This will throw a warning and have a visual strike-through in IDEs.
     deprecated_function();
 
-    /* Attributes are used to denote functions that are tests. This allows easy co-location of tests with their implementations. Testing will be discussed in a dedicated section. */
+    /* Attributes are used to denote functions that are tests. This allows easy
+    co-location of tests with their implementations. Testing will be discussed
+    in a dedicated section. */
 
 
     /*----------------------------------------------
