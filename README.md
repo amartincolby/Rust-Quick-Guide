@@ -73,7 +73,7 @@ which you will learn if you try to Google that phrase.
 A critical analysis of _Design Patterns_ is outside the scope of this guide,
 suffice it to say that many analyses have shown the problems they solve are
 _linguistic_ problems and not implementation problems. To wit, the patterns
-described are band-aids over a broken paradigm. Solving linguistic problems with structure is not new. The humorous maxim of Greenspun's Tenth Rule[0] specifically addresses this and he was talking about _Lisp and Fortran!_. _Design Patterns_ was published in 1994, but work on it started in 1990. We are over thirty years into an industry-wide effort to put lipstick on a pig.[1]
+described are band-aids over a broken paradigm. Solving linguistic problems with structure is not new. The humorous maxim of Greenspun's Tenth Rule[[0](#fn0)] specifically addresses this and he was talking about _Lisp and Fortran!_. _Design Patterns_ was published in 1994, but work on it started in 1990. We are over thirty years into an industry-wide effort to put lipstick on a pig.[[1](#fn1)]
 
 But beautiful change is in the air. Now is the autumn of the old ways. To be
 clear, I do not speak of AI. Indeed, AI, or at least the AI that is generating
@@ -98,7 +98,7 @@ fimly rooted in the physical world.
 
 Rust starts on the academic end of the spectrum of languages and moves toward
 the machine in search of maximum, real-world performance. Meanwhile, Rust's
-philsophical counterpart, C, starts from the machine and moves toward a more symbolic representation of concepts in search of easier use. Indeed, the stated purpose of C was to be "portable assembly": the thinnest possible symbolic layer over machine instruction to faciliate writing programs for the multitude of CPU architectures that existed in the late 1970s. There was basically an architecture for each company making computers. The idea of something like the x86 architecture dominating the CPU industry was unimagineable. There were other higher-level languages available at the time, notably COBOL, Lisp, Fortran, PL/I, Algol, and Pascal, but none of them were simple enough to be easily usable for truly general tasks, and their performance was universally much slower than hand-written assembly, as all highly symbolic languages were. C was specifically created to move only as far away from the machine as was necessary to fulfill the goal of code portability. This raw performance is why, even after all this time, C remains the _ne plus ultra_ for lower-level code writing.[2]
+philsophical counterpart, C, starts from the machine and moves toward a more symbolic representation of concepts in search of easier use. Indeed, the stated purpose of C was to be "portable assembly": the thinnest possible symbolic layer over machine instruction to faciliate writing programs for the multitude of CPU architectures that existed in the late 1970s. There was basically an architecture for each company making computers. The idea of something like the x86 architecture dominating the CPU industry was unimagineable. There were other higher-level languages available at the time, notably COBOL, Lisp, Fortran, PL/I, Algol, and Pascal, but none of them were simple enough to be easily usable for truly general tasks, and their performance was universally much slower than hand-written assembly, as all highly symbolic languages were. C was specifically created to move only as far away from the machine as was necessary to fulfill the goal of code portability. This raw performance is why, even after all this time, C remains the _ne plus ultra_ for lower-level code writing.[[2](#fn2)]
 
 I see the juxtaposition of C and Rust to be a microcosm, a synecdoche of sorts,
 for the entirety of computing history. The famous book _Hackers: Heroes of The
@@ -110,7 +110,7 @@ short supply. As such, the excitement and successes of the real world were
 defined by the first "hackers," who were people less concerned with what symbols
 could do and more concerned with the cool things that could be achieved with
 direct control over the machine. This divide between the symbolic purists and
-the hackers would continue into every successive era of computation.[3]
+the hackers would continue into every successive era of computation.[[3](#fn3)]
 
 Unfortunately, the consequence of this is an entire industry that never fully
 embraced either perspective. As computing power increased, higher-level
@@ -118,8 +118,8 @@ languages became more common, such as COBOL and Fortran in the 60's, BASIC and P
 80's, Java in the 90's, and perhaps the Frieza-style **Final Form** of messy
 languages, JavaScript, in the 2000's. But these languages rarely came from
 academic research and were instead Frankenstein monsters that emerged from the
-needs of _business_ or simple creations aimed at educating laypeople.[4, 5, 6] Their
-_raison d'etre_ was neither geeky nor academic; it was purely human.[7]
+needs of _business_ or simple creations aimed at educating laypeople.[[4, 5, 6](#fn4)] Their
+_raison d'etre_ was neither geeky nor academic; it was purely human.[[7](#fn7)]
 
 These languages represent the third major historical thread running parallel to
 the struggle between the geeks and the academics: businesses. In the early days of computing, this thread was of minor significance simply because there were comparatively few computers and programmers in the world. But as the number of programmers increased, so did the cultural impact of the languages being used in the wild.
@@ -143,7 +143,7 @@ natural skepticism for the status quo, so too are businesses realizing that
 prioritizing feature delivery over other concerns can have profoundly negative
 outcomes.
 
-There are moral consequences. A bad program can produce much more CO2 than a good program. A bad program can fail someone just when they need it most. A bad program can literally kill people.[8] A bad program can expose users to hackers. A bad program can fail society at large.[9] There are business consequences if confidence in a product falls. There are even organizational consequences, with burnt-out engineers quitting. But I think the biggest motivation is because cloud computing is _extremely_ expensive. If an organization is genuinely only "paying for what you use," as all cloud providers pitch, then a language that is twice as fast as another could result in a massive decrease in monthly cloud charges. That is a performance difference that would not have excited anyone fifteen years ago, but today, the bean counters start paying attention to what the geeks are saying.
+There are moral consequences. A bad program can produce much more CO2 than a good program. A bad program can fail someone just when they need it most. A bad program can literally kill people.[[8](#fn8)] A bad program can expose users to hackers. A bad program can fail society at large.[[9](#fn9)] There are business consequences if confidence in a product falls. There are even organizational consequences, with burnt-out engineers quitting. But I think the biggest motivation is because cloud computing is _extremely_ expensive. If an organization is genuinely only "paying for what you use," as all cloud providers pitch, then a language that is twice as fast as another could result in a massive decrease in monthly cloud charges. That is a performance difference that would not have excited anyone fifteen years ago, but today, the bean counters start paying attention to what the geeks are saying.
 
 And so we have Rust. Or perhaps I should say so we have the _popularity_ of
 Rust. Rust was going to be created regardless of the market, as is the wont of
@@ -165,50 +165,49 @@ hold it now in our hands. Make it breathe.
 
 --------------------------------------------------------------------------------
 
-0: "Any sufficiently complicated C or Fortran program contains an ad hoc,
+<a name="fn0">0</a>: "Any sufficiently complicated C or Fortran program contains an ad hoc,
 informally-specified, bug-ridden, slow implementation of half of Common Lisp."
 
-1: While _Design Patterns_ vis-a-vis languages is open to significant critique,
-the concepts discussed in the book are still valuable, especially as regards
+<a name="fn1">1</a>: While _Design Patterns_ vis-a-vis languages is open to significant critique, the concepts discussed in the book are still valuable, especially as regards
 distributed systems. Solving problems of multi-service systems necessarily
 cannot be solved with any current language and must be solved in the
 implementation. The next great language may be one that turns archiectural
 concerns into linguistic concerns, yet again obviating the book, but for the
 time being, it remains a must-read.
 
-2: The ability of C to map to assembly in ways other languages simply couldn't
+<a name="fn2">2</a>: The ability of C to map to assembly in ways other languages simply couldn't
 is best exemplified in the famous Duff's Device, which literally just mashes
 together two syntax structures and somehow it works. Look it up. It's wild.
 
-3: The narrative thread connecting Rust and C even goes back to the very
+<a name="fn3">3</a>: The narrative thread connecting Rust and C even goes back to the very
 beginning of computing. The first people who could reasonably be called
 programmers, Ada Lovelace and Charles Babbage, separated along the same lines.
 Lovelace was a self-described metaphysician who recognized the philosophical
 possibilities in Babbage's machine, while Babbage cared about the machine itself
 and its ability to do mathematics.
 
-4: We had one glorious moment where an academic language nearly achieved some
+<a name="fn4">4</a>: We had one glorious moment where an academic language nearly achieved some
 degree of dominance in the 1980's with the rise of Lisp Machines. Ironically,
 the two main Lisp Machine companies that emerged from MIT left a drama so
 significant in their wake that it brought about the death of the hacker culture
 at the university and was the direct cause for the modern Open Source movement.
 
-5: We had another moment where a rigidly defined language achieved huge success in the form of Ada. Sadly, real-world considerations again killed Ada as its compiler, which needed to verify its powerful type system, was cripplingly slow. Compilers back in the 80's were usually proprietary products, so vendors of compilers would concentrate efforts where there was money to be made. If Ada had come out during the era of online open-source, who knows what could have been.
+<a name="fn5">5</a>: We had another moment where a rigidly defined language achieved huge success in the form of Ada. Sadly, real-world considerations again killed Ada as its compiler, which needed to verify its powerful type system, was cripplingly slow. Compilers back in the 80's were usually proprietary products, so vendors of compilers would concentrate efforts where there was money to be made. If Ada had come out during the era of online open-source, who knows what could have been.
 
-6: Even though I don't consider them academic in the sense that I defined, both
+<a name="fn6">6</a>: Even though I don't consider them academic in the sense that I defined, both
 Basic and Smalltalk emerged from academic settings. Their aim was education of
 people, and they succeeded while becoming popular as well.
 
-7: Indeed, JavaScript gives us perhaps the best example of this dynamic. An
+<a name="fn7">7</a>: Indeed, JavaScript gives us perhaps the best example of this dynamic. An
 academic was given the task of creating a language for the web and he set out to
 create an academic language, namely a variant of Scheme. This plan was torpedoed
 by executives at Netscape who demanded that he instead make a language like Java
 simply because Java was popular. And also call it JavaScript, even though the
 languages are _completely_ different.
 
-8: The examples of this are too numerous to list, but some glaring examples are Toyota's unintended acceleration debacle, the Therac 25, the Boeing 737 MAX, Tesla's Autopilot, and the countless industiral accidents involving manufacturing robots.
+<a name="fn8">8</a>: The examples of this are too numerous to list, but some glaring examples are Toyota's unintended acceleration debacle, the Therac 25, the Boeing 737 MAX, Tesla's Autopilot, and the countless industiral accidents involving manufacturing robots.
 
-9: Deloitte and its multiple lawsuits over its disastrous failures to develop municipal services like DMV systems, or the famous dumpster fire that was the launch of Obamacare.
+<a name="fn9">9</a>: Deloitte and its multiple lawsuits over its disastrous failures to develop municipal services like DMV systems, or the famous dumpster fire that was the launch of Obamacare.
 
 --------------------------------------------------------------------------------
 
