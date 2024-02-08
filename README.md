@@ -73,7 +73,12 @@ which you will learn if you try to Google that phrase.
 A critical analysis of _Design Patterns_ is outside the scope of this guide,
 suffice it to say that many analyses have shown the problems they solve are
 _linguistic_ problems and not implementation problems. To wit, the patterns
-described are band-aids over a broken paradigm. Solving linguistic problems with structure is not new. The humorous maxim of Greenspun's Tenth Rule[[0](#fn0)] specifically addresses this and he was talking about _Lisp and Fortran!_. _Design Patterns_ was published in 1994, but work on it started in 1990. We are over thirty years into an industry-wide effort to put lipstick on a pig.[[1](#fn1)]
+described are band-aids over a broken paradigm. Solving linguistic problems
+with structure is not new. The humorous maxim of Greenspun's Tenth
+Rule[[0](#fn0)] specifically addresses this and he was talking about _Lisp and
+Fortran!_. _Design Patterns_ was published in 1994, but work on it started in
+1990. We are over thirty years into an industry-wide effort to put lipstick on
+a pig.[[1](#fn1)]
 
 But beautiful change is in the air. Now is the autumn of the old ways. To be
 clear, I do not speak of AI. Indeed, AI, or at least the AI that is generating
@@ -98,7 +103,21 @@ fimly rooted in the physical world.
 
 Rust starts on the academic end of the spectrum of languages and moves toward
 the machine in search of maximum, real-world performance. Meanwhile, Rust's
-philsophical counterpart, C, starts from the machine and moves toward a more symbolic representation of concepts in search of easier use. Indeed, the stated purpose of C was to be "portable assembly": the thinnest possible symbolic layer over machine instruction to faciliate writing programs for the multitude of CPU architectures that existed in the late 1970s. There was basically an architecture for each company making computers. The idea of something like the x86 architecture dominating the CPU industry was unimagineable. There were other higher-level languages available at the time, notably COBOL, Lisp, Fortran, PL/I, Algol, and Pascal, but none of them were simple enough to be easily usable for truly general tasks, and their performance was universally much slower than hand-written assembly, as all highly symbolic languages were. C was specifically created to move only as far away from the machine as was necessary to fulfill the goal of code portability. This raw performance is why, even after all this time, C remains the _ne plus ultra_ for lower-level code writing.[[2](#fn2)]
+philsophical counterpart, C, starts from the machine and moves toward a more
+symbolic representation of concepts in search of easier use. Indeed, the stated
+purpose of C was to be "portable assembly": the thinnest possible symbolic
+layer over machine instruction to faciliate writing programs for the multitude
+of CPU architectures that existed in the late 1970s. There was basically an
+architecture for each company making computers. The idea of something like the
+x86 architecture dominating the CPU industry was unimagineable. There were
+other higher-level languages available at the time, notably COBOL, Lisp,
+Fortran, PL/I, Algol, and Pascal, but none of them were simple enough to be
+easily usable for truly general tasks, and their performance was universally
+much slower than hand-written assembly, as all highly symbolic languages were.
+C was specifically created to move only as far away from the machine as was
+necessary to fulfill the goal of code portability. This raw performance is why,
+even after all this time, C remains the _ne plus ultra_ for lower-level code
+writing.[[2](#fn2)]
 
 I see the juxtaposition of C and Rust to be a microcosm, a synecdoche of sorts,
 for the entirety of computing history. The famous book _Hackers: Heroes of The
@@ -114,24 +133,41 @@ the hackers would continue into every successive era of computation.[[3](#fn3)]
 
 Unfortunately, the consequence of this is an entire industry that never fully
 embraced either perspective. As computing power increased, higher-level
-languages became more common, such as COBOL and Fortran in the 60's, BASIC and Pascal in the 70's, Ada in the
-80's, Java in the 90's, and perhaps the Frieza-style **Final Form** of messy
-languages, JavaScript, in the 2000's. But these languages rarely came from
-academic research and were instead Frankenstein monsters that emerged from the
-needs of _business_ or simple creations aimed at educating laypeople.[[4, 5, 6](#fn4)] Their
-_raison d'etre_ was neither geeky nor academic; it was purely human.[[7](#fn7)]
+languages became more common, such as COBOL and Fortran in the 60's, BASIC and
+Pascal in the 70's, Ada in the 80's, Java in the 90's, and perhaps the
+Frieza-style **Final Form** of messy languages, JavaScript, in the 2000's. But
+these languages rarely came from academic research and were instead
+Frankenstein monsters that emerged from the needs of _business_ or simple
+creations aimed at educating laypeople.[[4, 5, 6](#fn4)] Their _raison d'etre_
+was neither geeky nor academic; it was purely human.[[7](#fn7)]
 
 These languages represent the third major historical thread running parallel to
-the struggle between the geeks and the academics: businesses. In the early days of computing, this thread was of minor significance simply because there were comparatively few computers and programmers in the world. But as the number of programmers increased, so did the cultural impact of the languages being used in the wild.
+the struggle between the geeks and the academics: businesses. In the early days
+of computing, this thread was of minor significance simply because there were
+comparatively few computers and programmers in the world. But as the number of
+programmers increased, so did the cultural impact of the languages being used
+in the wild.
 
 These languages powered the _usage_ of computers. That is to say that COBOL was
 used by companies that used computers to write solutions for business problems.
 One of the key elements, if not _the_ key element, of this thread is that
 businesses were much less concerned with performance or symbolic purity; they
-wanted features and they wanted them yesterday. To a great degree, C grew dominant because it was easier to transport code between computers, pleasing businesses.
+wanted features and they wanted them yesterday. To a great degree, C grew
+dominant because it was easier to transport code between computers, pleasing
+businesses.
 
 As software exploded in importance, business concerns had an increasing effect
-on languages, tools, and culture. Thus, it is no surprise that C was not the end of linguistic progress toward easier feature delivery and exploitation. Java, like C still among the most popular languages in the world, was introduced in 1995 and removed even the need to compile for specific architectures, instead opting to run all programs inside a "virtual machine." The performance was initially abysmal, but that did not stop its ascent. Languages like JavaScript, Python, and Ruby brought this process to its ultimate conclusion, where code is not compiled at all, but run as-is in a "runtime." It can be run instaneously, anywhere that supports the runtime. Unsurprisingly, even with performance far worse than Java or C, JavaScript can now be found running in every corner of the world.
+on languages, tools, and culture. Thus, it is no surprise that C was not the
+end of linguistic progress toward easier feature delivery and exploitation.
+Java, like C still among the most popular languages in the world, was
+introduced in 1995 and removed even the need to compile for specific
+architectures, instead opting to run all programs inside a "virtual machine."
+The performance was initially abysmal, but that did not stop its ascent.
+Languages like JavaScript, Python, and Ruby brought this process to its
+ultimate conclusion, where code is not compiled at all, but run as-is in a
+"runtime." It can be run instaneously, anywhere that supports the runtime.
+Unsurprisingly, even with performance far worse than Java or C, JavaScript can
+now be found running in every corner of the world.
 
 Features über alles.
 
@@ -143,7 +179,18 @@ natural skepticism for the status quo, so too are businesses realizing that
 prioritizing feature delivery over other concerns can have profoundly negative
 outcomes.
 
-There are moral consequences. A bad program can produce much more CO2 than a good program. A bad program can fail someone just when they need it most. A bad program can literally kill people.[[8](#fn8)] A bad program can expose users to hackers. A bad program can fail society at large.[[9](#fn9)] There are business consequences if confidence in a product falls. There are even organizational consequences, with burnt-out engineers quitting. But I think the biggest motivation is because cloud computing is _extremely_ expensive. If an organization is genuinely only "paying for what you use," as all cloud providers pitch, then a language that is twice as fast as another could result in a massive decrease in monthly cloud charges. That is a performance difference that would not have excited anyone fifteen years ago, but today, the bean counters start paying attention to what the geeks are saying.
+There are moral consequences. A bad program can produce much more CO2 than a
+good program. A bad program can fail someone just when they need it most. A bad
+program can literally kill people.[[8](#fn8)] A bad program can expose users to
+hackers. A bad program can fail society at large.[[9](#fn9)] There are business
+consequences if confidence in a product falls. There are even organizational
+consequences, with burnt-out engineers quitting. But I think the biggest
+motivation is because cloud computing is _extremely_ expensive. If an
+organization is genuinely only "paying for what you use," as all cloud
+providers pitch, then a language that is twice as fast as another could result
+in a massive decrease in monthly cloud charges. That is a performance
+difference that would not have excited anyone fifteen years ago, but today, the
+bean counters start paying attention to what the geeks are saying.
 
 And so we have Rust. Or perhaps I should say so we have the _popularity_ of
 Rust. Rust was going to be created regardless of the market, as is the wont of
@@ -165,55 +212,71 @@ hold it now in our hands. Make it breathe.
 
 --------------------------------------------------------------------------------
 
-<a name="fn0">0</a>: "Any sufficiently complicated C or Fortran program contains an ad hoc,
-informally-specified, bug-ridden, slow implementation of half of Common Lisp."
+<a name="fn0">0</a>: "Any sufficiently complicated C or Fortran program
+contains an ad hoc, informally-specified, bug-ridden, slow implementation of
+half of Common Lisp."
 
-<a name="fn1">1</a>: While _Design Patterns_ vis-a-vis languages is open to significant critique, the concepts discussed in the book are still valuable, especially as regards
-distributed systems. Solving problems of multi-service systems necessarily
-cannot be solved with any current language and must be solved in the
-implementation. The next great language may be one that turns archiectural
-concerns into linguistic concerns, yet again obviating the book, but for the
-time being, it remains a must-read.
+<a name="fn1">1</a>: While _Design Patterns_ vis-a-vis languages is open to
+significant critique, the concepts discussed in the book are still valuable,
+especially as regards distributed systems. Solving problems of multi-service
+systems necessarily cannot be solved with any current language and must be
+solved in the implementation. The next great language may be one that turns
+archiectural concerns into linguistic concerns, yet again obviating the book,
+but for the time being, it remains a must-read.
 
-<a name="fn2">2</a>: The ability of C to map to assembly in ways other languages simply couldn't
-is best exemplified in the famous Duff's Device, which literally just mashes
-together two syntax structures and somehow it works. Look it up. It's wild.
+<a name="fn2">2</a>: The ability of C to map to assembly in ways other
+languages simply couldn't is best exemplified in the famous Duff's Device,
+which literally just mashes together two syntax structures and somehow it
+works. Look it up. It's wild.
 
-<a name="fn3">3</a>: The narrative thread connecting Rust and C even goes back to the very
-beginning of computing. The first people who could reasonably be called
-programmers, Ada Lovelace and Charles Babbage, separated along the same lines.
-Lovelace was a self-described metaphysician who recognized the philosophical
-possibilities in Babbage's machine, while Babbage cared about the machine itself
-and its ability to do mathematics.
+<a name="fn3">3</a>: The narrative thread connecting Rust and C even goes back
+to the very beginning of computing. The first people who could reasonably be
+called programmers, Ada Lovelace and Charles Babbage, separated along the same
+lines. Lovelace was a self-described metaphysician who recognized the
+philosophical possibilities in Babbage's machine, while Babbage cared about the
+machine itself and its ability to do mathematics.
 
-<a name="fn4">4</a>: We had one glorious moment where an academic language nearly achieved some
-degree of dominance in the 1980's with the rise of Lisp Machines. Ironically,
-the two main Lisp Machine companies that emerged from MIT left a drama so
-significant in their wake that it brought about the death of the hacker culture
-at the university and was the direct cause for the modern Open Source movement.
+<a name="fn4">4</a>: We had one glorious moment where an academic language
+nearly achieved some degree of dominance in the 1980's with the rise of Lisp
+Machines. Ironically, the two main Lisp Machine companies that emerged from MIT
+left a drama so significant in their wake that it brought about the death of
+the hacker culture at the university and was the direct cause for the modern
+Open Source movement.
 
-<a name="fn5">5</a>: We had another moment where a rigidly defined language achieved huge success in the form of Ada. Sadly, real-world considerations again killed Ada as its compiler, which needed to verify its powerful type system, was cripplingly slow. Compilers back in the 80's were usually proprietary products, so vendors of compilers would concentrate efforts where there was money to be made. If Ada had come out during the era of online open-source, who knows what could have been.
+<a name="fn5">5</a>: We had another moment where a rigidly defined language
+achieved huge success in the form of Ada. Sadly, real-world considerations
+again killed Ada as its compiler, which needed to verify its powerful type
+system, was cripplingly slow. Compilers back in the 80's were usually
+proprietary products, so vendors of compilers would concentrate efforts where
+there was money to be made. If Ada had come out during the era of online
+open-source, who knows what could have been.
 
-<a name="fn6">6</a>: Even though I don't consider them academic in the sense that I defined, both
-Basic and Smalltalk emerged from academic settings. Their aim was education of
-people, and they succeeded while becoming popular as well.
+<a name="fn6">6</a>: Even though I don't consider them academic in the sense
+that I defined, both Basic and Smalltalk emerged from academic settings. Their
+aim was education of people, and they succeeded while becoming popular as well.
 
-<a name="fn7">7</a>: Indeed, JavaScript gives us perhaps the best example of this dynamic. An
-academic was given the task of creating a language for the web and he set out to
-create an academic language, namely a variant of Scheme. This plan was torpedoed
-by executives at Netscape who demanded that he instead make a language like Java
-simply because Java was popular. And also call it JavaScript, even though the
-languages are _completely_ different.
+<a name="fn7">7</a>: Indeed, JavaScript gives us perhaps the best example of
+this dynamic. An academic was given the task of creating a language for the web
+and he set out to create an academic language, namely a variant of Scheme. This
+plan was torpedoed by executives at Netscape who demanded that he instead make
+a language like Java simply because Java was popular. And also call it
+JavaScript, even though the languages are _completely_ different.
 
-<a name="fn8">8</a>: The examples of this are too numerous to list, but some glaring examples are Toyota's unintended acceleration debacle, the Therac 25, the Boeing 737 MAX, Tesla's Autopilot, and the countless industiral accidents involving manufacturing robots.
+<a name="fn8">8</a>: The examples of this are too numerous to list, but some
+glaring examples are Toyota's unintended acceleration debacle, the Therac 25,
+the Boeing 737 MAX, Tesla's Autopilot, and the countless industiral accidents
+involving manufacturing robots.
 
-<a name="fn9">9</a>: Deloitte and its multiple lawsuits over its disastrous failures to develop municipal services like DMV systems, or the famous dumpster fire that was the launch of Obamacare.
+<a name="fn9">9</a>: Deloitte and its multiple lawsuits over its disastrous
+failures to develop municipal services like DMV systems, or the famous dumpster
+fire that was the launch of Obamacare.
 
 --------------------------------------------------------------------------------
 
 The below text is valid Rust code. It is a copy of the code in the src directory.
 
-The various sub-sections of the code have been delineated with curly braces, thus allowing easier collapsing and expanding of the sections in an editor.
+The various sub-sections of the code have been delineated with curly braces,
+thus allowing easier collapsing and expanding of the sections in an editor.
 
 This was written in VSCode and using an interactive IDE with code linting and
 highlighting is recommended.
@@ -227,8 +290,7 @@ use tokio::*;
 use async_stream::stream;
 use rand::prelude::*;
 use std::rc::Rc;
-use std::sync::Arc;
-use std::sync::mpsc;
+use std::sync::{Arc, Mutex, mpsc};
 use std::collections::HashMap;
 
 // use futures_util::pin_mut;
@@ -284,6 +346,10 @@ their own programming language within a macro. Macros are one of the constructs
 in Rust that most programmers are not likely to have encountered. Macros will
 be discussed near the end of this tutorial. For the time being, just be aware
 that the exclamation mark syntax indicates a macro. */
+
+/*** A note on "unsafe" Rust ***/
+
+/* As stated, Rust's design started in the symbolic realm and only moved as close to the machine was was necessary for performance. Sometimes, though, when maximizing performance, the best method is to abandon symbols and simply manipulate the machine state directly like is possible in C and C++. Rust allows you to do this but requires an explicit "unsafe" block. There are many valid uses for unsafe code and Rust's best practices describe ways to mitigate risks inherent in its use. If you are looking at high-performance application development, then unsafe Rust is worth learning. I am mostly targeting n-tier application developers and JavaScript engineers with this tutorial, though, and thus consider unsafe Rust to be outside its scope. Read the official Rust docs for more information. */
 
 /*** The Main Function ***/
 
@@ -1835,7 +1901,7 @@ async fn main() {
     just be aware of it so you can avoid it. */
 
 
-    /*** Mutxes ***/
+    /*** Mutexes ***/
 
     /* A mutex is a smart pointer that only allows one entity to access it at a
     time. As with Arc, see the section on concurrency for a discussion of them.
@@ -2353,9 +2419,7 @@ async fn main() {
     this scare you. As I said, Rust is a great language because it gives
     programmers the _option_ to use lower-level functionality but provides
     libraries and tools that makes it surprisingly easy to use for the same
-    goals as languages like JavaScript or Go. These libraries and tools are
-    outside the scope of this tutorial. We will focus on Rust's basic
-    concurrency model.
+    goals as languages like JavaScript or Go.
     
     Just as all Rust applications have the main function, so too does that
     function represent the main thread. It is also the parent thread to any
@@ -2427,8 +2491,9 @@ async fn main() {
 
     let (transmitter, receiver) = mpsc::channel();
 
-    // This creates a second producer.
-    let transmitter_2 = transmitter.clone();
+    // This creates a second producer. This must remain commented since a
+    // dangling, unused transmitter will prevent a thread from completing.
+    // let transmitter_2 = transmitter.clone();
 
     // The transmitter is then moved to a new thread.
     thread::spawn(move || {
@@ -2457,32 +2522,101 @@ async fn main() {
     /* Mutex is a portmanteau of "mutual exclusion." If you are coming from C,
     C++, or Go, mutexes will be familiar. They are a common way to handle
     shared access to values. A mutex is mutually exclusive in that the value
-    can only ever be accessed by by one entity at a time. This prevents
-    multiple threads from all trying to access a value simultaneously. Mutexes
-    have clasically been seen as difficult and dangerous, but Rust's rigid
-    ownership rules makes using them rather simple. */
+    can only ever be accessed by one entity at a time. This prevents multiple
+    threads from all trying to access a value simultaneously. Sharing state
+    among threads has been a source of great difficulty, but Rust's rigid
+    ownership rules makes using mutexes rather simple.
+    
+    The below example only uses this main thread. To use multithreading, the Arc
+    smart pointer is needed, so the full example will come after. */
+
+    // The syntax for mutex creation is identical to other smart pointers.
+    let gigg = Mutex::new(23);
+
+    /* Since a mutex needs to be mutually exclusive, any use must first lock
+    it. This returns the boxed value which must be unwrapped to access. Of note,
+    `gigg` is not technically the smart pointer. The lock method returns the
+    smart pointer for use. */
+
+    {
+        let mut idy = gigg.lock().unwrap();
+        *idy = *idy * 3;
+    }
+
+    /* At this point, the naked scope above is complete, `idy` falls out of scope and is destroyed, and the mutex is unlocked.  */
+    
+    println!("{:?}, giggidy", gigg);
+
+    /* The above uses string formatting syntax not previously discussed. If you
+    are coming from C, C++, or Go, this syntax should be familiar. For values
+    that do not implement the display trait, and can thus not be immediately
+    included in strings, the :? unwraps that value. See more formatting
+    ablities in the Rust docs: https://doc.rust-lang.org/std/fmt/index.html */
 
 
     /*** Arc ***/
 
-    /* Just as mentioned earlier, sharing a value among multiple owners
-    requires a reference counter. For sharing across multiple threads, the
-    "Arc" type is required, for Atomic Reference Counter. */
+    /* As mentioned earlier, sharing a value among multiple owners requires a
+    reference counter. For sharing across multiple threads, the "Arc" type is
+    required, for Atomic Reference Counter. They are atomic in the sense that
+    they use "atomics". Atomics are a strange thing. Basically, a value is
+    atomic if entities can only every view the value in a "complete" state. By
+    that I mean that when values are changed, they can theoretically be in a
+    intermediate state, and the nature of this intermediate state can be highly
+    dependent on what the compiler does behind the scenes. Non-atomic values
+    expose these intermediate states.
+    
+    To illustrate this, imagine an object with two integer fields: val and
+    valx2. To update this object, the val needs to be updated then the valx2
+    field needs to be computed. If the object can be viewed after val has been
+    updated but before valx2 has been computed, the object is _not_ atomic. If
+    the object can only every be viewed after a complete update has occured, it
+    is atomic.
+    
+    Thus, by using Arc, different threads cannot access a value when it is in
+    an incomplete state. Atomic entities can be used independently as well with
+    the atomic module in the standard library.
+    
+    The below example was mostly taken from the official Rust docs. I have
+    added some comments and exploratory print lines. */
 
-    // Creation and cloning syntax is identical to Rc.
-    let thing_1 = Arc::new("Thing 1");
+    let accumulator = Arc::new(Mutex::new(0));
+
+    // A vector will be used to store the thread "handles" for later joining.
+    let mut handles = vec![];
 
     for i in 0..10 {
-        let thing_1 = Arc::clone(&thing_1);
+        let acc = Arc::clone(&accumulator);
+        let handle = thread::spawn(move || {
+            let mut num = acc.lock().unwrap();
 
-        let thread_1 = thread::spawn(move || {
-            println!("{thing_1} from thread {i}");
+            // The threads will likely print out of order.
+            println!("Thread {} value is {:?}", i, num);
+            *num += 1;
         });
-
-        let _ = thread_1.join();
+        handles.push(handle);
     }
-    
-    /* After this point, `thing_1` is destroyed. */
+
+    // Iterate through the handles and join each one to the main thread.
+    // Here I am using the unwrap() syntax discussed earlier.
+    for handle in handles {
+        handle.join().unwrap();
+    }
+
+    // The main thread will stop here and wait for the Arc to drop to 1, meaning
+    // that all child threads have completed.
+    println!("Result: {}", *accumulator.lock().unwrap());
+
+
+    /*** Deadlocks ***/
+
+    /* Just as Rc has the danger of circular references, thus resulting in a
+    memory leak, Mutex has the danger of "deadlocks." In a deadlock scenario,
+    thread A needs x and y, and thread B _also_ needs x and y. If thread A
+    locks x and thread B locks y, then both threads will sit there waiting for
+    the other value that they need to be unlocked. Thus, neither thread will
+    ever finish. There are best practices for avoiding deadlocks that are
+    outside the scope of this tutorial. */
 
 
     /*----------------------------------------------
@@ -2567,8 +2701,9 @@ async fn main() {
     different to the above. In the above, the function is not run and thus no
     stack space is allocated. In the below, the function _does_ run, but it
     immediately returns a block wrapped with a future. The performance
-    difference is likely tiny, but worth noting. */ let async_closure = ||
-    async { String::from("More data!") };
+    difference is likely tiny, but worth noting. */
+    
+    let async_closure = || async { String::from("More data!") };
     
 
     /*** Blocks ***/
@@ -2613,6 +2748,14 @@ async fn main() {
     }
 
 
+    /*----------------------------------------------
+    * Macros
+    *----------------------------------------------
+    */
+
+    /* Macros are one of Rust's superpowers. It is almost funny to say that considering that macros go all the way back to the dawn of high-level programming, but they are a capability that most programming languages have ignored. There are fundamental reasons for this that are outside the scope of this tutorial, but suffice it to say that it is because macros in the sense I am using require a rigidly symbolic language to implement, and most languages are... not... rigidly symbolic.
+    
+    In essense, macros allow a program to change itself. */
 
     /*----------------------------------------------
     * Cargo
