@@ -6,8 +6,7 @@ use tokio::*;
 use async_stream::stream;
 use rand::prelude::*;
 use std::rc::Rc;
-use std::sync::Arc;
-use std::sync::mpsc;
+use std::sync::{Arc, Mutex, mpsc};
 use std::collections::HashMap;
 
 // use futures_util::pin_mut;
@@ -63,6 +62,10 @@ their own programming language within a macro. Macros are one of the constructs
 in Rust that most programmers are not likely to have encountered. Macros will
 be discussed near the end of this tutorial. For the time being, just be aware
 that the exclamation mark syntax indicates a macro. */
+
+/*** A note on "unsafe" Rust ***/
+
+/* As stated, Rust's design started in the symbolic realm and only moved as close to the machine was was necessary for performance. Sometimes, though, when maximizing performance, the best method is to abandon symbols and simply manipulate the machine state directly like is possible in C and C++. Rust allows you to do this but requires an explicit "unsafe" block. There are many valid uses for unsafe code and Rust's best practices describe ways to mitigate risks inherent in its use. If you are looking at high-performance application development, then unsafe Rust is worth learning. I am mostly targeting n-tier application developers and JavaScript engineers with this tutorial, though, and thus consider unsafe Rust to be outside its scope. Read the official Rust docs for more information. */
 
 /*** The Main Function ***/
 
@@ -1614,7 +1617,7 @@ async fn main() {
     just be aware of it so you can avoid it. */
 
 
-    /*** Mutxes ***/
+    /*** Mutexes ***/
 
     /* A mutex is a smart pointer that only allows one entity to access it at a
     time. As with Arc, see the section on concurrency for a discussion of them.
@@ -2132,9 +2135,7 @@ async fn main() {
     this scare you. As I said, Rust is a great language because it gives
     programmers the _option_ to use lower-level functionality but provides
     libraries and tools that makes it surprisingly easy to use for the same
-    goals as languages like JavaScript or Go. These libraries and tools are
-    outside the scope of this tutorial. We will focus on Rust's basic
-    concurrency model.
+    goals as languages like JavaScript or Go.
     
     Just as all Rust applications have the main function, so too does that
     function represent the main thread. It is also the parent thread to any
@@ -2206,8 +2207,9 @@ async fn main() {
 
     let (transmitter, receiver) = mpsc::channel();
 
-    // This creates a second producer.
-    let transmitter_2 = transmitter.clone();
+    // This creates a second producer. This must remain commented since a
+    // dangling, unused transmitter will prevent a thread from completing.
+    // let transmitter_2 = transmitter.clone();
 
     // The transmitter is then moved to a new thread.
     thread::spawn(move || {
@@ -2236,32 +2238,101 @@ async fn main() {
     /* Mutex is a portmanteau of "mutual exclusion." If you are coming from C,
     C++, or Go, mutexes will be familiar. They are a common way to handle
     shared access to values. A mutex is mutually exclusive in that the value
-    can only ever be accessed by by one entity at a time. This prevents
-    multiple threads from all trying to access a value simultaneously. Mutexes
-    have clasically been seen as difficult and dangerous, but Rust's rigid
-    ownership rules makes using them rather simple. */
+    can only ever be accessed by one entity at a time. This prevents multiple
+    threads from all trying to access a value simultaneously. Sharing state
+    among threads has been a source of great difficulty, but Rust's rigid
+    ownership rules makes using mutexes rather simple.
+    
+    The below example only uses this main thread. To use multithreading, the Arc
+    smart pointer is needed, so the full example will come after. */
+
+    // The syntax for mutex creation is identical to other smart pointers.
+    let gigg = Mutex::new(23);
+
+    /* Since a mutex needs to be mutually exclusive, any use must first lock
+    it. This returns the boxed value which must be unwrapped to access. Of note,
+    `gigg` is not technically the smart pointer. The lock method returns the
+    smart pointer for use. */
+
+    {
+        let mut idy = gigg.lock().unwrap();
+        *idy = *idy * 3;
+    }
+
+    /* At this point, the naked scope above is complete, `idy` falls out of scope and is destroyed, and the mutex is unlocked.  */
+    
+    println!("{:?}, giggidy", gigg);
+
+    /* The above uses string formatting syntax not previously discussed. If you
+    are coming from C, C++, or Go, this syntax should be familiar. For values
+    that do not implement the display trait, and can thus not be immediately
+    included in strings, the :? unwraps that value. See more formatting
+    ablities in the Rust docs: https://doc.rust-lang.org/std/fmt/index.html */
 
 
     /*** Arc ***/
 
-    /* Just as mentioned earlier, sharing a value among multiple owners
-    requires a reference counter. For sharing across multiple threads, the
-    "Arc" type is required, for Atomic Reference Counter. */
+    /* As mentioned earlier, sharing a value among multiple owners requires a
+    reference counter. For sharing across multiple threads, the "Arc" type is
+    required, for Atomic Reference Counter. They are atomic in the sense that
+    they use "atomics". Atomics are a strange thing. Basically, a value is
+    atomic if entities can only every view the value in a "complete" state. By
+    that I mean that when values are changed, they can theoretically be in a
+    intermediate state, and the nature of this intermediate state can be highly
+    dependent on what the compiler does behind the scenes. Non-atomic values
+    expose these intermediate states.
+    
+    To illustrate this, imagine an object with two integer fields: val and
+    valx2. To update this object, the val needs to be updated then the valx2
+    field needs to be computed. If the object can be viewed after val has been
+    updated but before valx2 has been computed, the object is _not_ atomic. If
+    the object can only every be viewed after a complete update has occured, it
+    is atomic.
+    
+    Thus, by using Arc, different threads cannot access a value when it is in
+    an incomplete state. Atomic entities can be used independently as well with
+    the atomic module in the standard library.
+    
+    The below example was mostly taken from the official Rust docs. I have
+    added some comments and exploratory print lines. */
 
-    // Creation and cloning syntax is identical to Rc.
-    let thing_1 = Arc::new("Thing 1");
+    let accumulator = Arc::new(Mutex::new(0));
+
+    // A vector will be used to store the thread "handles" for later joining.
+    let mut handles = vec![];
 
     for i in 0..10 {
-        let thing_1 = Arc::clone(&thing_1);
+        let acc = Arc::clone(&accumulator);
+        let handle = thread::spawn(move || {
+            let mut num = acc.lock().unwrap();
 
-        let thread_1 = thread::spawn(move || {
-            println!("{thing_1} from thread {i}");
+            // The threads will likely print out of order.
+            println!("Thread {} value is {:?}", i, num);
+            *num += 1;
         });
-
-        let _ = thread_1.join();
+        handles.push(handle);
     }
-    
-    /* After this point, `thing_1` is destroyed. */
+
+    // Iterate through the handles and join each one to the main thread.
+    // Here I am using the unwrap() syntax discussed earlier.
+    for handle in handles {
+        handle.join().unwrap();
+    }
+
+    // The main thread will stop here and wait for the Arc to drop to 1, meaning
+    // that all child threads have completed.
+    println!("Result: {}", *accumulator.lock().unwrap());
+
+
+    /*** Deadlocks ***/
+
+    /* Just as Rc has the danger of circular references, thus resulting in a
+    memory leak, Mutex has the danger of "deadlocks." In a deadlock scenario,
+    thread A needs x and y, and thread B _also_ needs x and y. If thread A
+    locks x and thread B locks y, then both threads will sit there waiting for
+    the other value that they need to be unlocked. Thus, neither thread will
+    ever finish. There are best practices for avoiding deadlocks that are
+    outside the scope of this tutorial. */
 
 
     /*----------------------------------------------
@@ -2346,8 +2417,9 @@ async fn main() {
     different to the above. In the above, the function is not run and thus no
     stack space is allocated. In the below, the function _does_ run, but it
     immediately returns a block wrapped with a future. The performance
-    difference is likely tiny, but worth noting. */ let async_closure = ||
-    async { String::from("More data!") };
+    difference is likely tiny, but worth noting. */
+    
+    let async_closure = || async { String::from("More data!") };
     
 
     /*** Blocks ***/
@@ -2392,6 +2464,14 @@ async fn main() {
     }
 
 
+    /*----------------------------------------------
+    * Macros
+    *----------------------------------------------
+    */
+
+    /* Macros are one of Rust's superpowers. It is almost funny to say that considering that macros go all the way back to the dawn of high-level programming, but they are a capability that most programming languages have ignored. There are fundamental reasons for this that are outside the scope of this tutorial, but suffice it to say that it is because macros in the sense I am using require a rigidly symbolic language to implement, and most languages are... not... rigidly symbolic.
+    
+    In essense, macros allow a program to change itself. */
 
     /*----------------------------------------------
     * Cargo
