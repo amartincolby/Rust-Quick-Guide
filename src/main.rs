@@ -65,7 +65,17 @@ that the exclamation mark syntax indicates a macro. */
 
 /*** A note on "unsafe" Rust ***/
 
-/* As stated, Rust's design started in the symbolic realm and only moved as close to the machine was was necessary for performance. Sometimes, though, when maximizing performance, the best method is to abandon symbols and simply manipulate the machine state directly like is possible in C and C++. Rust allows you to do this but requires an explicit "unsafe" block. There are many valid uses for unsafe code and Rust's best practices describe ways to mitigate risks inherent in its use. If you are looking at high-performance application development, then unsafe Rust is worth learning. I am mostly targeting n-tier application developers and JavaScript engineers with this tutorial, though, and thus consider unsafe Rust to be outside its scope. Read the official Rust docs for more information. */
+/* As stated, Rust's design started in the symbolic realm and only moved as
+close to the machine was was necessary for performance. Sometimes, though, when
+maximizing performance, the best method is to abandon symbols and simply
+manipulate the machine state directly like is possible in C and C++. Rust
+allows you to do this but requires an explicit "unsafe" block. There are many
+valid uses for unsafe code and Rust's best practices describe ways to mitigate
+risks inherent in its use. If you are looking at high-performance application
+development, then unsafe Rust is worth learning. I am mostly targeting n-tier
+application developers and JavaScript engineers with this tutorial, though, and
+thus consider unsafe Rust to be outside its scope. Read the official Rust docs
+for more information. */
 
 /*** The Main Function ***/
 
@@ -1089,20 +1099,53 @@ async fn main() {
 
     // TODO: Add struct merging
 
-    /*** Traits ***/
     
-    let a_number = 42;
-    let number_to_string = a_number.to_string();
-    // let string_to_number = String::from(a_number);
+    /*** Traits ***/
 
-    /* The different syntax represents where the method exists. If using dot
-    syntax, the method exists on the instance and can potentially change. The
-    double-colon syntax means it is a method on the type itself and will never
-    change. A good analogy for those coming from other OO languages is to see
-    the double-colon as calling static methods. The different syntax helps
-    provide clarity as to where and how method calls work. */
+    /* Traits are how Rust handles function signatures separate from their
+    implementations. In other languages, a function signature can simply be
+    added to a type or interface. In Rust they are separate. Traits are how
+    shared behavior can be defined. For example, a for_each() method can be
+    defined that can be implemented for any entity that is iterable. The
+    specifics of the iteration may be different for arrays, vectors, strings,
+    or tuples, but the basic idea can be shared. */
 
-    // TODO: Cover this subject. Cover traits. Cover how String::from() is different from .to_string(), even though they produce the same output.
+    trait Extend {
+        fn extend(&self, length: f64) -> f64;
+
+        // Default implementations can be defined in a trait block.
+        fn say_something(&self) -> String {
+            String::from("SoMeThInG")
+        }
+    }
+
+    impl Extend for Square {
+        fn extend(&self, amount: f64) -> f64 {
+            let area = self.area();
+            area * amount
+        }
+        // Since say_something has a default implementation, it does not need to
+        // be specified here.
+    }
+
+    let new_square = Square{
+        width: 5.0,
+        height: 5.0,
+    };
+
+    let vol = new_square.extend(4.0);
+    println!("Volume is {vol}");
+
+    /* Traits can be used as type parameters. This is discussed at greater length in the section on Opaque Types. In the below function, the function signature is saying that it returns _something_ that implements Extend. It returns a Square, so that fulfills the signature. */
+
+    fn get_extendable_thing() -> impl Extend {
+        Square{
+            width: 42.0,
+            height: 42.0,
+        }
+    }
+
+    /* At this point, make note of how Rust's syntax lets you know what sort of entity is being called. Dot syntax indicates something that is attached to, for lack of a better word, an object. The double-colon syntax, like seen at the top of this file, indicate something that is a member of a module. A good example is String::from() for creating Strings and .to_string() which also creates strings. */
 
 
     /*** Union ***/
@@ -1496,6 +1539,7 @@ async fn main() {
     the future. */
 
     fn specific_function(x : impl ToString) -> impl ToString {
+        print!("{}", x.to_string());
         "This is a string" // success
         // 42 // success
         // [42] // fail
@@ -1506,8 +1550,20 @@ async fn main() {
     likewise implements ToString. The returned &str implements ToString, so
     this works, as does the integer below it. The array below that does not
     implement this and thus fails. Similar logic applies to calling the
-    function and passing in an argument. */
+    function and passing in an argument. 
+    
+    An important point to recognize is that while the return type is restricted to types that implement ToString, the function evaluation must collapse down to a single type. This type is called the "hidden" type, since it is not visible in the annotations. */
 
+    fn two_hidden_types(x : bool) -> impl ToString {
+        if x {
+            return "This is a string"
+        } else {
+            // return 42 // Fails
+            return "42"
+        }
+    }
+
+    /* Even though the above function returns one of two things that both have the ToString trait, the hidden type of the function must be one or the other, &str or i32, it cannot be both. */
 
     /*----------------------------------------------
     * Smart Pointers
@@ -2261,7 +2317,7 @@ async fn main() {
 
     /* At this point, the naked scope above is complete, `idy` falls out of scope and is destroyed, and the mutex is unlocked.  */
     
-    println!("{:?}, giggidy", gigg);
+    println!("{:?}, giggidy", gigg.lock().unwrap());
 
     /* The above uses string formatting syntax not previously discussed. If you
     are coming from C, C++, or Go, this syntax should be familiar. For values
