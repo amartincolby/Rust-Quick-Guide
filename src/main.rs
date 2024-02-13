@@ -198,7 +198,7 @@ async fn main() {
 
     let immutable_value = 42;
 
-    /* Note that the above binding is an evaluation, meaning the right-hand side
+    /* NOTE: The above binding is an evaluation, meaning the right-hand side
     is an expression. Expressions are code that return a value. The majority of
     Rust code statements are expressions. The above is identical to: */
 
@@ -349,8 +349,6 @@ async fn main() {
         let y = 22;
         x + y // returns x + y
     };
-
-    /* Take note that naked blocks can have no return value. */
 
     /* The list of reserved words can be found here:
     https://doc.rust-lang.org/reference/keywords.html
@@ -1106,16 +1104,18 @@ async fn main() {
     implementations. In other languages, a function signature can simply be
     added to a type or interface. In Rust they are separate. Traits are how
     shared behavior can be defined. For example, a for_each() method can be
-    defined that can be implemented for any entity that is iterable. The
-    specifics of the iteration may be different for arrays, vectors, strings,
-    or tuples, but the basic idea can be shared. */
+    defined that can be implemented for any entity. The specific implementation
+    for each entity type may be different, but they share the name and
+    signature. */
 
     trait Extend {
         fn extend(&self, length: f64) -> f64;
 
         // Default implementations can be defined in a trait block.
         fn say_something(&self) -> String {
-            String::from("SoMeThInG")
+            // Default implementations can call other functions.
+            let val = self.extend(42.0).to_string();
+            String::from("{val}")
         }
     }
 
@@ -1136,7 +1136,7 @@ async fn main() {
     let vol = new_square.extend(4.0);
     println!("Volume is {vol}");
 
-    /* Traits can be used as type parameters. This is discussed at greater length in the section on Opaque Types. In the below function, the function signature is saying that it returns _something_ that implements Extend. It returns a Square, so that fulfills the signature. */
+    /* Traits can be used as type parameters. This is discussed at greater length in the section on "Opaque Types." In the below function, the signature is saying that it returns _something_ that implements Extend. It returns a Square, which implements Extend, so that fulfills the signature. Multiple traits can be specified with the `+` operator, e.g. `impl Extend + ToString`. */
 
     fn get_extendable_thing() -> impl Extend {
         Square{
@@ -1145,7 +1145,12 @@ async fn main() {
         }
     }
 
-    /* At this point, make note of how Rust's syntax lets you know what sort of entity is being called. Dot syntax indicates something that is attached to, for lack of a better word, an object. The double-colon syntax, like seen at the top of this file, indicate something that is a member of a module. A good example is String::from() for creating Strings and .to_string() which also creates strings. */
+    /* NOTE: Notice how Rust's syntax lets you know what sort of entity is
+    being called. Dot syntax indicates something that is attached to, for lack
+    of a better word, an object. The double-colon syntax, like seen at the top
+    of this file, indicates something that is a member of a module. A good
+    comparison is String::from() for creating Strings and .to_string() which
+    also creates strings. */
 
 
     /*** Union ***/
@@ -1174,7 +1179,13 @@ async fn main() {
 
     /*** Enum ***/
 
-    // If you have any experience with OCaml, you will recognize `enum` as being equivalent to `union`, sometimes called discriminated union or tagged union. Enum is a type that defines an identifier that can be bound to any of the enum's consituent types. For example, a value could be a string _or_ a 32-bit integer, an enum allows that to be represented. The Rust type checker will then ensure that any code that consumes an enum must handle all pertinent cases.
+    /* If you have any experience with OCaml, you will recognize `enum` as
+    being equivalent to `union`, sometimes called discriminated union or tagged
+    union. Enum is a type that defines an identifier that can be bound to any
+    of the enum's consituent types. For example, a value could be a string _or_
+    a 32-bit integer, an enum allows that to be represented. The Rust type
+    checker will then ensure that any code that consumes an enum must handle
+    all pertinent cases. */
 
     struct Ford;
     struct Toyota;
@@ -1289,7 +1300,8 @@ async fn main() {
 
     let possible_result = generate_result();
 
-    /* The value of enums like Option and Result will become apparent shortly in the section on "Pattern Matching". */
+    /* NOTE: The value of enums like Option and Result will be discussed shortly
+    in the section on "Pattern Matching". */
 
     
     /*----------------------------------------------
