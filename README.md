@@ -49,6 +49,7 @@ The Rust docs are good but verbose. I like documentation that is simple enough t
 - [The official docs for Cargo](https://doc.rust-lang.org/cargo/index.html)
 - [The official docs for Clippy](https://doc.rust-lang.org/clippy/)
 - [The official docs for Actix-Web](https://actix.rs/docs) *Rust's most popular web framework. Relies on Tokio.*
+- [Rayon Source Code](https://github.com/rayon-rs/rayon) *Rayon is a high-level library for turning sequential processes into concurrent*
 
 # The Guide
 
@@ -672,7 +673,9 @@ async fn main() {
 
     /*** Destructuring ***/
 
-    /* Rust allows destructuring bindings, where identifiers are written in the same structure as the value. This pattern is increasingly common and should be very familiar if you are coming from almost anything save for C. */
+    /* Rust allows destructuring bindings, where identifiers are written in the
+    same structure as the value. This pattern is increasingly common and should
+    be very familiar if you are coming from almost anything save for C. */
 
     let (first_value, second_value) = (2001, 42);
 
@@ -684,7 +687,9 @@ async fn main() {
     // This ignores the first value.
     let (_, only_value) = (2001, 42);
 
-    /* This assigns the identifiers to the indices, starting with index 0, it then ignores everything until the final two values, where it saves the sixth index and ignores the last. */
+    /* This assigns the identifiers to the indices, starting with index 0, it
+    then ignores everything until the final two values, where it saves the
+    sixth index and ignores the last. */
     let [index_0, .., index_6, _] = [0, 1, 2, 3, 4, 5, 6, 7];
 
     println!("{index_0}"); // Prints 0
