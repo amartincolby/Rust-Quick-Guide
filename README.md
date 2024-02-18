@@ -321,8 +321,8 @@ memory to store five 32-bit integers. When the program or function is complete,
 the memory is cleared. One of the most common memory errors is when the program
 does something that exceeds the stack that was allocated, resulting in the
 famous _stack overflow_, from which the website gets its name. Entities on the
-stack are added to the "top" and removed from top in a "first-in-last-out", aka
-FILO or LIFO, pattern. Imagine plates stacked. You always take the top plate.
+stack are added to the "top" and removed from top in a "last-in-first-out", aka
+LIFO, pattern. Imagine plates stacked; you always take the top plate.
 
 The heap is precisely that: a big pile of memory space. The primary
 differentiator between stack and heap entities is that anything on the stack
@@ -335,25 +335,28 @@ There are significant performance implications in the stack versus the heap, but
 these are outside the scope of this tutorial. If you are coming from C or C++,
 these considerations are not new to you. If you are coming from TypeScript, then
 don't even worry about it. Rust written in even the most naive way is still an
-order of magnitude faster that JavaScript. */
+order of magnitude faster that JavaScript. If you are debating using Rust over
+Go, on the other hand, be aware that naive Rust in the realm of n-tier
+applications can often be _slower_ than naive Go. */
 
 /*** A note on macros ***/
 
-/* Throughtout this tutorial, you will see some commands appeneded with an
+/* Throughtout this tutorial, you will see some commands appended with an
 exclamation mark, like `println!`. This mark indicates that this command is a
 "macro". Macros are _old_ in programming, having been first used in the 50's
 and added to Lisp in 1963. A macro is something that evaluates a string of
 characters and then interprets it at runtime. A macro, when compiled, usually
-"expands" into a larger amount of code. A programmer could genuinely implement
-their own programming language within a macro. Macros are one of the constructs
-in Rust that most programmers are not likely to have encountered. Macros will
-be discussed near the end of this tutorial. For the time being, just be aware
-that the exclamation mark syntax indicates a macro. */
+"expands" into a larger amount of code. You can think of a macro as a compiler
+that transforms provided glyphs into an implementation. A programmer could
+genuinely implement their own programming language within a macro. Macros are
+one of the constructs in Rust that most programmers are not likely to have
+encountered. Macros will be discussed near the end of this tutorial. For the
+time being, just be aware that the exclamation mark syntax indicates a macro. */
 
 /*** A note on "unsafe" Rust ***/
 
 /* As stated, Rust's design started in the symbolic realm and only moved as
-close to the machine was was necessary for performance. Sometimes, though, when
+close to the machine as was necessary for performance. Sometimes, though, when
 maximizing performance, the best method is to abandon symbols and simply
 manipulate the machine state directly like is possible in C and C++. Rust
 allows you to do this but requires an explicit "unsafe" block. There are many
@@ -364,7 +367,50 @@ application developers and JavaScript engineers with this tutorial, though, and
 thus consider unsafe Rust to be outside its scope. Read the official Rust docs
 for more information. */
 
-/*** The Main Function ***/
+
+/*----------------------------------------------
+* Cargo
+*----------------------------------------------
+*/
+
+/* Cargo is Rust's standard package manager/build tool. Conceptually it is
+identical to NPM. Most Rust applications will be tested, built, published, and
+have their dependencies managed with Cargo. Chances are, most new projects will
+be bootstrapped with it as well. Cargo uses Crates.io as its standard publish
+target, but just as with NPM, you can easily set up private registries. The
+standard compiler used by Crate is rustc.
+
+Cargo uses the Cargo.toml file instead of package.json, but again, they are
+extremely similar. And yes, Cargo uses yet another goddamned markup language.
+And just like you, this was the first I heard of .toml files. I feel like I
+should make my own markup language because everyone seems to be doing it. I'll
+call it BLAML.
+
+Cargo assumes a standard file structure. The Cargo.toml and Cargo.lock files
+are at the root of a project. The src/ directory contains the main.rs file
+which contains the main() function. The benches/ directory contains performance
+tests. And the tests/ directory contains... tests.
+
+Similar to newer JavaScript package managers and Go, Cargo centralizes
+downloaded dependencies in its "home" directory. As such, you will likely only
+ever have to download a dependency once.
+
+You will interact with Cargo primarily through the basic Cargo commands:
+
+`cargo` : downloads dependencies in the Cargo.toml file.
+`cargo new your-project-name` : Bootstraps a Rust project.
+`cargo add package-name` : Adds the package to the Cargo.toml and downloads it.
+`cargo build` : Downloads any missing dependencies and builds the project.
+`cargo run` : Builds _and_ executes your program.
+`cargo test` : Rust functions labeled as tests.
+
+There are many other commands and configurations. See the Cargo docs. */
+
+
+/*----------------------------------------------
+* The Main Function
+*----------------------------------------------
+*/
 
 /* The below is the main function which all Rust applications have. This quick
 guide does not cover the structure of Rust applications. It focuses on the
@@ -411,8 +457,8 @@ async fn main() {
     cheeky nod to Microsoft's gone-but-not-forgotten Office helper. Custom
     lints can be developed. */
 
-    #[allow(non_camel_case_types)]
-    type the_answer = i32; // Only works for this.
+    #[allow(non_camel_case_types)] // Only affects the line below.
+    type the_answer = i32; 
 
     /* Attributes can denote deprecated functionality. When compiled, warnings
     will appear whenever deprecated code is called or otherwise used. */
@@ -427,14 +473,17 @@ async fn main() {
 
     /* Attributes are used to denote functions that are tests. This allows easy
     co-location of tests with their implementations. Testing will be discussed
-    in a dedicated section. */
+    in a dedicated section.
+    
+    Code generation via attributes takes two forms: trait derives and macros.
+    Both of these are discussed more fully later. */
 
 
     /*----------------------------------------------
     * Items
     *----------------------------------------------
     */
-    
+  
     /* Items are entities that, whenever they are declared, they are analyzed
     and made global, even though their _visibility_ is restricted to the scope
     in which they were declared. They are "attached" to this scope like a key
@@ -467,7 +516,7 @@ async fn main() {
 
 
     /*----------------------------------------------
-    * Variables, functions, and bindings
+    * Variables, Functions, and Bindings
     *-----------------------------------------------
     */
 
@@ -485,23 +534,26 @@ async fn main() {
 
     let immutable_value = 42;
 
-    /* NOTE: The above binding is an evaluation, meaning the right-hand side
-    is an expression. Expressions are code that return a value. The majority of
-    Rust code statements are expressions. The above is identical to: */
+    /* NOTE: The above binding is an "evaluation," meaning the right-hand side
+    is an "expression." Expressions are code that return a value. The majority
+    of Rust code statements are expressions. The above is identical to: */
 
     let immutable_value = { 42 };
 
-    /* This also illustrates a concept in Rust called variable shadowing. This
-    is far from unique to Rust but allows an engineer to re-declare a
-    variable and have the new value apply henceforth. Shadowing allows the
-    type to be changed because, even though the name is the same, it is actually
-    a _different_ identifier, which is why we can re-declare the value as
-    mutable. */
+    /* The above code is short but expressions can be long and have multiple
+    sub-expressions and side-effects.
+    
+    This also illustrates a concept in Rust called variable shadowing. This is
+    far from unique to Rust but allows an engineer to re-declare a variable and
+    have the new value apply henceforth. Shadowing allows the type to be
+    changed because, even though the identifier name is the same, it is
+    actually a _different_ identifier, which is why we can re-declare the value
+    as mutable. */
 
     let mut immutable_value = 2001;
 
     // A mutable value is created with the `mut` modifier.
-    // Mutable values must still abide by the type of the original binding.
+    // New values must still abide by the type of the original binding.
     let mut mutable_value = 42;
     mutable_value = 2001;
 
@@ -675,9 +727,7 @@ async fn main() {
 
     /*** Destructuring ***/
 
-    /* Rust allows destructuring bindings, where identifiers are written in the
-    same structure as the value. This pattern is increasingly common and should
-    be very familiar if you are coming from almost anything save for C. */
+    /* Rust allows destructuring bindings, where identifiers are written in the same structure as the value. This pattern is increasingly common and should be very familiar if you are coming from almost anything save for C. */
 
     let (first_value, second_value) = (2001, 42);
 
@@ -692,7 +742,7 @@ async fn main() {
     /* This assigns the identifiers to the indices, starting with index 0, it
     then ignores everything until the final two values, where it saves the
     sixth index and ignores the last. */
-    let [index_0, .., index_6, _] = [0, 1, 2, 3, 4, 5, 6, 7];
+     let [index_0, .., index_6, _] = [0, 1, 2, 3, 4, 5, 6, 7];
 
     println!("{index_0}"); // Prints 0
     println!("{index_6}"); // Prints 6
@@ -783,6 +833,7 @@ async fn main() {
 
     /* Pointers are determined by the type signature of the identifier. */
 
+    
     /*----------------------------------------------
     * Ownership & Borrowing
     *----------------------------------------------
@@ -793,20 +844,21 @@ async fn main() {
     
     Ownership.
     
-    In Rust, every value has an "owner". An owner is also known as an identifier
-    since only through the identifier can a value be accessed. When an owner
-    goes out of scope, such as when a function completes, the value is "dropped"
-    from memory. Rust does this automatically, but also supports an explicit
-    "drop" command. Again, if coming from C++, all of this should be familiar
-    through what is known as RAII, but unlike C++, Rust does this automaically
-    and by default. If you write good, simple Rust, you will very likely never
-    have to concern yourself with the cleanup process. C and C++ engineers will
-    like that, but it is TypeScript engineers who should take most note, because
-    it means that Rust can _feel_ garbage collected, making it much more
-    approachable.
+    In Rust, every value has an "owner". An owner is also known as an
+    identifier since only through the identifier can a value be accessed. When
+    an owner goes out of scope, such as when a function completes, the value is
+    "dropped" from memory. Rust does this automatically, but also supports an
+    explicit "drop" command. Again, if coming from C++, all of this should be
+    familiar through what is known as RAII, but unlike C++, Rust does this
+    automaically and by default. If you write good, simple Rust, you will very
+    likely never have to concern yourself with the cleanup process. C and C++
+    engineers will like that, but it is TypeScript engineers who should take
+    most note, because it means that Rust can _feel_ garbage collected, making
+    it much more approachable. That said, Rust's system of ownership can be
+    restricting, confusing, and the compile errors that it produces can
+    sometimes seem strange.
     
-    That said, Rust's system of ownership can be a little confusing, and the
-    compile errors that it produces can sometimes seem strange. But before that,
+    But before that,
     let us go over the basics. */
 
     let catcher_in_the_rust = "Holden Caulfield";
@@ -1324,7 +1376,7 @@ async fn main() {
     type JarJarBinksQuotes = GenericLinkedList<String>;
 
     /* Type aliasing has a second use for creating entities called "opaque
-    types." These are addressed later. */
+    types." These are addressed later because they do not work at the moment. */
 
 
     /*** Tuples ***/
@@ -1427,7 +1479,12 @@ async fn main() {
     let vol = new_square.extend(4.0);
     println!("Volume is {vol}");
 
-    /* Traits can be used as type parameters. This is discussed at greater length in the section on "Opaque Types." In the below function, the signature is saying that it returns _something_ that implements Extend. It returns a Square, which implements Extend, so that fulfills the signature. Multiple traits can be specified with the `+` operator, e.g. `impl Extend + ToString`. */
+    /* Traits can be used as type parameters. This is discussed at greater
+    length in the section on "Opaque Types." In the below function, the
+    signature is saying that it returns _something_ that implements Extend. It
+    returns a Square, which implements Extend, so that fulfills the signature.
+    Multiple traits can be specified with the `+` operator, e.g. `impl Extend +
+    ToString`. */
 
     fn get_extendable_thing() -> impl Extend {
         Square{
@@ -1828,6 +1885,7 @@ async fn main() {
         next: Option<Box<GenericLinkedListNode<T>>>,
     }
 
+
     /*----------------------------------------------
     * Opaque Types
     *-----------------------------------------------
@@ -1855,7 +1913,10 @@ async fn main() {
     implement this and thus fails. Similar logic applies to calling the
     function and passing in an argument. 
     
-    An important point to recognize is that while the return type is restricted to types that implement ToString, the function evaluation must collapse down to a single type. This type is called the "hidden" type, since it is not visible in the annotations. */
+    An important point to recognize is that while the return type is restricted
+    to types that implement ToString, the function evaluation must collapse
+    down to a single type. This type is called the "hidden" type, since it is
+    not visible in the annotations. */
 
     fn two_hidden_types(x : bool) -> impl ToString {
         if x {
@@ -1866,13 +1927,22 @@ async fn main() {
         }
     }
 
-    /* Even though the above function returns one of two things that both have the ToString trait, the hidden type of the function must be one or the other, &str or i32, it cannot be both. */
+    /* Even though the above function returns one of two things that both have
+    the ToString trait, the hidden type of the function must be one or the
+    other, &str or i32, it cannot be both.
+    
+    Unlike anonymous types with un-typed parameters, calling a function with an
+    opaque parameter type does not harden its hidden type. For example, the
+    above specific_function() accepts an argument that implements ToString, so
+    an integer would work. If specific_function() is called with an integer, it
+    can still be called later with a &str. */
+
 
     /*----------------------------------------------
     * Smart Pointers
     *-----------------------------------------------
     */
-    
+
     /* Pointers are obviously a memory address at which data can be found.
     Rust's most common pointer is the reference, denoted by the ampersand. But
     Rust also has "smart" pointers, which are semantic structures that contain
@@ -2078,7 +2148,7 @@ async fn main() {
     
     Similar modules have been declared outside of the function at the bottom of
     this file to illustrate how modules can interact. Go there now. */
-    
+
 
     /*----------------------------------------------
     * Basic operators
@@ -2618,7 +2688,8 @@ async fn main() {
         *idy = *idy * 3;
     }
 
-    /* At this point, the naked scope above is complete, `idy` falls out of scope and is destroyed, and the mutex is unlocked.  */
+    /* At this point, the naked scope above is complete, `idy` falls out of
+    scope and is destroyed, and the mutex is unlocked. */
     
     println!("{:?}, giggidy", gigg.lock().unwrap());
 
@@ -2648,18 +2719,23 @@ async fn main() {
     the object can only every be viewed after a complete update has occured, it
     is atomic.
     
-    Thus, by using Arc, different threads cannot access a value when it is in
-    an incomplete state. Atomic entities can be used independently as well with
-    the atomic module in the standard library.
+    But how does this thought experiment apply to real-world Rust? If three
+    threads tried to use an Rc to, for example, increment a value of 39, they
+    may all try to increment 39, making the final value 40 instead of 42. Arc
+    prevents this by making changes seem instantaneous to all consumers of the
+    value. Thread A would necessarily increment 39 to 40, thread B 40 to 41,
+    and thread C 41 to 42. Atomic entities can be used independently as well
+    with the atomic module in the standard library.
     
     The below example was mostly taken from the official Rust docs. I have
     added some comments and exploratory print lines. */
 
     let accumulator = Arc::new(Mutex::new(0));
 
-    // A vector will be used to store the thread "handles" for later joining.
+    // A vector will store the thread "handles" for later join() calls.
     let mut handles = vec![];
 
+    // Generate 10 threads.
     for i in 0..10 {
         let acc = Arc::clone(&accumulator);
         let handle = thread::spawn(move || {
@@ -2831,11 +2907,6 @@ async fn main() {
     /* Macros are one of Rust's superpowers. It is almost funny to say that considering that macros go all the way back to the dawn of high-level programming, but they are a capability that most programming languages have ignored. There are fundamental reasons for this that are outside the scope of this tutorial, but suffice it to say that it is because macros in the sense I am using require a rigidly symbolic language to implement, and most languages are... not... rigidly symbolic.
     
     In essense, macros allow a program to change itself. */
-
-    /*----------------------------------------------
-    * Cargo
-    *----------------------------------------------
-    */
 
 
     /*----------------------------------------------
