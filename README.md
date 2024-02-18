@@ -45,11 +45,11 @@ The Rust docs are good but verbose. I like documentation that is simple enough t
 - [A great blog from a Rust consultancy](https://corrode.dev/blog/)
 - [The Rust Async Docs](https://rust-lang.github.io/async-book/) *These have been perpetually unfinished*
 - [The Tokio Docs](https://tokio.rs/tokio/tutorial) *Rust's most popular async runtime and what most people mean when they say async*
-- [The official docs for Rustdoc](https://doc.rust-lang.org/rustdoc/index.html)
-- [The official docs for Cargo](https://doc.rust-lang.org/cargo/index.html)
+- [The official docs for Rustdoc](https://doc.rust-lang.org/rustdoc/)
+- [The official docs for Cargo](https://doc.rust-lang.org/cargo/)
 - [The official docs for Clippy](https://doc.rust-lang.org/clippy/)
 - [The official docs for Actix-Web](https://actix.rs/docs) *Rust's most popular web framework. Relies on Tokio.*
-- [Rayon Source Code](https://github.com/rayon-rs/rayon) *Rayon is a high-level library for turning sequential processes into concurrent*
+- [Rayon Github](https://github.com/rayon-rs/rayon) *Rayon is a high-level library for making sequential processes concurrent*
 
 # The Guide
 
@@ -196,8 +196,8 @@ bean counters start paying attention to what the geeks are saying.
 And so we have Rust. Or perhaps I should say so we have the _popularity_ of
 Rust. Rust was going to be created regardless of the market, as is the wont of
 geeks, but it is the specifics of our sociocultural age, our techno-mores, that
-has allowed Rust to reach a stunning level of recognition and interest. Rust has
-even achieved what no other language could in over twenty-five years: be
+has allowed Rust to reach a surprising level of recognition and interest. Rust
+has even achieved what no other language could in over twenty-five years: be
 included in Linux's codebase. It has done all of this while being an arguably
 academic language. Much like OCaml, its few concessions are related to operating
 in the "real world," and the language makes them grudgingly, putting many of
