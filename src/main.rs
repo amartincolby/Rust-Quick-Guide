@@ -452,8 +452,10 @@ async fn main() {
     // This ignores the first value.
     let (_, only_value) = (2001, 42);
 
-    /* This assigns the identifiers to the indices, starting with index 0, it then ignores everything until the final two values, where it saves the sixth index and ignores the last. */
-    let [index_0, .., index_6, _] = [0, 1, 2, 3, 4, 5, 6, 7];
+    /* This assigns the identifiers to the indices, starting with index 0, it
+    then ignores everything until the final two values, where it saves the
+    sixth index and ignores the last. */
+     let [index_0, .., index_6, _] = [0, 1, 2, 3, 4, 5, 6, 7];
 
     println!("{index_0}"); // Prints 0
     println!("{index_6}"); // Prints 6
