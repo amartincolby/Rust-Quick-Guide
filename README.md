@@ -76,10 +76,10 @@ suffice it to say that many analyses have shown the problems they solve are
 _linguistic_ problems and not implementation problems. To wit, the patterns
 described are band-aids over a broken paradigm. Solving linguistic problems
 with structure is not new. The humorous maxim of Greenspun's Tenth
-Rule[[0](#fn0)] specifically addresses this and he was talking about _Lisp and
+Rule<sup>[[0](#fn0)]</sup> specifically addresses this and he was talking about _Lisp and
 Fortran!_. _Design Patterns_ was published in 1994, but work on it started in
 1990. We are over thirty years into an industry-wide effort to put lipstick on
-a pig.[[1](#fn1)]
+a pig.<sup>[[1](#fn1)]</sup>
 
 But beautiful change is in the air. Now is the autumn of the old ways. To be
 clear, I do not speak of AI. Indeed, AI, or at least the AI that is generating
@@ -118,7 +118,7 @@ much slower than hand-written assembly, as all highly symbolic languages were.
 C was specifically created to move only as far away from the machine as was
 necessary to fulfill the goal of code portability. This raw performance is why,
 even after all this time, C remains the _ne plus ultra_ for lower-level code
-writing.[[2](#fn2)]
+writing.<sup>[[2](#fn2)]</sup>
 
 I see the juxtaposition of C and Rust to be a microcosm, a synecdoche of sorts,
 for the entirety of computing history. The famous book _Hackers: Heroes of The
@@ -130,7 +130,7 @@ short supply. As such, the excitement and successes of the real world were
 defined by the first "hackers," who were people less concerned with what symbols
 could do and more concerned with the cool things that could be achieved with
 direct control over the machine. This divide between the symbolic purists and
-the hackers would continue into every successive era of computation.[[3](#fn3)]
+the hackers would continue into every successive era of computation.<sup>[[3](#fn3)]</sup>
 
 Unfortunately, the consequence of this is an entire industry that never fully
 embraced either perspective. As computing power increased, higher-level
@@ -139,8 +139,8 @@ Pascal in the 70's, Ada in the 80's, Java in the 90's, and perhaps the
 Frieza-style **Final Form** of messy languages, JavaScript, in the 2000's. But
 these languages rarely came from academic research and were instead
 Frankenstein monsters that emerged from the needs of _business_ or simple
-creations aimed at educating laypeople.[[4, 5, 6](#fn4)] Their _raison d'etre_
-was neither geeky nor academic; it was purely human.[[7](#fn7)]
+creations aimed at educating laypeople.<sup>[[4, 5, 6](#fn4)]</sup> Their _raison d'etre_
+was neither geeky nor academic; it was purely human.<sup>[[7](#fn7)]</sup>
 
 These languages represent the third major historical thread running parallel to
 the struggle between the geeks and the academics: businesses. In the early days
@@ -180,14 +180,15 @@ natural skepticism for the status quo, so too are businesses realizing that
 prioritizing feature delivery over other concerns can have profoundly negative
 outcomes.
 
-There are moral consequences. A bad program can produce much more CO2 than a
-good program. A bad program can fail someone just when they need it most. A bad
-program can literally kill people.[[8](#fn8)] A bad program can expose users to
-hackers. A bad program can fail society at large.[[9](#fn9)] There are business
-consequences if confidence in a product falls. There are even organizational
-consequences, with burnt-out engineers quitting. But I think the biggest
-motivation is because cloud computing is _extremely_ expensive. If an
-organization is genuinely only "paying for what you use," as all cloud
+There are moral consequences: A bad program can produce much more CO2 than a
+good program; a bad program can fail someone just when they need it most; a bad
+program can literally kill people;<sup>[[8](#fn8)]</sup> a bad program can
+expose users to hackers; a bad program can fail society at
+large.<sup>[[9](#fn9)]</sup> There are business consequences if confidence in a
+product falls. There are even organizational consequences, with burnt-out
+engineers quitting. I am sure that all of those factors come into play. But I
+think the real motivator is that cloud computing is _extremely_ expensive. If
+an organization is genuinely only "paying for what you use," as all cloud
 providers pitch, then a language that is twice as fast as another could result
 in a massive decrease in monthly cloud charges. That is a performance
 difference that would not have excited anyone fifteen years ago, but today, the
@@ -205,11 +206,11 @@ them behind an explicit "unsafe" flag. Rust has learned all of the mistakes from
 the past and set out not to repeat them, and we finally live in a world where
 people in power care about that.
 
-Rust is not alone in this shift, nor do I think that Rust is the end goal of
-some grand historical arc. But for this moment, right now, I think that Rust is
-part of the future, and it is a future that should be encouraged. We as
-programmers are the midwives to a better world that struggles to be born. We
-hold it now in our hands. Make it breathe.
+Rust is not alone in this shift,<sup>[[10](#fn10)]</sup> nor do I think that
+Rust is the end goal of some grand historical arc. But for this moment, right
+now, I think that Rust is part of the future, and it is a future that should be
+encouraged. We as programmers are the midwives to a better world that struggles
+to be born. We hold it now in our hands. Make it breathe.
 
 --------------------------------------------------------------------------------
 
@@ -272,14 +273,13 @@ involving manufacturing robots.
 failures to develop municipal services like DMV systems, or the famous dumpster
 fire that was the launch of Obamacare.
 
+<a name="fn10">10</a>: The most notable recent event being driven by similar motivators is the rise of alternative server-side JavaScript runtimes like LLVR, JustJS, Bun, and uWebSockets. Node spent over a decade focusing on features and stability while its child, Deno, did similar in an attempt to steal market share. Then Bun, which doesn't even support Windows yet, has blown both out of the water in mindshare.
+
 --------------------------------------------------------------------------------
 
-The below text is valid Rust code. It is a copy of the code in the src directory.
+The below text is valid Rust code. It is a copy of the code in the /src directory.
 
-The various sub-sections of the code have been delineated with curly braces,
-thus allowing easier collapsing and expanding of the sections in an editor.
-
-This was written in VSCode and using an interactive IDE with code linting and
+This was written in VSCode and using an interactive IDE with code linting, folding, and
 highlighting is recommended.
 
 ``` rust
