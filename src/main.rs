@@ -58,7 +58,7 @@ applications can often be _slower_ than naive Go. */
 exclamation mark, like `println!`. This mark indicates that this command is a
 "macro". Macros are _old_ in programming, having been first used in the 50's
 and added to Lisp in 1963. A macro is something that evaluates a string of
-characters and then interprets it at runtime. A macro, when compiled, usually
+tokens and then interprets it at compile time. A macro, when compiled,
 "expands" into a larger amount of code. You can think of a macro as a compiler
 that transforms provided glyphs into an implementation. A programmer could
 genuinely implement their own programming language within a macro. Macros are
@@ -139,6 +139,7 @@ later. More attributes will be covered shortly. */
 #[allow(unused_assignments)]
 #[allow(dead_code)]
 #[allow(unused_mut)]
+#[allow(unused_macros)]
 #[tokio::main]
 async fn main() {
 
@@ -229,7 +230,7 @@ async fn main() {
 
 
     /*----------------------------------------------
-    * Variables, Functions, and Bindings
+    * Variables and Bindings
     *-----------------------------------------------
     */
 
@@ -440,7 +441,9 @@ async fn main() {
 
     /*** Destructuring ***/
 
-    /* Rust allows destructuring bindings, where identifiers are written in the same structure as the value. This pattern is increasingly common and should be very familiar if you are coming from almost anything save for C. */
+    /* Rust allows destructuring bindings, where identifiers are written in the
+    same structure as the value. This pattern is increasingly common and should
+    be very familiar if you are coming from almost anything save for C. */
 
     let (first_value, second_value) = (2001, 42);
 
@@ -913,9 +916,17 @@ async fn main() {
 
     // The key difference is that str is of known length, while String is not.
 
-    // The `String` type that was used in earlier examples to create a string on the heap is actually part of the standard library and is fundamentally a wrapper around `str` that provides helpful functionality. Because of the common usage of `String`, the two types are often confused in conversation, with people using the term "string" to refer to either `String` or `str`.
+    /* The `String` type that was used in earlier examples to create a string
+    on the heap is actually part of the standard library and is fundamentally a
+    wrapper around `str` that provides helpful functionality. Because of the
+    common usage of `String`, the two types are often confused in conversation,
+    with people using the term "string" to refer to either `String` or `str`.
+    */
 
-    /* To reiterate, using the String crate from the standard library creates a sequence of chars on the heap. This string can be added to and reduced, but as it is a collection, interactions with it are similar to a vector. Indeed, this is because under the covers, String _is_ a vector. */
+    /* To reiterate, using the String crate from the standard library creates a
+    sequence of chars on the heap. This string can be added to and reduced, but
+    as it is a collection, interactions with it are similar to a vector.
+    Indeed, this is because under the covers, String _is_ a vector. */
 
     let mut heap_of_chars = String::from("A few of my favorite things: ");
     
@@ -1445,7 +1456,7 @@ async fn main() {
     always scenarios where the failure should be terminal. For this situations,
     Rust has `panic!()`. panic is a macro that, when called, terminates the
     process in which it is called and "unwinds" its stack. Basically,
-    everything in scope is destroyed and memory is freed. Since a panic exists
+    everything in scope is destroyed and memory is freed. Since a panic exits
     the control flow of the program, the reason for the panic is likely unique,
     and thus the only information required by the compiler is a string. The key
     thing to remember is that if a function panics, the function that called
@@ -2033,6 +2044,17 @@ async fn main() {
     final value, should be the ideal pattern. */
 
 
+    /*** Function Pointers ***/
+
+    /* Just as with most modern languages, Rust allows passing functions as values. Since functions in Rust are items and thus exist globally, passing a function is actually passing a pointer to that function. */
+
+    fn call_something(cb: fn(x: String) -> String) -> String {
+        cb(String::from("Steve"))
+    }
+
+
+
+
     /*** Anonymous Functions ***/
 
     /* Just like JavaScript and TypeScript, Rust functions can be "anonymous",
@@ -2602,9 +2624,11 @@ async fn main() {
     };
 
     /* This macro is an easy way to "pin" a value. A pinned value means that it
-    will remain in the same memory location for its entire lifetime. Since
-    async code runs at indeterminate intervals, ensuring it is reliably
-    positioned is necessary. */ pin_mut!(cross_the);
+    will remain in the same memory location for its entire lifetime or until it
+    is "unpinned". Since async code runs at indeterminate intervals, ensuring
+    it is reliably positioned at all times is necessary. */
+    
+    pin_mut!(cross_the);
 
     // Async values require the use of while loops. For loops are in progress.
     while let Some(value) = cross_the.next().await {
@@ -2617,9 +2641,99 @@ async fn main() {
     *----------------------------------------------
     */
 
-    /* Macros are one of Rust's superpowers. It is almost funny to say that considering that macros go all the way back to the dawn of high-level programming, but they are a capability that most programming languages have ignored. There are fundamental reasons for this that are outside the scope of this tutorial, but suffice it to say that it is because macros in the sense I am using require a rigidly symbolic language to implement, and most languages are... not... rigidly symbolic.
+    /* Macros are one of Rust's superpowers. It is almost funny to say that
+    considering that macros go all the way back to the dawn of high-level
+    programming, but they are a capability that most programming languages have
+    ignored. There are fundamental reasons for this that are outside the scope
+    of this tutorial, but suffice it to say that it is because macros in the
+    sense I am using the term require a rigidly symbolic language to implement,
+    and most languages are not rigidly symbolic. They have flex and give in
+    their syntax and semantics.
     
-    In essense, macros allow a program to change itself. */
+    Macros, in essence, instruct the compiler to write code for you. At compile
+    time, a macro takes provided "tokens," often just a string, and turns those
+    tokens into full Rust code. This is what I meant when I said that macros
+    "expand." This expanded code then runs like any other piece of code that
+    was written by the programmer themself.
+    
+    At first, this sounds like a roundabout way to write a function. Why
+    generate code at compile time? Why not just write it? Basically, this is a
+    layer of abstraction. A programmer is disconnecting their _desires_ from
+    the _implementation_. It is declarative programming at a very low level.
+    Indeed, when using the generic term "macro," like the macros used in Lisp,
+    we are actually discussing what Rust explicitly classifies as "declarative
+    macros." These are the macros previously discussed and used, like println!
+    and vec!. Fundamentally, declarative macros analyse the pattern of provided
+    tokens and generate code based on the pattern. The generated code then
+    replaces the macro call site. That sounds very similar to a compiler
+    because it _is_ very similar to a compiler.
+
+    Rust has a second type of macro called "procedural" macros. They are so
+    called because they are semantically similar to "procedures," which are,
+    for our purposes, synonymous with functions. They take code as input and
+    return code as output. In Rust parlance, this code is called a token
+    stream. The distinction between declarative and procedural macros may seem
+    small. While declarative macros can accept any syntax, procedural macros
+    only accept valid Rust code as an input. And while declarative macros
+    actually replace the macro call with the generated code, procedurals do not
+    replace the code, but instead alter or augment it.
+    
+    For example, the previously used #[derive(PartialEq)]; this generates an
+    implementation of a trait for the struct that directly follows the macro
+    call.
+
+    Procedural macros must be in their own crate, meaning I cannot put examples
+    in this file. See the official docs and the Little Book Of Rust Macros for
+    more information.
+    
+    Rust macros are known as "hygienic" macros, meaning they cannot access
+    values outside of their context and will not accidentally generate code
+    that interferes with external entities.
+    
+    With all that said, understand that most developers will not write many of
+    their own macros. They are best when made as generic as possible, which
+    means most macros that you would want exist in libraries. */
+
+
+    /*** Declarative Macros ***/
+
+    /* If declarative macros behave like functions, why not just use functions?
+    Because Rust is strict in its code shape, macros enable flexibility by not
+    being code themselves. Instead, they generate strict code. For example, it
+    is impossible to write a function that accepts an unknown argument shape.
+    This is exactly what println! does. It can accept a single string or a
+    string and any number of ancillary arguments.
+    
+    The downside of declarative macros is primarily just complexity. The
+    special syntax required to automatically generate Rust is dense and becomes
+    unwieldy when generating large pieces of code. The official Rust docs have
+    a good example implementation of the vec! macro that I will copy here. I
+    have renamed it to simple_vec. */
+
+    macro_rules! simple_vec {
+        ( $( $x:expr ),* ) => {
+            {
+                let mut temp_vec = Vec::new();
+                $(
+                    temp_vec.push($x);
+                )*
+                temp_vec
+            }
+        };
+    }
+
+    let a_simple_vector = simple_vec!([1, 2, 3, 42]);
+
+    /* A full exploration of the special syntax, called macro_rules! syntax, is
+    outside the scope of this tutorial. Read the Rust docs for more
+    information. But even eliding the details does not prevent the matching
+    syntax from being pretty clear. The first line accepts $x as an expression,
+    the * matches and arbitrary number of expressions, and it then generates a
+    push for however many expressions there were. It feels a bit like a
+    templating language because, really, it is.
+    
+    The ultimate effect of a declarative macro is that the macro call is
+    replaced with the code specified in the template. */
 
 
     /*----------------------------------------------

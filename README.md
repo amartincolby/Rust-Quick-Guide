@@ -52,6 +52,7 @@ The Rust docs are good but verbose. I like documentation that is simple enough t
 - [The official docs for Clippy](https://doc.rust-lang.org/clippy/)
 - [The official docs for Actix-Web](https://actix.rs/docs) *Rust's most popular web framework. Relies on Tokio.*
 - [Rayon Github](https://github.com/rayon-rs/rayon) *Rayon is a high-level library for making sequential processes concurrent*
+- [The Little Book Of Rust Macros](https://veykril.github.io/tlborm/) *Documentation specifically for macros*
 
 # The Guide
 
@@ -727,7 +728,9 @@ async fn main() {
 
     /*** Destructuring ***/
 
-    /* Rust allows destructuring bindings, where identifiers are written in the same structure as the value. This pattern is increasingly common and should be very familiar if you are coming from almost anything save for C. */
+    /* Rust allows destructuring bindings, where identifiers are written in the
+    same structure as the value. This pattern is increasingly common and should
+    be very familiar if you are coming from almost anything save for C. */
 
     let (first_value, second_value) = (2001, 42);
 
