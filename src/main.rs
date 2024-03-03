@@ -1619,8 +1619,11 @@ async fn main() {
     opaque types "specifics" to contrast them with generics. A generic means
     that a struct or function accepts one of all possible types, while a
     specific restricts the accepted type to a subset of all possible types.
-    Opaque types can be bound to an identifier with the `type` keyword, but
-    this is considered "unstable". This will be implemented at some point in
+    Opaque types can be bound to an identifier with the `type` keyword like so:
+    
+    type ThingWithToString = impl ToString;
+
+    This is considered "unstable". This will be implemented at some point in
     the future. */
 
     fn specific_function(x : impl ToString) -> impl ToString {
@@ -1634,7 +1637,7 @@ async fn main() {
     implement the `ToString` trait. The function then returns any type that
     likewise implements ToString. The returned &str implements ToString, so
     this works, as does the integer below it. The array below that does not
-    implement this and thus fails. Similar logic applies to calling the
+    implement ToString and thus fails. Similar logic applies to calling the
     function and passing in an argument. 
     
     An important point to recognize is that while the return type is restricted
@@ -1660,6 +1663,19 @@ async fn main() {
     above specific_function() accepts an argument that implements ToString, so
     an integer would work. If specific_function() is called with an integer, it
     can still be called later with a &str. */
+
+
+    /*** Monomorphization & Zero-Cost Abstractions ***/
+    
+    /* The reason for the difference between specific_function() and two_hidden_types() is a process that the Rust compiler does called "monomorphization." This is in contrast to the code that a developer writes, which is called "polymorphic." Polymorphic means "many forms" and describes specific_function() very well. The types that the function can accept take many forms, thus the function is flexible. But truly polymorphic code, as the default behavior of a function in JavaScript, suffers performance penalties, and Rust's goal is to be fast. Thus, the Rust compiler will take polymorphic code and transform it into "monomorphic" code. By that, I mean the compiler will create multiple versions of specific_function(), one for each use. For example: */
+
+    specific_function(42);
+    specific_function("a string");
+    specific_function('Z');
+
+    /* When compiled, a version of specific_function() that accepts an integer, a string, and a char will be generated. Thus a polymorphic function is turned into three monomorphic functions. This requires more memory but provides a significant speed benefit.
+    
+    The monomorphic transformation can easily generate functions that _accept_ different types, but because a function can be arbitrarily complex, it cannot generate functions that _return_ different types. */
 
 
     /*----------------------------------------------
@@ -2044,17 +2060,6 @@ async fn main() {
     final value, should be the ideal pattern. */
 
 
-    /*** Function Pointers ***/
-
-    /* Just as with most modern languages, Rust allows passing functions as values. Since functions in Rust are items and thus exist globally, passing a function is actually passing a pointer to that function. */
-
-    fn call_something(cb: fn(x: String) -> String) -> String {
-        cb(String::from("Steve"))
-    }
-
-
-
-
     /*** Anonymous Functions ***/
 
     /* Just like JavaScript and TypeScript, Rust functions can be "anonymous",
@@ -2072,7 +2077,7 @@ async fn main() {
             return(`Thanks for signing up ${email}``);
         };
 
-     */
+    */
 
     sign_up_to_newsletter("hello@rust_lovers.org");
 
@@ -2204,6 +2209,67 @@ async fn main() {
     While only using closures in restricted scenarios is considered idiomatic,
     if you want to use them in nearly every scenario, there is no real
     downside. */
+
+
+    /*** First Class Functions & Dynamic Dispatch ***/
+
+    /* Just as with most modern languages, Rust allows passing functions as values. Anonymous functions are truly first class and are passed like any other value, but regular functions can be passed as "function pointers." */
+
+    fn get_closure() -> Box<dyn Fn() -> i32> {
+        // A new closure is created on each call.
+        Box::new(|| 42)
+    }
+
+    let a_closure = get_closure();
+    let value_from_closure = a_closure();
+
+    fn a_function() -> i32 {
+        42
+    }
+
+    fn get_function() -> fn() -> i32 {
+        // No new function is created. The same pointer is simply returned on
+        // each call.
+        a_function
+    }
+
+    let a_function = get_function();
+    let value_from_functin = a_function();
+
+
+    /* There are two things to note in the above: the usage of the `dyn` keyword and the capital F in Fn for the closure example.
+    
+    The type signature for get_function() makes sense. Functions are declared with fn, thus a function pointer is typed with fn. But the signature for get_closure() uses a capital F. This is because a closure is actually a trait.Closures are compiled into struct instances with a method attached to them that contains the actual logic of your closure.
+    
+    Even though closures are traits, the `impl` keyword is not used because, as mentioned, when `impl` is used in a function signature, that signature represents an underlying concrete type. Closures have no underlying type.
+    
+    The `dyn` keyword is the result of old Rust syntax that overloaded `impl`. The details are unimportant. The reason that a function that accepts or returns a closure must declare the closure with `dyn` is because when type signatures use `impl`, the compiler needs to determine the hidden type that the `impl` represents. A closure has no hidden type. Thus, instead of `impl` closure types use `dyn` even though a closure just sitting there has a type signature using `impl`. It is all very confusing.
+    
+    Earlier, I said that an implementation is not a type itself, but it does change the type signature of whatever it is implemented for. This is not entirely accurate. Implementations _can_ be types. */
+
+    // Type is impl Fn(i32) -> i32;
+    let a_closure = |x: i32| 42 + x;
+
+
+    /* Since the size of a closure is unknown at compile time, the type signature requires that the closure is boxed just like any other value of unknown size. */
+
+    /* Since functions in Rust are items and thus exist globally, passing a function is actually passing a pointer to that function. */
+
+    fn call_something(cb: fn(x: String) -> String) -> String {
+        cb(String::from("Steve"))
+    }
+
+    /* Because function pointers are of constant size, they can be included on structs without any special considerations. */
+
+    struct Strunction {
+        func: fn(x: i32) -> i32,
+        val: i32,
+    }
+
+    /* If you are coming from JavaScript, or any scripting language, the concept of dispatch will be new to you. In compiled languages, there is a distinction between knowing what function will run at compile time versus at runtime. If the function called is determined at compile time, it is called "static dispatch," meaning the behavior that is "dispatched" never changes. Dyanmic dispatch is the opposite of that. A synonymous description is "early binding" versus "late binding," where binding refers to the act of binding a value or behavior to an identifier. For example, `let x = 42;`. Rust's compiler knows that `x` is `42`, so it does not bother to check the value of `x` when running. This check is called "indirection." In JavaScript, every call to `x` theoretically requires the runtime to check `x` to see its value, although in practice runtimes will attempt to optimize this away.
+    
+    Dynamic dispatch provides significant flexibility in how a program runs but achieves it with a performance hit that can be similarly significant. In languages such as Python or JavaScript, the dispatch consideration is completely hidden. By and large, Rust's structure negates the need to consider dispatch. Indeed, one of Rust's goals was called "zero-cost abstractions," meaning that Rust features many very high-level language structures with great flexibility, but these "polymorphic" abstractions are made "monomorphic" at compile time. This means code that can behave in many ways is turned into different pieces of code that can each only run one way, with the compiler duplicating code when necessary. Static dispatch will thus consume more memory and result in larger binaries. */
+
 
 
     /*** Unit ***/
