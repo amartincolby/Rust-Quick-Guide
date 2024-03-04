@@ -1,3 +1,4 @@
+use std::ops::{Add, Div, Mul, Sub};
 /* These imports should be familiar to most. The double-colon syntax represents
 the "path" to the entity. */
 use std::{thread};
@@ -1225,6 +1226,24 @@ async fn main() {
     also creates strings. */
 
 
+    /*** Supertraits ***/
+
+    /* Traits can be tied to one another in a parent-child relationship, meaning that if the child is implemented, so to must the parent. */
+
+    trait Vehicle {
+        fn honk() -> String;
+    }
+
+    trait Engine: Vehicle {
+        fn accelerate() -> i32;
+    }
+
+    /* In the above, if Engine is implemented, Vehicle must also be
+    implemented. Just like trait type parameters, supertraits can contain
+    multiple traits via the `+` operator, e.g. Engine: Vehicle + Transmission.
+    */
+
+
     /*** Union ***/
 
     /* The reason for why Rust did not simply take OCaml's terminology is
@@ -1662,7 +1681,10 @@ async fn main() {
     opaque parameter type does not harden its hidden type. For example, the
     above specific_function() accepts an argument that implements ToString, so
     an integer would work. If specific_function() is called with an integer, it
-    can still be called later with a &str. */
+    can still be called later with a &str.
+    
+    Functions like two_hidden_types() can be implemented, but this will be
+    discussed later in the section on "dynamic dispatch." */
 
 
     /*** Monomorphization & Zero-Cost Abstractions ***/
@@ -1674,8 +1696,10 @@ async fn main() {
     specific_function('Z');
 
     /* When compiled, a version of specific_function() that accepts an integer, a string, and a char will be generated. Thus a polymorphic function is turned into three monomorphic functions. This requires more memory but provides a significant speed benefit.
-    
-    The monomorphic transformation can easily generate functions that _accept_ different types, but because a function can be arbitrarily complex, it cannot generate functions that _return_ different types. */
+
+    The monomorphic transformation can easily generate functions that _accept_ different types, but because a function can be arbitrarily complex, it cannot generate functions that _return_ different types.
+
+    This monomorphic transformation by the compiler is what is meant by Rust's motto of "zero-cost abstractions." They are abstractions that only exist in the code. To call them powerful syntactic sugar is accurate. */
 
 
     /*----------------------------------------------
@@ -1696,7 +1720,7 @@ async fn main() {
     version of `malloc`. */
 
     let boxed_int = Box::new(42);
-    // Uses of the box automatically, and safely, dereference the pointer.
+    // Use of the box automatically, and safely, dereferences the pointer.
     println!("The box contains {boxed_int}");
 
     /* Because pointers are fixed size, they can be used in data structures
@@ -1714,9 +1738,10 @@ async fn main() {
     }
 
     /* When data exists in a box and not as a literal, programmers can attach
-    code to lower-level behaviors such as when the box is cleared from memory.
-    This is complex and outside the scope of this tutorial, but it is one of
-    the major reasons for using smart pointers like Box. */
+    their own logic to lower-level behaviors such as when the box is cleared
+    from memory. Basically, it gives a developer visibility into lifecycle
+    events. This is complex and outside the scope of this tutorial, but it is
+    one of the major reasons for using smart pointers like Box. */
 
     
     /* Reference Counter */
@@ -1969,7 +1994,7 @@ async fn main() {
     let compare_authors_2 = author1 == author1; // - : bool = true
 
 
-    /* Comparing Values */
+    /*** Comparing Values ***/
 
     // The equality operators work differently for values instead of structures.
     // Attempting to compare two different types will cause a compile error.
@@ -1981,6 +2006,25 @@ async fn main() {
     let compare_integers = 42 == 42;                // - : bool = true
     // let compare_number_string = 42 == "A string" ;     // Error
 
+
+    /*** Custom Operators ***/
+
+    /* Operators in Rust are actually just traits. For example, the equality
+    comparisons above can be written thusly: */
+
+    let compare_authors_3 = author1.eq(&author2);
+
+    /* Note how the compared value must be a reference. Using an operator hides
+    that detail.
+
+    All other operators are likewise methods that can be overridden. */
+
+    let add_method = 2.add(40);
+    let sub_method = 44.sub(2);
+    
+    /* For a full list of operators that can be overloaded, see the Rust docs.
+    What this means it that a developer can create a custom .eq() trait that
+    will be called when the `==` operator is used. */
 
     /*----------------------------------------------
     * Functions
@@ -2213,51 +2257,29 @@ async fn main() {
 
     /*** First Class Functions & Dynamic Dispatch ***/
 
-    /* Just as with most modern languages, Rust allows passing functions as values. Anonymous functions are truly first class and are passed like any other value, but regular functions can be passed as "function pointers." */
+    /* Just as with most modern languages, Rust allows passing functions as values. Anonymous functions are truly first class and are passed like any other value, but regular functions can be passed as "function pointers," which are preicely that: pointers to a single function sitting in memory. */
 
     fn get_closure() -> Box<dyn Fn() -> i32> {
-        // A new closure is created on each call.
         Box::new(|| 42)
     }
 
     let a_closure = get_closure();
-    let value_from_closure = a_closure();
+    let value_from_closure = a_closure(); // 42
 
     fn a_function() -> i32 {
         42
     }
 
     fn get_function() -> fn() -> i32 {
-        // No new function is created. The same pointer is simply returned on
-        // each call.
         a_function
     }
 
     let a_function = get_function();
-    let value_from_functin = a_function();
+    let value_from_function = a_function(); //42
 
-
-    /* There are two things to note in the above: the usage of the `dyn` keyword and the capital F in Fn for the closure example.
-    
-    The type signature for get_function() makes sense. Functions are declared with fn, thus a function pointer is typed with fn. But the signature for get_closure() uses a capital F. This is because a closure is actually a trait.Closures are compiled into struct instances with a method attached to them that contains the actual logic of your closure.
-    
-    Even though closures are traits, the `impl` keyword is not used because, as mentioned, when `impl` is used in a function signature, that signature represents an underlying concrete type. Closures have no underlying type.
-    
-    The `dyn` keyword is the result of old Rust syntax that overloaded `impl`. The details are unimportant. The reason that a function that accepts or returns a closure must declare the closure with `dyn` is because when type signatures use `impl`, the compiler needs to determine the hidden type that the `impl` represents. A closure has no hidden type. Thus, instead of `impl` closure types use `dyn` even though a closure just sitting there has a type signature using `impl`. It is all very confusing.
-    
-    Earlier, I said that an implementation is not a type itself, but it does change the type signature of whatever it is implemented for. This is not entirely accurate. Implementations _can_ be types. */
-
-    // Type is impl Fn(i32) -> i32;
-    let a_closure = |x: i32| 42 + x;
-
-
-    /* Since the size of a closure is unknown at compile time, the type signature requires that the closure is boxed just like any other value of unknown size. */
-
-    /* Since functions in Rust are items and thus exist globally, passing a function is actually passing a pointer to that function. */
-
-    fn call_something(cb: fn(x: String) -> String) -> String {
-        cb(String::from("Steve"))
-    }
+    // Function pointers can also serve as simple aliases.
+    let a_function_alias = a_function;
+    let another_value_from_function = a_function_alias(); // 42
 
     /* Because function pointers are of constant size, they can be included on structs without any special considerations. */
 
@@ -2266,9 +2288,17 @@ async fn main() {
         val: i32,
     }
 
-    /* If you are coming from JavaScript, or any scripting language, the concept of dispatch will be new to you. In compiled languages, there is a distinction between knowing what function will run at compile time versus at runtime. If the function called is determined at compile time, it is called "static dispatch," meaning the behavior that is "dispatched" never changes. Dyanmic dispatch is the opposite of that. A synonymous description is "early binding" versus "late binding," where binding refers to the act of binding a value or behavior to an identifier. For example, `let x = 42;`. Rust's compiler knows that `x` is `42`, so it does not bother to check the value of `x` when running. This check is called "indirection." In JavaScript, every call to `x` theoretically requires the runtime to check `x` to see its value, although in practice runtimes will attempt to optimize this away.
+    /* There are two things to note in the above: the usage of the `dyn` keyword and the capital F in Fn for the closure example.
     
-    Dynamic dispatch provides significant flexibility in how a program runs but achieves it with a performance hit that can be similarly significant. In languages such as Python or JavaScript, the dispatch consideration is completely hidden. By and large, Rust's structure negates the need to consider dispatch. Indeed, one of Rust's goals was called "zero-cost abstractions," meaning that Rust features many very high-level language structures with great flexibility, but these "polymorphic" abstractions are made "monomorphic" at compile time. This means code that can behave in many ways is turned into different pieces of code that can each only run one way, with the compiler duplicating code when necessary. Static dispatch will thus consume more memory and result in larger binaries. */
+    The type signature for get_function() makes sense. Functions are declared with fn, thus a function pointer is typed with fn. But the signature for get_closure() uses a capital F. This is because a closure is actually a trait.Closures are compiled into struct instances with a method attached to them that contains the actual logic of your closure.
+    
+    Even though closures are traits, the `impl` keyword is not used because, as mentioned when discussing opaque types and monomorphization, when `impl` is used in a function signature, that signature represents an underlying concrete type. Closures have no underlying type. When pointing to a trait that exists on the heap, such as when having a Box<Trait> like in the above example, it is referred to as a "trait object." The `dyn` keyword was created to more clearly differentiate between implementations and trait objects. */
+
+    /* Trait objects are Rust's way of handling what is known as "dynamic dispatch." If you are coming from JavaScript, or any scripting language, the concept of dispatch will be new to you. In compiled languages, there is a distinction between knowing what function will run, i.e. be dispatched, at compile time versus at runtime. For example, if an integer is greater than 0, function A will run, and function B will run if less than 0. The compiler does not necessarily know the value of the integer, but it doesn't need to. It knowns both roads perfectly, so it can walk either one equally quickly.
+    
+    But if the _function_ is not known, the compiler needs to find out what road it is to walk. If the function called is determined at compile time, it is called "static dispatch," meaning the behavior that is "dispatched" never changes. Dyanmic dispatch is the opposite of that. A synonymous description is "early binding" versus "late binding," where binding refers to the act of binding a value or behavior to an identifier. For example, `let x = 42;`. Rust's compiler knows that `x` is `42`, so it does not bother to check the value of `x` when running. This check is called "indirection." In JavaScript, every call to `x` theoretically requires the runtime to check `x` to see its value, although in practice runtimes will attempt to optimize this away.
+    
+    Dynamic dispatch provides significant flexibility in how a program runs but achieves it with a performance hit that can be similarly significant. In languages such as Python or JavaScript, the dispatch consideration is completely hidden. By and large, Rust's structure negates the need to consider dispatch. As mentioned, one of Rust's goals was "zero-cost abstractions," meaning that Rust features many very high-level language structures with great flexibility, but these "polymorphic" abstractions are made "monomorphic" at compile time. This means code can feel as though it is dynamically dispatching procedures while all functionality is actually static. */
 
 
 
