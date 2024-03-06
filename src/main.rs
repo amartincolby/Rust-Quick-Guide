@@ -509,8 +509,6 @@ async fn main() {
     There is more to be said about references, since Rust's management of values
     is its party trick, but we will get to that in the section on ownership. */
 
-    // TODO: Cover that. Copy the original values entirely to go back over what
-    // was previously discussed.
 
     /*** Pointers ***/
 
@@ -542,8 +540,8 @@ async fn main() {
     
     For the time being, a cursory explanation of pointers will suffice. */
 
-    // The most common way to create a pointer is to bind the memory location of
-    // a reference.
+    /* The most common way to create a pointer is to bind the memory location of
+    a reference. */
 
     let a_number_in_memory: i32 = 42;
     let a_pointer_to_a_number: *const i32 = &a_number_in_memory;
@@ -716,6 +714,23 @@ async fn main() {
     anarchic like JavaScript, this can initially feel overly restrictive, but
     it is _critical_ to Rust's value. Whole classes of errors are eliminated by
     this semantic decision. Learn it. Live it. Love it. */
+
+
+    /*----------------------------------------------
+    * Generics
+    *-----------------------------------------------
+    */
+
+    /* If you are coming from C++ or TypeScript, generics should be very
+    familiar to you. Go only recently introduced them, but they are common
+    across most typed languages. Generics are essentially just entities that
+    can accept different types. The syntax for this is broadly similar to
+    TypeScript, so it should be easy to pick up. */
+
+    struct Things<T1, T2> {
+        thing1: T1,
+        thing2: T2,
+    }
 
 
     /*----------------------------------------------
@@ -1098,7 +1113,7 @@ async fn main() {
     identifier used, it could even be the dreaded "data", semantic information
     about what the identifier represents is not lost. */
 
-    type JarJarBinksQuotes = GenericLinkedList<String>;
+    type JarJarBinksQuotes = Vec<String>;
 
     /* Type aliasing has a second use for creating entities called "opaque
     types." These are addressed later because they do not work at the moment. */
@@ -1228,7 +1243,8 @@ async fn main() {
 
     /*** Supertraits ***/
 
-    /* Traits can be tied to one another in a parent-child relationship, meaning that if the child is implemented, so to must the parent. */
+    /* Traits can be tied to one another in a parent-child relationship,
+    meaning that if the child is implemented, so to must the parent. */
 
     trait Vehicle {
         fn honk() -> String;
@@ -1592,7 +1608,7 @@ async fn main() {
 
     fn cast_spell() {
         let mut rng = rand::thread_rng();
-        let spell = rng.gen_range(1..4);
+        let spell = rng.gen_range(1..3);
         let power = rng.gen_range(0..99);
         match spell {
             1 => generate_spell(Magic::MagicMissile(power)),
@@ -1606,27 +1622,6 @@ async fn main() {
     }
 
     cast_spell();
-
-
-    /*----------------------------------------------
-    * Generics
-    *-----------------------------------------------
-    */
-
-    /* If you are coming from C++ or TypeScript, generics should be very
-    familiar to you. Go only recently introduced them, but they are common
-    across most typed languages. Generics are essentially just entities that
-    can accept different types. The syntax for this is broadly similar to
-    TypeScript, so it should be easy to pick up. */
-
-    struct GenericLinkedList<T> {
-        head: GenericLinkedListNode<T>,
-    }
-    
-    struct GenericLinkedListNode<T> {
-        value: T,
-        next: Option<Box<GenericLinkedListNode<T>>>,
-    }
 
 
     /*----------------------------------------------
@@ -1728,13 +1723,13 @@ async fn main() {
     have a potentially infinite recursion of next nodes, so `next` simply
     points to another node. */
 
-    struct LinkedList {
-        head: LinkedListNode,
+    struct LinkedList<T> {
+        head: LinkedListNode<T>,
     }
     
-    struct LinkedListNode {
-        value: i32,
-        next: Option<Box<LinkedListNode>>, // If None, it's the end of the list.
+    struct LinkedListNode<T> {
+        value: T,
+        next: Option<Box<LinkedListNode<T>>>, // If None, it's the end of the list.
     }
 
     /* When data exists in a box and not as a literal, programmers can attach
@@ -2803,8 +2798,8 @@ async fn main() {
     The downside of declarative macros is primarily just complexity. The
     special syntax required to automatically generate Rust is dense and becomes
     unwieldy when generating large pieces of code. The official Rust docs have
-    a good example implementation of the vec! macro that I will copy here. I
-    have renamed it to simple_vec. */
+    a simplified implementation of the vec! macro that I will copy here. I have
+    renamed it to simple_vec. */
 
     macro_rules! simple_vec {
         ( $( $x:expr ),* ) => {
@@ -2824,7 +2819,7 @@ async fn main() {
     outside the scope of this tutorial. Read the Rust docs for more
     information. But even eliding the details does not prevent the matching
     syntax from being pretty clear. The first line accepts $x as an expression,
-    the * matches and arbitrary number of expressions, and it then generates a
+    the * matches an arbitrary number of expressions, and it then generates a
     push for however many expressions there were. It feels a bit like a
     templating language because, really, it is.
     
