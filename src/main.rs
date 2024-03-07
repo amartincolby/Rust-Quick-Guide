@@ -2838,11 +2838,6 @@ async fn main() {
     objects and generate a web page that allows people to explore the code. */
 
 
-    /*----------------------------------------------
-    * Testing
-    *----------------------------------------------
-    */
-
 
     /*----------------------------------------------
     * Actix-Web
@@ -2872,6 +2867,12 @@ async fn main() {
 
 
 }
+
+
+/*----------------------------------------------
+* Modules Part Deux
+*----------------------------------------------
+*/
 
 /* This content is part of a section in the above function. Do not read it
 separately.
@@ -2926,15 +2927,49 @@ mod more_external_stuff {
     }
 }
 
+
+/*----------------------------------------------
+* Testing
+*----------------------------------------------
+*/
+
 /* This section is dedicated to testing since tests cannot be nested. They must
 be direct descendents of a module. They are wrapped in their own module here
 because how the test attribute is interpreted is based on what imports are
 found in the module. The conflict for this tutorial comes from the Tokio
 import. */
 
+/* As briefly mentioned, testing in Rust is done with simple attributes atop functions. Including this syntax with the language spec itself has become common in newer languages and enables the popular pattern of colocating implementation code and testing code to be idiomatic. I appreciate the JavaScript world's separation of testing and language, which has resulted in significant innovation in its build and test ecosystem, but I ultimately prefer standards. */
+
+/* A notable difference from other languages such as JavaScript is testing for function calls. Rust discourages this pattern. If you want to check for a function call, you must leverage dependency injection. */
+
+fn mult_by_two(x: i32) -> i32 {
+    println!("Multiplying");
+    x * 2
+}
+
+
+#[cfg(test)]
 mod testing_stuff {
+    use crate::mult_by_two;
+
     #[test]
-    fn testing_testing_123() {
-        println!("This is only a test")
+    fn testing_multiplier() {
+        let result = mult_by_two(21);
+        assert_eq!(result, 42); // Change this to see a failure.
+    }
+
+    #[test]
+    #[should_panic(expected = "ran away")]
+    fn test_panic() {
+        panic!("I got scared and ran away");
+    }
+}
+
+mod tests {
+    #[test]
+    fn it_works() {
+        let result = 2 + 2;
+        assert_eq!(result, 4);
     }
 }
