@@ -135,7 +135,9 @@ The syntax structures above the function are called attributes. They allow a
 developer to specify how the function is the be handled by the compiler. In
 these examples, four linting settings are being disabled and an attribute for
 the library Tokio is being applied to enable async. Async will be discussed
-later. More attributes will be covered shortly. */
+later. More attributes will be covered shortly.
+
+The tutorial is structured such that the main function calls supporting functions that each explain an element of Rust. This allows usage of an IDE like VSCode to collapse the supporting functions to make scrolling easier and faster while also using the function calls to jump to the function definitions like a table of contents. */
 
 #[allow(unused_assignments)]
 #[allow(dead_code)]
@@ -144,6 +146,27 @@ later. More attributes will be covered shortly. */
 #[tokio::main]
 async fn main() {
 
+    atributes();
+    items();
+    variables_and_bindings();
+    ownership_and_borrowing();
+    generics();
+    primitive_types();
+    lifetimes();
+    pattern_matching();
+    opaque_types();
+    smart_pointers();
+    modules_and_crates();
+    basic_operators();
+    functions();
+    multithreading_and_concurrency();
+    async_syntax();
+    macros();
+    actix_web();
+
+}
+
+fn atributes() {
     /*----------------------------------------------
     * Attributes
     *----------------------------------------------
@@ -192,8 +215,9 @@ async fn main() {
     
     Code generation via attributes takes two forms: trait derives and macros.
     Both of these are discussed more fully later. */
+}
 
-
+fn items() {
     /*----------------------------------------------
     * Items
     *----------------------------------------------
@@ -228,8 +252,9 @@ async fn main() {
     analogy, if we liken a program to a building, what happens in the building
     can change over time, but what happens in the building should not determine
     how many floors the building has. */
+}
 
-
+fn variables_and_bindings() {
     /*----------------------------------------------
     * Variables and Bindings
     *-----------------------------------------------
@@ -547,8 +572,9 @@ async fn main() {
     let a_pointer_to_a_number: *const i32 = &a_number_in_memory;
 
     /* Pointers are determined by the type signature of the identifier. */
+}
 
-    
+fn ownership_and_borrowing() {
     /*----------------------------------------------
     * Ownership & Borrowing
     *----------------------------------------------
@@ -714,8 +740,9 @@ async fn main() {
     anarchic like JavaScript, this can initially feel overly restrictive, but
     it is _critical_ to Rust's value. Whole classes of errors are eliminated by
     this semantic decision. Learn it. Live it. Love it. */
+}
 
-
+fn generics() {
     /*----------------------------------------------
     * Generics
     *-----------------------------------------------
@@ -731,8 +758,9 @@ async fn main() {
         thing1: T1,
         thing2: T2,
     }
+}
 
-
+fn primitive_types() {
     /*----------------------------------------------
     * Primitive Types
     *-----------------------------------------------
@@ -990,7 +1018,9 @@ async fn main() {
         _ => println!("There is no cheddar in stock"),
     }
 
+}
 
+fn type_structures() {
     /*----------------------------------------------
     * Type Structures
     *-----------------------------------------------
@@ -1409,8 +1439,9 @@ async fn main() {
 
     /* NOTE: The value of enums like Option and Result will be discussed shortly
     in the section on "Pattern Matching". */
+}
 
-    
+fn lifetimes() {
     /*----------------------------------------------
     * Lifetimes
     *-----------------------------------------------
@@ -1518,8 +1549,9 @@ async fn main() {
     essense, panics in Rust are what exceptions in other languages _should_ be:
     the machine state has fallen out of alignment with the symbolic state.
     Panics are used to fail tests. */
+}
 
-
+fn pattern_matching() {
     /*----------------------------------------------
     * Pattern Matching
     *-----------------------------------------------
@@ -1622,8 +1654,9 @@ async fn main() {
     }
 
     cast_spell();
+}
 
-
+fn opaque_types() {
     /*----------------------------------------------
     * Opaque Types
     *-----------------------------------------------
@@ -1695,8 +1728,9 @@ async fn main() {
     The monomorphic transformation can easily generate functions that _accept_ different types, but because a function can be arbitrarily complex, it cannot generate functions that _return_ different types.
 
     This monomorphic transformation by the compiler is what is meant by Rust's motto of "zero-cost abstractions." They are abstractions that only exist in the code. To call them powerful syntactic sugar is accurate. */
+}
 
-
+fn smart_pointers() {
     /*----------------------------------------------
     * Smart Pointers
     *-----------------------------------------------
@@ -1811,8 +1845,9 @@ async fn main() {
     /* A mutex is a smart pointer that only allows one entity to access it at a
     time. As with Arc, see the section on concurrency for a discussion of them.
     */
+}
 
-
+fn modules_and_crates() {
     /*----------------------------------------------
     * Modules & Crates
     *-----------------------------------------------
@@ -1908,8 +1943,9 @@ async fn main() {
     
     Similar modules have been declared outside of the function at the bottom of
     this file to illustrate how modules can interact. Go there now. */
+}
 
-
+fn basic_operators() {
     /*----------------------------------------------
     * Basic operators
     *-----------------------------------------------
@@ -2021,6 +2057,9 @@ async fn main() {
     What this means it that a developer can create a custom .eq() trait that
     will be called when the `==` operator is used. */
 
+}
+
+fn functions() {
     /*----------------------------------------------
     * Functions
     *----------------------------------------------
@@ -2296,7 +2335,6 @@ async fn main() {
     Dynamic dispatch provides significant flexibility in how a program runs but achieves it with a performance hit that can be similarly significant. In languages such as Python or JavaScript, the dispatch consideration is completely hidden. By and large, Rust's structure negates the need to consider dispatch. As mentioned, one of Rust's goals was "zero-cost abstractions," meaning that Rust features many very high-level language structures with great flexibility, but these "polymorphic" abstractions are made "monomorphic" at compile time. This means code can feel as though it is dynamically dispatching procedures while all functionality is actually static. */
 
 
-
     /*** Unit ***/
 
     /* You may have noticed in the above example of less_than_42, that if you
@@ -2335,7 +2373,9 @@ async fn main() {
     /* The above function expects to return nothing and will throw a compile
     error if anything is returned. */
 
+}
 
+fn multithreading_and_concurrency() {
     /*----------------------------------------------
     * Multithreading/Concurrency
     *----------------------------------------------
@@ -2594,8 +2634,9 @@ async fn main() {
     the other value that they need to be unlocked. Thus, neither thread will
     ever finish. There are best practices for avoiding deadlocks that are
     outside the scope of this tutorial. */
+}
 
-
+fn async_syntax() {
     /*----------------------------------------------
     * Async
     *----------------------------------------------
@@ -2725,8 +2766,9 @@ async fn main() {
     while let Some(value) = cross_the.next().await {
         println!("{value} is an important number");
     }
+}
 
-
+fn macros() {
     /*----------------------------------------------
     * Macros
     *----------------------------------------------
@@ -2826,7 +2868,9 @@ async fn main() {
     The ultimate effect of a declarative macro is that the macro call is
     replaced with the code specified in the template. */
 
+}
 
+fn rustdoc() {
     /*----------------------------------------------
     * Rustdoc
     *----------------------------------------------
@@ -2837,8 +2881,9 @@ async fn main() {
     Rustdoc will take the documentation blocks at the top of functions and
     objects and generate a web page that allows people to explore the code. */
 
+}
 
-
+fn actix_web() {
     /*----------------------------------------------
     * Actix-Web
     *----------------------------------------------
@@ -2864,8 +2909,52 @@ async fn main() {
     including this section here to show how easy n-tier development can be and
     how familiar it can feel. Also of note, Actix relies on Tokio for its async
     runtime and the previous section on async nicely connects here. */
+}
+
+/*----------------------------------------------
+* Testing
+*----------------------------------------------
+*/
+
+/* This section is dedicated to testing since tests cannot be nested. They must
+be direct descendents of a module. They are wrapped in their own module here
+because how the test attribute is interpreted is based on what imports are
+found in the module. The conflict for this tutorial comes from the Tokio
+import. */
+
+/* As briefly mentioned, testing in Rust is done with simple attributes atop functions. Including this syntax with the language spec itself has become common in newer languages and enables the popular pattern of colocating implementation code and testing code to be idiomatic. I appreciate the JavaScript world's separation of testing and language, which has resulted in significant innovation in its build and test ecosystem, but I ultimately prefer standards. */
+
+/* A notable difference from other languages such as JavaScript is testing for function calls. Rust discourages this pattern. If you want to check for a function call, you must leverage dependency injection. */
+
+fn mult_by_two(x: i32) -> i32 {
+    println!("Multiplying");
+    x * 2
+}
 
 
+#[cfg(test)]
+mod testing_stuff {
+    use crate::mult_by_two;
+
+    #[test]
+    fn testing_multiplier() {
+        let result = mult_by_two(21);
+        assert_eq!(result, 42); // Change this to see a failure.
+    }
+
+    #[test]
+    #[should_panic(expected = "ran away")]
+    fn test_panic() {
+        panic!("I got scared and ran away");
+    }
+}
+
+mod tests {
+    #[test]
+    fn it_works() {
+        let result = 2 + 2;
+        assert_eq!(result, 4);
+    }
 }
 
 
@@ -2928,48 +3017,3 @@ mod more_external_stuff {
 }
 
 
-/*----------------------------------------------
-* Testing
-*----------------------------------------------
-*/
-
-/* This section is dedicated to testing since tests cannot be nested. They must
-be direct descendents of a module. They are wrapped in their own module here
-because how the test attribute is interpreted is based on what imports are
-found in the module. The conflict for this tutorial comes from the Tokio
-import. */
-
-/* As briefly mentioned, testing in Rust is done with simple attributes atop functions. Including this syntax with the language spec itself has become common in newer languages and enables the popular pattern of colocating implementation code and testing code to be idiomatic. I appreciate the JavaScript world's separation of testing and language, which has resulted in significant innovation in its build and test ecosystem, but I ultimately prefer standards. */
-
-/* A notable difference from other languages such as JavaScript is testing for function calls. Rust discourages this pattern. If you want to check for a function call, you must leverage dependency injection. */
-
-fn mult_by_two(x: i32) -> i32 {
-    println!("Multiplying");
-    x * 2
-}
-
-
-#[cfg(test)]
-mod testing_stuff {
-    use crate::mult_by_two;
-
-    #[test]
-    fn testing_multiplier() {
-        let result = mult_by_two(21);
-        assert_eq!(result, 42); // Change this to see a failure.
-    }
-
-    #[test]
-    #[should_panic(expected = "ran away")]
-    fn test_panic() {
-        panic!("I got scared and ran away");
-    }
-}
-
-mod tests {
-    #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
-    }
-}
