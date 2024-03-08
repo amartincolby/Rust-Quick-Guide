@@ -1563,6 +1563,20 @@ fn pattern_matching() {
     the logical flow. The basic matching concept is similar to a regex, but
     full-featured pattern matching is much more powerful. To initially
     illustrate, let's consume the Option from earlier. */
+
+    fn generate_answer() -> Option<i32> {
+        if rand::random::<bool>() {
+            Some(42)
+        } else {
+            None
+        }
+    }
+
+    let possible_answer = generate_answer();
+
+    if possible_answer == Some(42) {
+        println!("The answer is 42")
+    }
     
     match possible_answer {
         Some(x) => println!("There is an answer and it is {x}!"),
@@ -1594,6 +1608,23 @@ fn pattern_matching() {
     nested pyramids almost like the old "Callback Hell" of JavaScript. With the
     `?`, if the error occurs, the function simply returns that error. Think of
     this like shorthand for a try/catch block. */
+
+    enum ResultError {
+        ErrOne(String),
+        ErrTwo(String),
+    }
+
+    type TestResult = Result<i32, ResultError>;
+
+    fn generate_result() -> TestResult {
+        if rand::random::<bool>() {
+            Ok(42)
+        } else {
+            Err(ResultError::ErrTwo(String::from("There was no answer")))
+        }
+    }
+
+    let possible_result = generate_result();
 
     fn check_result() -> TestResult {
         let result: i32 = generate_result()?;
@@ -2636,7 +2667,7 @@ fn multithreading_and_concurrency() {
     outside the scope of this tutorial. */
 }
 
-fn async_syntax() {
+async fn async_syntax() {
     /*----------------------------------------------
     * Async
     *----------------------------------------------
