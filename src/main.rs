@@ -163,7 +163,7 @@ async fn main() {
     async_syntax();
     macros();
     actix_web();
-
+    rustdoc();
 }
 
 fn atributes() {
@@ -2955,20 +2955,49 @@ import. */
 
 /* As briefly mentioned, testing in Rust is done with simple attributes atop functions. Including this syntax with the language spec itself has become common in newer languages and enables the popular pattern of colocating implementation code and testing code to be idiomatic. I appreciate the JavaScript world's separation of testing and language, which has resulted in significant innovation in its build and test ecosystem, but I ultimately prefer standards. */
 
-/* A notable difference from other languages such as JavaScript is testing for function calls. Rust discourages this pattern. If you want to check for a function call, you must leverage dependency injection. */
+/* The test-writing experience in Rust is very similar to patterns in other languages, so there shouldn't be many surprises. A notable difference from other languages such as JavaScript is testing for function calls. Rust discourages this pattern. If you want to check for a function call, you must leverage dependency injection.
+
+The below functions will run with the `cargo test` command. Rust uses multiple threads by default, so make sure to avoid using shared state. If you want predictable control of shared state, use the `-- --test-threads=1` flag to only use a single thread.
+
+Rust does not display any output from the code, such as from println!, by default. You can enable it with the --show-output flag.
+
+Tests can be ignored by default with the #[ignore] attribute. This is commonly used on long-duration tests to prevent a full test run from taking forever. The ignored tests can be run with the `--ignored` flag. ALl tests, regardless of status, can be run with `--include-ignored`.
+
+Specific tests can be run using the same double-colon path syntax used to reference modules. 
+
+    cargo test testing_stuff::test_panic 
+
+The above will only run one test. To run multiple tests, passing in any incompletely identifier will run all tests that match the provided string.
+
+    cargo test testing_stuff
+
+The above will run all tests in the testing_stuff module.
+
+    cargo test multiplier -- --include-ignored
+
+The above will match "multiplier" to test names. This means that both tests with the word "multiplier" in their identifier will run.
+*/
 
 fn mult_by_two(x: i32) -> i32 {
     println!("Multiplying");
     x * 2
 }
 
-
 #[cfg(test)]
 mod testing_stuff {
     use crate::mult_by_two;
 
     #[test]
-    fn testing_multiplier() {
+    fn test_multiplier() {
+        let result = mult_by_two(21);
+        println!("The test result is {result}");
+        assert_eq!(result, 42); // Change this to see a failure.
+        assert_ne!(result, 41);
+    }
+
+    #[test]
+    #[ignore]
+    fn test_multiplier_2() {
         let result = mult_by_two(21);
         assert_eq!(result, 42); // Change this to see a failure.
     }
@@ -2980,13 +3009,6 @@ mod testing_stuff {
     }
 }
 
-mod tests {
-    #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
-    }
-}
 
 
 /*----------------------------------------------
