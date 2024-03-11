@@ -2951,23 +2951,44 @@ fn actix_web() {
 be direct descendents of a module. They are wrapped in their own module here
 because how the test attribute is interpreted is based on what imports are
 found in the module. The conflict for this tutorial comes from the Tokio
-import. */
+import. 
 
-/* As briefly mentioned, testing in Rust is done with simple attributes atop functions. Including this syntax with the language spec itself has become common in newer languages and enables the popular pattern of colocating implementation code and testing code to be idiomatic. I appreciate the JavaScript world's separation of testing and language, which has resulted in significant innovation in its build and test ecosystem, but I ultimately prefer standards. */
+As briefly mentioned, testing in Rust is done with simple attributes atop
+functions. Including this syntax with the language spec itself has become
+common in newer languages and enables the popular pattern of colocating
+implementation code and testing code to be idiomatic. I appreciate the
+JavaScript world's separation of testing and language, which has resulted in
+significant innovation in its build and test ecosystem, but I ultimately prefer
+standards.
 
-/* The test-writing experience in Rust is very similar to patterns in other languages, so there shouldn't be many surprises. A notable difference from other languages such as JavaScript is testing for function calls. Rust discourages this pattern. If you want to check for a function call, you must leverage dependency injection.
+The test-writing experience in Rust is very similar to patterns in other
+languages, so there shouldn't be many surprises. There are two notable
+differences from other languages. Firstly, unlike languages such as JavaScript,
+Rust does not allow testing for function calls. If you want to check for a
+function call, you must leverage dependency injection. Secondly, Rust does not
+enforce privacy for functions, meaning that tests can access public or private
+behavior.
 
-The below functions will run with the `cargo test` command. Rust uses multiple threads by default, so make sure to avoid using shared state. If you want predictable control of shared state, use the `-- --test-threads=1` flag to only use a single thread.
+The below functions will run with the `cargo test` command. Rust uses multiple
+threads by default, so make sure to avoid using shared state. If you want
+predictable control of shared state, use the `--test-threads=1` flag to only
+use a single thread.
 
-Rust does not display any output from the code, such as from println!, by default. You can enable it with the --show-output flag.
+Rust does not display any output from the code, such as from println!, by
+default. You can enable it with the `--show-output` flag.
 
-Tests can be ignored by default with the #[ignore] attribute. This is commonly used on long-duration tests to prevent a full test run from taking forever. The ignored tests can be run with the `--ignored` flag. ALl tests, regardless of status, can be run with `--include-ignored`.
+Tests can be ignored by default with the #[ignore] attribute. This is commonly
+used on long-duration tests to prevent a full test run from taking forever. The
+ignored tests can be run with the `--ignored` flag. ALl tests, regardless of
+status, can be run with `--include-ignored`.
 
-Specific tests can be run using the same double-colon path syntax used to reference modules. 
+Specific tests can be run using the same double-colon path syntax used to
+reference modules.
 
     cargo test testing_stuff::test_panic 
 
-The above will only run one test. To run multiple tests, passing in any incompletely identifier will run all tests that match the provided string.
+The above will only run one test. To run multiple tests, passing in any
+incompletely identifier will run all tests that match the provided string.
 
     cargo test testing_stuff
 
@@ -2975,8 +2996,8 @@ The above will run all tests in the testing_stuff module.
 
     cargo test multiplier -- --include-ignored
 
-The above will match "multiplier" to test names. This means that both tests with the word "multiplier" in their identifier will run.
-*/
+The above will match "multiplier" to test names. This means that both tests
+with the word "multiplier" in their identifier will run. */
 
 fn mult_by_two(x: i32) -> i32 {
     println!("Multiplying");
@@ -3009,6 +3030,20 @@ mod testing_stuff {
     }
 }
 
+
+/*** Integration Tests ***/
+
+/* As mentioned, Rust allows unit testing of private functions. Rust instead
+uses privacy restriction as the primary differentiator between unit tests and
+integration tests. Integration tests are again similar to how they exist in
+other languages. They consume your code as though they were an external entity.
+Integration tests turn each test file into its own crate which imports your
+code, meaning that integration tests are best used when writing a library.
+
+Appropriately, the tests sit inside the /tests directory that is a sibling of
+the /src directory. Since the test files must exist in this location for the
+compiler to correctly manage them, they are outside the scope of this one-page
+tutorial. For full details see the Rust docs. */
 
 
 /*----------------------------------------------
@@ -3068,5 +3103,3 @@ mod more_external_stuff {
         }
     }
 }
-
-
