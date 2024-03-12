@@ -139,11 +139,11 @@ Unfortunately, the consequence of this is an entire industry that never fully
 embraced either perspective. As computing power increased, higher-level
 languages became more common, such as COBOL and Fortran in the 60's, BASIC and
 Pascal in the 70's, Ada in the 80's, Java in the 90's, and perhaps the
-Frieza-style **Final Form** of messy languages, JavaScript, in the 2000's. But
+Frieza-style **Final Form** of messy languages, JavaScript, in the 2000's.<sup>[[4](#fn4)] But
 these languages rarely came from academic research and were instead
 Frankenstein monsters that emerged from the needs of _business_ or simple
-creations aimed at educating laypeople.<sup>[[4, 5, 6](#fn4)]</sup> Their _raison d'etre_
-was neither geeky nor academic; it was purely human.<sup>[[7](#fn7)]</sup>
+creations aimed at educating laypeople.<sup>[[5, 6, 7](#fn5)]</sup> Their _raison d'etre_
+was neither geeky nor academic; it was purely human.<sup>[[8](#fn8)]</sup>
 
 These languages represent the third major historical thread running parallel to
 the struggle between the geeks and the academics: businesses. In the early days
@@ -185,9 +185,9 @@ outcomes.
 
 There are moral consequences: A bad program can produce much more CO2 than a
 good program; a bad program can fail someone just when they need it most; a bad
-program can literally kill people;<sup>[[8](#fn8)]</sup> a bad program can
+program can literally kill people;<sup>[[9](#fn9)]</sup> a bad program can
 expose users to hackers; a bad program can fail society at
-large.<sup>[[9](#fn9)]</sup> There are business consequences if confidence in a
+large.<sup>[[10](#fn10)]</sup> There are business consequences if confidence in a
 product falls. There are even organizational consequences, with burnt-out
 engineers quitting. I am sure that all of those factors come into play. But I
 think the real motivator is that cloud computing is _extremely_ expensive. If
@@ -209,7 +209,7 @@ them behind an explicit "unsafe" flag. Rust has learned all of the mistakes from
 the past and set out not to repeat them, and we finally live in a world where
 people in power care about that.
 
-Rust is not alone in this shift,<sup>[[10](#fn10)]</sup> nor do I think that
+Rust is not alone in this shift,<sup>[[11](#fn11)]</sup> nor do I think that
 Rust is the end goal of some grand historical arc. But for this moment, right
 now, I think that Rust is part of the future, and it is a future that should be
 encouraged. We as programmers are the midwives to a better world that struggles
@@ -241,14 +241,17 @@ lines. Lovelace was a self-described metaphysician who recognized the
 philosophical possibilities in Babbage's machine, while Babbage cared about the
 machine itself and its ability to do mathematics.
 
-<a name="fn4">4</a>: We had one glorious moment where an academic language
+<a name="fn4">4</a>: RIP Akira Toriyama. You were a brick in the wall of my
+childhood.
+
+<a name="fn5">5</a>: We had one glorious moment where an academic language
 nearly achieved some degree of dominance in the 1980's with the rise of Lisp
 Machines. Ironically, the two main Lisp Machine companies that emerged from MIT
 left a drama so significant in their wake that it brought about the death of
 the hacker culture at the university and was the direct cause for the modern
 Open Source movement.
 
-<a name="fn5">5</a>: We had another moment where a rigidly defined language
+<a name="fn6">6</a>: We had another moment where a rigidly defined language
 achieved huge success in the form of Ada. Sadly, real-world considerations
 again killed Ada as its compiler, which needed to verify its powerful type
 system, was cripplingly slow. Compilers back in the 80's were usually
@@ -256,34 +259,39 @@ proprietary products, so vendors of compilers would concentrate efforts where
 there was money to be made. If Ada had come out during the era of online
 open-source, who knows what could have been.
 
-<a name="fn6">6</a>: Even though I don't consider them academic in the sense
+<a name="fn7">7</a>: Even though I don't consider them academic in the sense
 that I defined, both Basic and Smalltalk emerged from academic settings. Their
 aim was education of people, and they succeeded while becoming popular as well.
 
-<a name="fn7">7</a>: Indeed, JavaScript gives us perhaps the best example of
+<a name="fn8">8</a>: Indeed, JavaScript gives us perhaps the best example of
 this dynamic. An academic was given the task of creating a language for the web
 and he set out to create an academic language, namely a variant of Scheme. This
 plan was torpedoed by executives at Netscape who demanded that he instead make
 a language like Java simply because Java was popular. And also call it
 JavaScript, even though the languages are _completely_ different.
 
-<a name="fn8">8</a>: The examples of this are too numerous to list, but some
+<a name="fn9">9</a>: The examples of this are too numerous to list, but some
 glaring examples are Toyota's unintended acceleration debacle, the Therac 25,
 the Boeing 737 MAX, Tesla's Autopilot, and the countless industiral accidents
 involving manufacturing robots.
 
-<a name="fn9">9</a>: Deloitte and its multiple lawsuits over its disastrous
+<a name="fn10">10</a>: Deloitte and its multiple lawsuits over its disastrous
 failures to develop municipal services like DMV systems, or the famous dumpster
 fire that was the launch of Obamacare.
 
-<a name="fn10">10</a>: The most notable recent event being driven by similar motivators is the rise of alternative server-side JavaScript runtimes like LLVR, JustJS, Bun, and uWebSockets. Node spent over a decade focusing on features and stability while its child, Deno, did similar in an attempt to steal market share. Then Bun, which doesn't even support Windows yet, has blown both out of the water in mindshare.
+<a name="fn11">11</a>: The most notable recent event being driven by similar
+motivators is the rise of alternative server-side JavaScript runtimes like
+LLVR, JustJS, Bun, and uWebSockets. Node spent over a decade focusing on
+features and stability while its child, Deno, did similar in an attempt to
+steal market share. Then Bun, which doesn't even support Windows yet, has blown
+both out of the water in mindshare.
 
 --------------------------------------------------------------------------------
 
 The below text is valid Rust code. It is a copy of the code in the /src directory.
 
-This was written in VSCode and using an interactive IDE with code linting, folding, and
-highlighting is recommended.
+This was written in VSCode and using an interactive IDE with code linting,
+folding, and highlighting is recommended.
 
 ``` rust
 /* These imports should be familiar to most. The double-colon syntax represents
