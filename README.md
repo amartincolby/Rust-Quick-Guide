@@ -17,9 +17,20 @@ more on TypeScript and JavaScript since I see a move from that language to be of
 the greatest value and sense a readiness in the web development community to
 move to better languages.
 
-I think that the best docs are short, sweet, and specific, elide programming basics, but do not elide the symbolic fundamentals undergirding the syntax. The reasons for this are twofold. First, people already accustomed to programming will have very short attention spans when retreading territory. Second, it is not the basics that are of great value on the open market; it is knowledge of _the arcane_. I argue that all human endeavors have _arcana_, the secret knowledge that separates the true practitioners from the dillettantes. As such, even the simplest introductions to a language must include some degree of arcane knowledge to be of any worth.
-
-I tried to achieve this educational perfection with my [ReasonML Quick Guide](https://github.com/amartincolby/ReasonML-Quick-Guide), but ReasonML imploded with a community schism and thus caused me to abandon the language. I still have a fondness for ReasonML because it, and its connection to OCaml, were my introduction to the beautiful world of highly symbolic, academic languages, and I hope to communicate that to readers of this guide.
+I think that the best docs are short, sweet, and specific, elide programming
+basics, but do not elide the symbolic fundamentals undergirding the syntax. The
+reasons for this are twofold. First, people already accustomed to programming
+will have very short attention spans when retreading territory. Second, it is
+not the basics that are of great value on the open market; it is knowledge of
+_the arcane_. I argue that all human endeavors have _arcana_, the secret
+knowledge that separates the true practitioners from the dillettantes. As such,
+even the simplest introductions to a language must include some degree of
+arcane knowledge to be of any worth. I tried to achieve this educational
+perfection with my [ReasonML QuickGuide](https://github.com/amartincolby/ReasonML-Quick-Guide),
+but ReasonML imploded with a community schism and thus caused me to abandon the
+language. I still have a fondness for ReasonML because it, and its connection
+to OCaml, were my introduction to the beautiful world of highly symbolic,
+academic languages, and I hope to communicate that to readers of this guide.
 
 Programming is the arrangement of symbols. Symbols only have meaning insofar as
 they are related to other symbols. Devoid of context, a symbol has no meaning
@@ -39,7 +50,10 @@ These two goals, concise simplicity and broad context, are obviously at odds
 with one another. This is especially true with a language as rich as Rust. I
 hope that I find a middle ground that is approachable and easy to understand.
 
-The Rust docs are good but verbose. I like documentation that is simple enough to be a one-pager. I aim for [the famous Smalltalk postcard](https://richardeng.medium.com/syntax-on-a-post-card-cb6d85fabf88). I did a previous quick guide for ReasonML, a syntax of OCaml, which profoundly inspired Rust's semantics.
+The Rust docs are good but verbose. I like documentation that is simple enough
+to be a one-pager. I aim for [the famous Smalltalkpostcard](https://richardeng.medium.com/syntax-on-a-post-card-cb6d85fabf88).
+I did a previous quick guide for ReasonML, a syntax of OCaml, which profoundly
+inspired Rust's semantics.
 
 # Further Information
 - [The Official Learn Rust Online Book](https://doc.rust-lang.org/book/title-page.html) *The source of truth for learning Rust*
