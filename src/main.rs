@@ -1552,6 +1552,7 @@ fn lifetimes() {
 }
 
 fn pattern_matching() {
+
     /*----------------------------------------------
     * Pattern Matching
     *-----------------------------------------------
@@ -1562,7 +1563,7 @@ fn pattern_matching() {
     "pattern" that is used to analyze something and determine the next step in
     the logical flow. The basic matching concept is similar to a regex, but
     full-featured pattern matching is much more powerful. To initially
-    illustrate, let's consume the Option from earlier. */
+    illustrate, let's use the Option from earlier. */
 
     fn generate_answer() -> Option<i32> {
         if rand::random::<bool>() {
@@ -1584,11 +1585,13 @@ fn pattern_matching() {
     }
 
     /* Notice how the `Some()` is unpacked and its contents are given an
-    identifier? Options were common enough to be included in the language, so
-    specialized syntax was also included for consuming them: the `if let`. `if
-    let` allows for the `None` case to be silently ignored. If you delete the
-    `None` part of the above `match`, you will get an error because the match
-    cases are not exhaustive. */
+    identifier? Seems a bit heavy, no? The Rust team agrees. Options were
+    common enough to earn inclusion in the language, and as such specialized
+    syntax was also included for consuming them: the `if let`.
+    
+    `if let` allows for the `None` case to be silently ignored. If you delete
+    the `None` part of the above `match`, you will get an error because the
+    match cases are not exhaustive. You _must_ handle all possible cases. */
 
     if let Some(x) = possible_answer {
         println!("There is an answer and it is {x}!")
@@ -1624,14 +1627,14 @@ fn pattern_matching() {
         }
     }
 
-    let possible_result = generate_result();
-
     fn check_result() -> TestResult {
         let result: i32 = generate_result()?;
         let another_result: i32 = generate_result()?;
 
         Ok(result + another_result)
     }
+
+    let final_result = check_result();
 
     /* As mentioned earlier, optional arguments for functions require the use
     of Option(), which is best handled with pattern matching. Options _can_ be
