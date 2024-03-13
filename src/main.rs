@@ -1,4 +1,4 @@
-use std::ops::{Add, Div, Mul, Sub};
+use std::ops::{Add, Sub};
 /* These imports should be familiar to most. The double-colon syntax represents
 the "path" to the entity. */
 use std::{thread};
@@ -143,8 +143,6 @@ like VSCode to collapse the supporting functions to make scrolling easier and
 faster while also using the function calls to jump to the function definitions
 like a table of contents. */
 
-#[allow(unused_assignments)]
-#[allow(dead_code)]
 #[allow(unused_mut)]
 #[allow(unused_macros)]
 #[tokio::main]
@@ -156,6 +154,7 @@ async fn main() {
     ownership_and_borrowing();
     generics();
     primitive_types();
+    type_structures();
     lifetimes();
     pattern_matching();
     opaque_types();
@@ -164,12 +163,13 @@ async fn main() {
     basic_operators();
     functions();
     multithreading_and_concurrency();
-    async_syntax();
+    async_syntax().await;
     macros();
     actix_web();
     rustdoc();
 }
 
+#[allow(dead_code)]
 fn atributes() {
     /*----------------------------------------------
     * Attributes
@@ -258,6 +258,10 @@ fn items() {
     how many floors the building has. */
 }
 
+#[allow(unused_variables)]
+#[allow(unused_mut)]
+#[allow(unused_assignments)]
+#[allow(dead_code)]
 fn variables_and_bindings() {
     /*----------------------------------------------
     * Variables and Bindings
@@ -578,6 +582,7 @@ fn variables_and_bindings() {
     /* Pointers are determined by the type signature of the identifier. */
 }
 
+#[allow(unused_variables)]
 fn ownership_and_borrowing() {
     /*----------------------------------------------
     * Ownership & Borrowing
@@ -746,6 +751,7 @@ fn ownership_and_borrowing() {
     this semantic decision. Learn it. Live it. Love it. */
 }
 
+#[allow(dead_code)]
 fn generics() {
     /*----------------------------------------------
     * Generics
@@ -764,6 +770,7 @@ fn generics() {
     }
 }
 
+#[allow(unused_variables)]
 fn primitive_types() {
     /*----------------------------------------------
     * Primitive Types
@@ -1024,6 +1031,10 @@ fn primitive_types() {
 
 }
 
+#[allow(unused_variables)]
+#[allow(unused_assignments)]
+#[allow(dead_code)]
+#[allow(unused_mut)]
 fn type_structures() {
     /*----------------------------------------------
     * Type Structures
@@ -1445,6 +1456,9 @@ fn type_structures() {
     in the section on "Pattern Matching". */
 }
 
+#[allow(unused_assignments)]
+#[allow(unused_variables)]
+#[allow(dead_code)]
 fn lifetimes() {
     /*----------------------------------------------
     * Lifetimes
@@ -1555,6 +1569,8 @@ fn lifetimes() {
     Panics are used to fail tests. */
 }
 
+#[allow(unused_variables)]
+#[allow(dead_code)]
 fn pattern_matching() {
 
     /*----------------------------------------------
@@ -1694,6 +1710,7 @@ fn pattern_matching() {
     cast_spell();
 }
 
+#[allow(dead_code)]
 fn opaque_types() {
     /*----------------------------------------------
     * Opaque Types
@@ -1768,6 +1785,8 @@ fn opaque_types() {
     This monomorphic transformation by the compiler is what is meant by Rust's motto of "zero-cost abstractions." They are abstractions that only exist in the code. To call them powerful syntactic sugar is accurate. */
 }
 
+#[allow(dead_code)]
+#[allow(unused_variables)]
 fn smart_pointers() {
     /*----------------------------------------------
     * Smart Pointers
@@ -1885,6 +1904,7 @@ fn smart_pointers() {
     */
 }
 
+#[allow(unused_variables)]
 fn modules_and_crates() {
     /*----------------------------------------------
     * Modules & Crates
@@ -1983,6 +2003,7 @@ fn modules_and_crates() {
     this file to illustrate how modules can interact. Go there now. */
 }
 
+#[allow(unused_variables)]
 fn basic_operators() {
     /*----------------------------------------------
     * Basic operators
@@ -2097,6 +2118,8 @@ fn basic_operators() {
 
 }
 
+#[allow(dead_code)]
+#[allow(unused_variables)]
 fn functions() {
     /*----------------------------------------------
     * Functions
@@ -2553,7 +2576,7 @@ fn multithreading_and_concurrency() {
             // because the receiver has fallen out of scope.
             let result = transmitter.send(val);
             match result {
-                Ok(x) => (), // Ignore success.
+                Ok(_) => (), // Ignore success.
                 Err(v) => println!("Error transmitting {v}"),
             }
         }
@@ -2674,6 +2697,7 @@ fn multithreading_and_concurrency() {
     outside the scope of this tutorial. */
 }
 
+#[allow(unused_variables)]
 async fn async_syntax() {
     /*----------------------------------------------
     * Async
@@ -2806,6 +2830,7 @@ async fn async_syntax() {
     }
 }
 
+#[allow(unused_variables)]
 fn macros() {
     /*----------------------------------------------
     * Macros
@@ -3006,6 +3031,7 @@ The above will run all tests in the testing_stuff module.
 The above will match "multiplier" to test names. This means that both tests
 with the word "multiplier" in their identifier will run. */
 
+#[allow(dead_code)]
 fn mult_by_two(x: i32) -> i32 {
     println!("Multiplying");
     x * 2
