@@ -137,7 +137,11 @@ these examples, four linting settings are being disabled and an attribute for
 the library Tokio is being applied to enable async. Async will be discussed
 later. More attributes will be covered shortly.
 
-The tutorial is structured such that the main function calls supporting functions that each explain an element of Rust. This allows usage of an IDE like VSCode to collapse the supporting functions to make scrolling easier and faster while also using the function calls to jump to the function definitions like a table of contents. */
+The tutorial is structured such that the main function calls supporting
+functions that each explain an element of Rust. This allows usage of an IDE
+like VSCode to collapse the supporting functions to make scrolling easier and
+faster while also using the function calls to jump to the function definitions
+like a table of contents. */
 
 #[allow(unused_assignments)]
 #[allow(dead_code)]
