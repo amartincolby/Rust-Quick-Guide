@@ -303,6 +303,7 @@ This was written in VSCode and using an interactive IDE with code linting,
 folding, and highlighting is recommended.
 
 ``` rust
+use std::ops::{Add, Sub};
 /* These imports should be familiar to most. The double-colon syntax represents
 the "path" to the entity. */
 use std::{thread};
@@ -363,7 +364,7 @@ applications can often be _slower_ than naive Go. */
 exclamation mark, like `println!`. This mark indicates that this command is a
 "macro". Macros are _old_ in programming, having been first used in the 50's
 and added to Lisp in 1963. A macro is something that evaluates a string of
-characters and then interprets it at runtime. A macro, when compiled, usually
+tokens and then interprets it at compile time. A macro, when compiled,
 "expands" into a larger amount of code. You can think of a macro as a compiler
 that transforms provided glyphs into an implementation. A programmer could
 genuinely implement their own programming language within a macro. Macros are
@@ -439,24 +440,50 @@ The syntax structures above the function are called attributes. They allow a
 developer to specify how the function is the be handled by the compiler. In
 these examples, four linting settings are being disabled and an attribute for
 the library Tokio is being applied to enable async. Async will be discussed
-later. More attributes will be covered shortly. */
+later. More attributes will be covered shortly.
 
-#[allow(unused_assignments)]
-#[allow(dead_code)]
-#[allow(unused_mut)]
+The tutorial is structured such that the main function calls supporting
+functions that each explain an element of Rust. This allows usage of an IDE
+like VSCode to collapse the supporting functions to make scrolling easier and
+faster while also using the function calls to jump to the function definitions
+like a table of contents. */
+
 #[tokio::main]
 async fn main() {
+    atributes();
+    items();
+    variables_and_bindings();
+    ownership_and_borrowing();
+    generics();
+    primitive_types();
+    type_structures();
+    lifetimes();
+    pattern_matching();
+    opaque_types();
+    smart_pointers();
+    modules_and_crates();
+    basic_operators();
+    functions();
+    multithreading_and_concurrency();
+    async_syntax().await;
+    macros();
+    actix_web();
+    rustdoc();
+}
 
+#[allow(dead_code)]
+fn atributes() {
     /*----------------------------------------------
     * Attributes
     *----------------------------------------------
     */
 
-    /* Attributes, as seen at the top of the main() function, are simply
-    metadata for the compiler. They let you ignore certain errors, transform
-    code, generate code, communicate with 3rd party tools, or enable features
-    that are not active by default. They cannot be used to break the type
-    system or suppress errors. Many attributes will be shown in thie tutorial.
+    /* Attributes, as seen at the top of the various functions in this
+    tutorial, are simply metadata for the compiler. They let you ignore certain
+    errors, transform code, generate code, communicate with 3rd party tools, or
+    enable features that are not active by default. They cannot be used to
+    break the type system or suppress errors. Many attributes will be shown in
+    thie tutorial.
     
     There are two forms of attributes: outer and inner. Outer attributes are
     like the examples above main(). They affect the thing they are declared
@@ -495,8 +522,9 @@ async fn main() {
     
     Code generation via attributes takes two forms: trait derives and macros.
     Both of these are discussed more fully later. */
+}
 
-
+fn items() {
     /*----------------------------------------------
     * Items
     *----------------------------------------------
@@ -531,10 +559,15 @@ async fn main() {
     analogy, if we liken a program to a building, what happens in the building
     can change over time, but what happens in the building should not determine
     how many floors the building has. */
+}
 
-
+#[allow(unused_variables)]
+#[allow(unused_mut)]
+#[allow(unused_assignments)]
+#[allow(dead_code)]
+fn variables_and_bindings() {
     /*----------------------------------------------
-    * Variables, Functions, and Bindings
+    * Variables and Bindings
     *-----------------------------------------------
     */
 
@@ -812,8 +845,6 @@ async fn main() {
     There is more to be said about references, since Rust's management of values
     is its party trick, but we will get to that in the section on ownership. */
 
-    // TODO: Cover that. Copy the original values entirely to go back over what
-    // was previously discussed.
 
     /*** Pointers ***/
 
@@ -845,15 +876,17 @@ async fn main() {
     
     For the time being, a cursory explanation of pointers will suffice. */
 
-    // The most common way to create a pointer is to bind the memory location of
-    // a reference.
+    /* The most common way to create a pointer is to bind the memory location of
+    a reference. */
 
     let a_number_in_memory: i32 = 42;
     let a_pointer_to_a_number: *const i32 = &a_number_in_memory;
 
     /* Pointers are determined by the type signature of the identifier. */
+}
 
-    
+#[allow(unused_variables)]
+fn ownership_and_borrowing() {
     /*----------------------------------------------
     * Ownership & Borrowing
     *----------------------------------------------
@@ -1019,8 +1052,29 @@ async fn main() {
     anarchic like JavaScript, this can initially feel overly restrictive, but
     it is _critical_ to Rust's value. Whole classes of errors are eliminated by
     this semantic decision. Learn it. Live it. Love it. */
+}
 
+#[allow(dead_code)]
+fn generics() {
+    /*----------------------------------------------
+    * Generics
+    *-----------------------------------------------
+    */
 
+    /* If you are coming from C++ or TypeScript, generics should be very
+    familiar to you. Go only recently introduced them, but they are common
+    across most typed languages. Generics are essentially just entities that
+    can accept different types. The syntax for this is broadly similar to
+    TypeScript, so it should be easy to pick up. */
+
+    struct Things<T1, T2> {
+        thing1: T1,
+        thing2: T2,
+    }
+}
+
+#[allow(unused_variables)]
+fn primitive_types() {
     /*----------------------------------------------
     * Primitive Types
     *-----------------------------------------------
@@ -1220,9 +1274,17 @@ async fn main() {
 
     // The key difference is that str is of known length, while String is not.
 
-    // The `String` type that was used in earlier examples to create a string on the heap is actually part of the standard library and is fundamentally a wrapper around `str` that provides helpful functionality. Because of the common usage of `String`, the two types are often confused in conversation, with people using the term "string" to refer to either `String` or `str`.
+    /* The `String` type that was used in earlier examples to create a string
+    on the heap is actually part of the standard library and is fundamentally a
+    wrapper around `str` that provides helpful functionality. Because of the
+    common usage of `String`, the two types are often confused in conversation,
+    with people using the term "string" to refer to either `String` or `str`.
+    */
 
-    /* To reiterate, using the String crate from the standard library creates a sequence of chars on the heap. This string can be added to and reduced, but as it is a collection, interactions with it are similar to a vector. Indeed, this is because under the covers, String _is_ a vector. */
+    /* To reiterate, using the String crate from the standard library creates a
+    sequence of chars on the heap. This string can be added to and reduced, but
+    as it is a collection, interactions with it are similar to a vector.
+    Indeed, this is because under the covers, String _is_ a vector. */
 
     let mut heap_of_chars = String::from("A few of my favorite things: ");
     
@@ -1270,7 +1332,13 @@ async fn main() {
         _ => println!("There is no cheddar in stock"),
     }
 
+}
 
+#[allow(unused_variables)]
+#[allow(unused_assignments)]
+#[allow(dead_code)]
+#[allow(unused_mut)]
+fn type_structures() {
     /*----------------------------------------------
     * Type Structures
     *-----------------------------------------------
@@ -1393,7 +1461,7 @@ async fn main() {
     identifier used, it could even be the dreaded "data", semantic information
     about what the identifier represents is not lost. */
 
-    type JarJarBinksQuotes = GenericLinkedList<String>;
+    type JarJarBinksQuotes = Vec<String>;
 
     /* Type aliasing has a second use for creating entities called "opaque
     types." These are addressed later because they do not work at the moment. */
@@ -1519,6 +1587,25 @@ async fn main() {
     of this file, indicates something that is a member of a module. A good
     comparison is String::from() for creating Strings and .to_string() which
     also creates strings. */
+
+
+    /*** Supertraits ***/
+
+    /* Traits can be tied to one another in a parent-child relationship,
+    meaning that if the child is implemented, so to must the parent. */
+
+    trait Vehicle {
+        fn honk() -> String;
+    }
+
+    trait Engine: Vehicle {
+        fn accelerate() -> i32;
+    }
+
+    /* In the above, if Engine is implemented, Vehicle must also be
+    implemented. Just like trait type parameters, supertraits can contain
+    multiple traits via the `+` operator, e.g. Engine: Vehicle + Transmission.
+    */
 
 
     /*** Union ***/
@@ -1670,8 +1757,12 @@ async fn main() {
 
     /* NOTE: The value of enums like Option and Result will be discussed shortly
     in the section on "Pattern Matching". */
+}
 
-    
+#[allow(unused_assignments)]
+#[allow(unused_variables)]
+#[allow(dead_code)]
+fn lifetimes() {
     /*----------------------------------------------
     * Lifetimes
     *-----------------------------------------------
@@ -1752,7 +1843,7 @@ async fn main() {
     always scenarios where the failure should be terminal. For this situations,
     Rust has `panic!()`. panic is a macro that, when called, terminates the
     process in which it is called and "unwinds" its stack. Basically,
-    everything in scope is destroyed and memory is freed. Since a panic exists
+    everything in scope is destroyed and memory is freed. Since a panic exits
     the control flow of the program, the reason for the panic is likely unique,
     and thus the only information required by the compiler is a string. The key
     thing to remember is that if a function panics, the function that called
@@ -1779,7 +1870,11 @@ async fn main() {
     essense, panics in Rust are what exceptions in other languages _should_ be:
     the machine state has fallen out of alignment with the symbolic state.
     Panics are used to fail tests. */
+}
 
+#[allow(unused_variables)]
+#[allow(dead_code)]
+fn pattern_matching() {
 
     /*----------------------------------------------
     * Pattern Matching
@@ -1791,7 +1886,21 @@ async fn main() {
     "pattern" that is used to analyze something and determine the next step in
     the logical flow. The basic matching concept is similar to a regex, but
     full-featured pattern matching is much more powerful. To initially
-    illustrate, let's consume the Option from earlier. */
+    illustrate, let's use the Option from earlier. */
+
+    fn generate_answer() -> Option<i32> {
+        if rand::random::<bool>() {
+            Some(42)
+        } else {
+            None
+        }
+    }
+
+    let possible_answer = generate_answer();
+
+    if possible_answer == Some(42) {
+        println!("The answer is 42")
+    }
     
     match possible_answer {
         Some(x) => println!("There is an answer and it is {x}!"),
@@ -1799,11 +1908,13 @@ async fn main() {
     }
 
     /* Notice how the `Some()` is unpacked and its contents are given an
-    identifier? Options were common enough to be included in the language, so
-    specialized syntax was also included for consuming them: the `if let`. `if
-    let` allows for the `None` case to be silently ignored. If you delete the
-    `None` part of the above `match`, you will get an error because the match
-    cases are not exhaustive. */
+    identifier? Seems a bit heavy, no? The Rust team agrees. Options were
+    common enough to earn inclusion in the language, and as such specialized
+    syntax was also included for consuming them: the `if let`.
+    
+    `if let` allows for the `None` case to be silently ignored. If you delete
+    the `None` part of the above `match`, you will get an error because the
+    match cases are not exhaustive. You _must_ handle all possible cases. */
 
     if let Some(x) = possible_answer {
         println!("There is an answer and it is {x}!")
@@ -1824,12 +1935,29 @@ async fn main() {
     `?`, if the error occurs, the function simply returns that error. Think of
     this like shorthand for a try/catch block. */
 
+    enum ResultError {
+        ErrOne(String),
+        ErrTwo(String),
+    }
+
+    type TestResult = Result<i32, ResultError>;
+
+    fn generate_result() -> TestResult {
+        if rand::random::<bool>() {
+            Ok(42)
+        } else {
+            Err(ResultError::ErrTwo(String::from("There was no answer")))
+        }
+    }
+
     fn check_result() -> TestResult {
         let result: i32 = generate_result()?;
         let another_result: i32 = generate_result()?;
 
         Ok(result + another_result)
     }
+
+    let final_result = check_result();
 
     /* As mentioned earlier, optional arguments for functions require the use
     of Option(), which is best handled with pattern matching. Options _can_ be
@@ -1869,7 +1997,7 @@ async fn main() {
 
     fn cast_spell() {
         let mut rng = rand::thread_rng();
-        let spell = rng.gen_range(1..4);
+        let spell = rng.gen_range(1..3);
         let power = rng.gen_range(0..99);
         match spell {
             1 => generate_spell(Magic::MagicMissile(power)),
@@ -1883,29 +2011,10 @@ async fn main() {
     }
 
     cast_spell();
+}
 
-
-    /*----------------------------------------------
-    * Generics
-    *-----------------------------------------------
-    */
-
-    /* If you are coming from C++ or TypeScript, generics should be very
-    familiar to you. Go only recently introduced them, but they are common
-    across most typed languages. Generics are essentially just entities that
-    can accept different types. The syntax for this is broadly similar to
-    TypeScript, so it should be easy to pick up. */
-
-    struct GenericLinkedList<T> {
-        head: GenericLinkedListNode<T>,
-    }
-    
-    struct GenericLinkedListNode<T> {
-        value: T,
-        next: Option<Box<GenericLinkedListNode<T>>>,
-    }
-
-
+#[allow(dead_code)]
+fn opaque_types() {
     /*----------------------------------------------
     * Opaque Types
     *-----------------------------------------------
@@ -1915,8 +2024,11 @@ async fn main() {
     opaque types "specifics" to contrast them with generics. A generic means
     that a struct or function accepts one of all possible types, while a
     specific restricts the accepted type to a subset of all possible types.
-    Opaque types can be bound to an identifier with the `type` keyword, but
-    this is considered "unstable". This will be implemented at some point in
+    Opaque types can be bound to an identifier with the `type` keyword like so:
+    
+    type ThingWithToString = impl ToString;
+
+    This is considered "unstable". This will be implemented at some point in
     the future. */
 
     fn specific_function(x : impl ToString) -> impl ToString {
@@ -1930,7 +2042,7 @@ async fn main() {
     implement the `ToString` trait. The function then returns any type that
     likewise implements ToString. The returned &str implements ToString, so
     this works, as does the integer below it. The array below that does not
-    implement this and thus fails. Similar logic applies to calling the
+    implement ToString and thus fails. Similar logic applies to calling the
     function and passing in an argument. 
     
     An important point to recognize is that while the return type is restricted
@@ -1955,9 +2067,30 @@ async fn main() {
     opaque parameter type does not harden its hidden type. For example, the
     above specific_function() accepts an argument that implements ToString, so
     an integer would work. If specific_function() is called with an integer, it
-    can still be called later with a &str. */
+    can still be called later with a &str.
+    
+    Functions like two_hidden_types() can be implemented, but this will be
+    discussed later in the section on "dynamic dispatch." */
 
 
+    /*** Monomorphization & Zero-Cost Abstractions ***/
+    
+    /* The reason for the difference between specific_function() and two_hidden_types() is a process that the Rust compiler does called "monomorphization." This is in contrast to the code that a developer writes, which is called "polymorphic." Polymorphic means "many forms" and describes specific_function() very well. The types that the function can accept take many forms, thus the function is flexible. But truly polymorphic code, as the default behavior of a function in JavaScript, suffers performance penalties, and Rust's goal is to be fast. Thus, the Rust compiler will take polymorphic code and transform it into "monomorphic" code. By that, I mean the compiler will create multiple versions of specific_function(), one for each use. For example: */
+
+    specific_function(42);
+    specific_function("a string");
+    specific_function('Z');
+
+    /* When compiled, a version of specific_function() that accepts an integer, a string, and a char will be generated. Thus a polymorphic function is turned into three monomorphic functions. This requires more memory but provides a significant speed benefit.
+
+    The monomorphic transformation can easily generate functions that _accept_ different types, but because a function can be arbitrarily complex, it cannot generate functions that _return_ different types.
+
+    This monomorphic transformation by the compiler is what is meant by Rust's motto of "zero-cost abstractions." They are abstractions that only exist in the code. To call them powerful syntactic sugar is accurate. */
+}
+
+#[allow(dead_code)]
+#[allow(unused_variables)]
+fn smart_pointers() {
     /*----------------------------------------------
     * Smart Pointers
     *-----------------------------------------------
@@ -1976,7 +2109,7 @@ async fn main() {
     version of `malloc`. */
 
     let boxed_int = Box::new(42);
-    // Uses of the box automatically, and safely, dereference the pointer.
+    // Use of the box automatically, and safely, dereferences the pointer.
     println!("The box contains {boxed_int}");
 
     /* Because pointers are fixed size, they can be used in data structures
@@ -1984,19 +2117,20 @@ async fn main() {
     have a potentially infinite recursion of next nodes, so `next` simply
     points to another node. */
 
-    struct LinkedList {
-        head: LinkedListNode,
+    struct LinkedList<T> {
+        head: LinkedListNode<T>,
     }
     
-    struct LinkedListNode {
-        value: i32,
-        next: Option<Box<LinkedListNode>>, // If None, it's the end of the list.
+    struct LinkedListNode<T> {
+        value: T,
+        next: Option<Box<LinkedListNode<T>>>, // If None, it's the end of the list.
     }
 
     /* When data exists in a box and not as a literal, programmers can attach
-    code to lower-level behaviors such as when the box is cleared from memory.
-    This is complex and outside the scope of this tutorial, but it is one of
-    the major reasons for using smart pointers like Box. */
+    their own logic to lower-level behaviors such as when the box is cleared
+    from memory. Basically, it gives a developer visibility into lifecycle
+    events. This is complex and outside the scope of this tutorial, but it is
+    one of the major reasons for using smart pointers like Box. */
 
     
     /* Reference Counter */
@@ -2071,8 +2205,10 @@ async fn main() {
     /* A mutex is a smart pointer that only allows one entity to access it at a
     time. As with Arc, see the section on concurrency for a discussion of them.
     */
+}
 
-
+#[allow(unused_variables)]
+fn modules_and_crates() {
     /*----------------------------------------------
     * Modules & Crates
     *-----------------------------------------------
@@ -2168,8 +2304,10 @@ async fn main() {
     
     Similar modules have been declared outside of the function at the bottom of
     this file to illustrate how modules can interact. Go there now. */
+}
 
-
+#[allow(unused_variables)]
+fn basic_operators() {
     /*----------------------------------------------
     * Basic operators
     *-----------------------------------------------
@@ -2249,7 +2387,7 @@ async fn main() {
     let compare_authors_2 = author1 == author1; // - : bool = true
 
 
-    /* Comparing Values */
+    /*** Comparing Values ***/
 
     // The equality operators work differently for values instead of structures.
     // Attempting to compare two different types will cause a compile error.
@@ -2262,6 +2400,30 @@ async fn main() {
     // let compare_number_string = 42 == "A string" ;     // Error
 
 
+    /*** Custom Operators ***/
+
+    /* Operators in Rust are actually just traits. For example, the equality
+    comparisons above can be written thusly: */
+
+    let compare_authors_3 = author1.eq(&author2);
+
+    /* Note how the compared value must be a reference. Using an operator hides
+    that detail.
+
+    All other operators are likewise methods that can be overridden. */
+
+    let add_method = 2.add(40);
+    let sub_method = 44.sub(2);
+    
+    /* For a full list of operators that can be overloaded, see the Rust docs.
+    What this means it that a developer can create a custom .eq() trait that
+    will be called when the `==` operator is used. */
+
+}
+
+#[allow(dead_code)]
+#[allow(unused_variables)]
+fn functions() {
     /*----------------------------------------------
     * Functions
     *----------------------------------------------
@@ -2357,7 +2519,7 @@ async fn main() {
             return(`Thanks for signing up ${email}``);
         };
 
-     */
+    */
 
     sign_up_to_newsletter("hello@rust_lovers.org");
 
@@ -2491,6 +2653,52 @@ async fn main() {
     downside. */
 
 
+    /*** First Class Functions & Dynamic Dispatch ***/
+
+    /* Just as with most modern languages, Rust allows passing functions as values. Anonymous functions are truly first class and are passed like any other value, but regular functions can be passed as "function pointers," which are preicely that: pointers to a single function sitting in memory. */
+
+    fn get_closure() -> Box<dyn Fn() -> i32> {
+        Box::new(|| 42)
+    }
+
+    let a_closure = get_closure();
+    let value_from_closure = a_closure(); // 42
+
+    fn a_function() -> i32 {
+        42
+    }
+
+    fn get_function() -> fn() -> i32 {
+        a_function
+    }
+
+    let a_function = get_function();
+    let value_from_function = a_function(); //42
+
+    // Function pointers can also serve as simple aliases.
+    let a_function_alias = a_function;
+    let another_value_from_function = a_function_alias(); // 42
+
+    /* Because function pointers are of constant size, they can be included on structs without any special considerations. */
+
+    struct Strunction {
+        func: fn(x: i32) -> i32,
+        val: i32,
+    }
+
+    /* There are two things to note in the above: the usage of the `dyn` keyword and the capital F in Fn for the closure example.
+    
+    The type signature for get_function() makes sense. Functions are declared with fn, thus a function pointer is typed with fn. But the signature for get_closure() uses a capital F. This is because a closure is actually a trait.Closures are compiled into struct instances with a method attached to them that contains the actual logic of your closure.
+    
+    Even though closures are traits, the `impl` keyword is not used because, as mentioned when discussing opaque types and monomorphization, when `impl` is used in a function signature, that signature represents an underlying concrete type. Closures have no underlying type. When pointing to a trait that exists on the heap, such as when having a Box<Trait> like in the above example, it is referred to as a "trait object." The `dyn` keyword was created to more clearly differentiate between implementations and trait objects. */
+
+    /* Trait objects are Rust's way of handling what is known as "dynamic dispatch." If you are coming from JavaScript, or any scripting language, the concept of dispatch will be new to you. In compiled languages, there is a distinction between knowing what function will run, i.e. be dispatched, at compile time versus at runtime. For example, if an integer is greater than 0, function A will run, and function B will run if less than 0. The compiler does not necessarily know the value of the integer, but it doesn't need to. It knowns both roads perfectly, so it can walk either one equally quickly.
+    
+    But if the _function_ is not known, the compiler needs to find out what road it is to walk. If the function called is determined at compile time, it is called "static dispatch," meaning the behavior that is "dispatched" never changes. Dyanmic dispatch is the opposite of that. A synonymous description is "early binding" versus "late binding," where binding refers to the act of binding a value or behavior to an identifier. For example, `let x = 42;`. Rust's compiler knows that `x` is `42`, so it does not bother to check the value of `x` when running. This check is called "indirection." In JavaScript, every call to `x` theoretically requires the runtime to check `x` to see its value, although in practice runtimes will attempt to optimize this away.
+    
+    Dynamic dispatch provides significant flexibility in how a program runs but achieves it with a performance hit that can be similarly significant. In languages such as Python or JavaScript, the dispatch consideration is completely hidden. By and large, Rust's structure negates the need to consider dispatch. As mentioned, one of Rust's goals was "zero-cost abstractions," meaning that Rust features many very high-level language structures with great flexibility, but these "polymorphic" abstractions are made "monomorphic" at compile time. This means code can feel as though it is dynamically dispatching procedures while all functionality is actually static. */
+
+
     /*** Unit ***/
 
     /* You may have noticed in the above example of less_than_42, that if you
@@ -2529,7 +2737,9 @@ async fn main() {
     /* The above function expects to return nothing and will throw a compile
     error if anything is returned. */
 
+}
 
+fn multithreading_and_concurrency() {
     /*----------------------------------------------
     * Multithreading/Concurrency
     *----------------------------------------------
@@ -2669,7 +2879,7 @@ async fn main() {
             // because the receiver has fallen out of scope.
             let result = transmitter.send(val);
             match result {
-                Ok(x) => (), // Ignore success.
+                Ok(_) => (), // Ignore success.
                 Err(v) => println!("Error transmitting {v}"),
             }
         }
@@ -2788,8 +2998,10 @@ async fn main() {
     the other value that they need to be unlocked. Thus, neither thread will
     ever finish. There are best practices for avoiding deadlocks that are
     outside the scope of this tutorial. */
+}
 
-
+#[allow(unused_variables)]
+async fn async_syntax() {
     /*----------------------------------------------
     * Async
     *----------------------------------------------
@@ -2909,26 +3121,128 @@ async fn main() {
     };
 
     /* This macro is an easy way to "pin" a value. A pinned value means that it
-    will remain in the same memory location for its entire lifetime. Since
-    async code runs at indeterminate intervals, ensuring it is reliably
-    positioned is necessary. */ pin_mut!(cross_the);
+    will remain in the same memory location for its entire lifetime or until it
+    is "unpinned". Since async code runs at indeterminate intervals, ensuring
+    it is reliably positioned at all times is necessary. */
+    
+    pin_mut!(cross_the);
 
     // Async values require the use of while loops. For loops are in progress.
     while let Some(value) = cross_the.next().await {
         println!("{value} is an important number");
     }
+}
 
-
+#[allow(unused_variables)]
+#[doc(hidden)]
+fn macros() {
     /*----------------------------------------------
     * Macros
     *----------------------------------------------
     */
 
-    /* Macros are one of Rust's superpowers. It is almost funny to say that considering that macros go all the way back to the dawn of high-level programming, but they are a capability that most programming languages have ignored. There are fundamental reasons for this that are outside the scope of this tutorial, but suffice it to say that it is because macros in the sense I am using require a rigidly symbolic language to implement, and most languages are... not... rigidly symbolic.
+    /* Macros are one of Rust's superpowers. It is almost funny to say that
+    considering that macros go all the way back to the dawn of high-level
+    programming, but they are a capability that most programming languages have
+    ignored. There are fundamental reasons for this that are outside the scope
+    of this tutorial, but suffice it to say that it is because macros in the
+    sense I am using the term require a rigidly symbolic language to implement,
+    and most languages are not rigidly symbolic. They have flex and give in
+    their syntax and semantics.
     
-    In essense, macros allow a program to change itself. */
+    Macros, in essence, instruct the compiler to write code for you. At compile
+    time, a macro takes provided "tokens," often just a string, and turns those
+    tokens into full Rust code. This is what I meant when I said that macros
+    "expand." This expanded code then runs like any other piece of code that
+    was written by the programmer themself.
+    
+    At first, this sounds like a roundabout way to write a function. Why
+    generate code at compile time? Why not just write it? Basically, this is a
+    layer of abstraction. A programmer is disconnecting their _desires_ from
+    the _implementation_. It is declarative programming at a very low level.
+    Indeed, when using the generic term "macro," like the macros used in Lisp,
+    we are actually discussing what Rust explicitly classifies as "declarative
+    macros." These are the macros previously discussed and used, like println!
+    and vec!. Fundamentally, declarative macros analyse the pattern of provided
+    tokens and generate code based on the pattern. The generated code then
+    replaces the macro call site. That sounds very similar to a compiler
+    because it _is_ very similar to a compiler.
+
+    Rust has a second type of macro called "procedural" macros. They are so
+    called because they are semantically similar to "procedures," which are,
+    for our purposes, synonymous with functions. They take code as input and
+    return code as output. In Rust parlance, this code is called a token
+    stream. The distinction between declarative and procedural macros may seem
+    small. While declarative macros can accept any syntax, procedural macros
+    only accept valid Rust code as an input. And while declarative macros
+    actually replace the macro call with the generated code, procedurals do not
+    replace the code, but instead alter or augment it.
+    
+    For example, the previously used #[derive(PartialEq)]; this generates an
+    implementation of a trait for the struct that directly follows the macro
+    call.
+
+    Procedural macros must be in their own crate, meaning I cannot put examples
+    in this file. See the official docs and the Little Book Of Rust Macros for
+    more information.
+    
+    Rust macros are known as "hygienic" macros, meaning they cannot access
+    values outside of their context and will not accidentally generate code
+    that interferes with external entities.
+    
+    With all that said, understand that most developers will not write many of
+    their own macros. They are best when made as generic as possible, which
+    means most macros that you would want exist in libraries. */
 
 
+    /*** Declarative Macros ***/
+
+    /* If declarative macros behave like functions, why not just use functions?
+    Because Rust is strict in its code shape, macros enable flexibility by not
+    being code themselves. Instead, they generate strict code. For example, it
+    is impossible to write a function that accepts an unknown argument shape.
+    This is exactly what println! does. It can accept a single string or a
+    string and any number of ancillary arguments.
+    
+    The downside of declarative macros is primarily just complexity. The
+    special syntax required to automatically generate Rust is dense and becomes
+    unwieldy when generating large pieces of code. The official Rust docs have
+    a simplified implementation of the vec! macro that I will copy here. I have
+    renamed it to simple_vec. */
+
+    macro_rules! simple_vec {
+        ( $( $x:expr ),* ) => {
+            {
+                let mut temp_vec = Vec::new();
+                $(
+                    temp_vec.push($x);
+                )*
+                temp_vec
+            }
+        };
+    }
+
+    let a_simple_vector = simple_vec!([1, 2, 3, 42]);
+
+    /* A full exploration of the special syntax, called macro_rules! syntax, is
+    outside the scope of this tutorial. Read the Rust docs for more
+    information. But even eliding the details does not prevent the matching
+    syntax from being pretty clear. The first line accepts $x as an expression,
+    the * matches an arbitrary number of expressions, and it then generates a
+    push for however many expressions there were. It feels a bit like a
+    templating language because, really, it is.
+    
+    The ultimate effect of a declarative macro is that the macro call is
+    replaced with the code specified in the template. */
+
+}
+
+/// This is a Rustdoc outer document comment.
+/// 
+/// It can stretch over multiple lines.
+/// Most IDEs will allow you to collapse it.
+#[doc(alias("documentation", "bingpot"))]
+fn rustdoc() {
     /*----------------------------------------------
     * Rustdoc
     *----------------------------------------------
@@ -2937,15 +3251,41 @@ async fn main() {
     /* Rustdoc is similar in intent to JSDoc for those coming from JavaScript.
     Unlike JS, though, the tool is included in the standard Rust distribution.
     Rustdoc will take the documentation blocks at the top of functions and
-    objects and generate a web page that allows people to explore the code. */
+    other objects and generate a web page that allows people to explore the API.
+    
+    It is important to note that Rustdoc does not rely on Cargo. Instead, it
+    relies on the same things on which Cargo also relies, notably the Rust
+    compiler. This means that correctly configuring your Cargo.toml file does
+    not necessarily mean that Rustdoc will work or that it will work as
+    expected. In most cases, this simply means that your Rustdoc command will
+    make use of numerous flags. But of course, you can also just run Rustdoc
+    _through_ Cargo, which will correctly handle all of the various flags. This
+    is how most engineers will generate docs. Simply run this command:
 
+        cargo doc
 
-    /*----------------------------------------------
-    * Testing
-    *----------------------------------------------
-    */
+    Navigate to /target\doc\rust_quick_guide and open the index.html file in a
+    browser.
+    
+    Just as with attributes, Rust differentiates between inner and outer doc
+    comments. Outer comments are similar to systems like JSDoc, where the
+    comment directly precedes the entity it documents. These outer comments are
+    preceded by _three_ forward slashes. You can see one of these comments
+    directly above the rustdoc() function.
 
+    A useful tool for organizing large libraries and applications are the
+    documentation aliases seen above this function. It allows for arbitrary
+    strings to be attached to a function for the purpose of searching.
+    
+    Finally, often, functionality that is not meant for public consumption may
+    have documentation automatically generated. To prevent this, use the
+    #[doc(hidden)] attrbitue. An example of this can be found above the macro()
+    function just above the rustdoc() function. When docs are generated,
+    macros() will not be included in the output. */
 
+}
+
+fn actix_web() {
     /*----------------------------------------------
     * Actix-Web
     *----------------------------------------------
@@ -2971,9 +3311,117 @@ async fn main() {
     including this section here to show how easy n-tier development can be and
     how familiar it can feel. Also of note, Actix relies on Tokio for its async
     runtime and the previous section on async nicely connects here. */
-
-
 }
+
+/*----------------------------------------------
+* Testing
+*----------------------------------------------
+*/
+
+/* This section is dedicated to testing since tests cannot be nested. They must
+be direct descendents of a module. They are wrapped in their own module here
+because how the test attribute is interpreted is based on what imports are
+found in the module. The conflict for this tutorial comes from the Tokio
+import. 
+
+As briefly mentioned, testing in Rust is done with simple attributes atop
+functions. Including this syntax with the language spec itself has become
+common in newer languages and enables the popular pattern of colocating
+implementation code and testing code to be idiomatic. I appreciate the
+JavaScript world's separation of testing and language, which has resulted in
+significant innovation in its build and test ecosystem, but I ultimately prefer
+standards.
+
+The test-writing experience in Rust is very similar to patterns in other
+languages, so there shouldn't be many surprises. There are two notable
+differences from other languages. Firstly, unlike languages such as JavaScript,
+Rust does not allow testing for function calls. If you want to check for a
+function call, you must leverage dependency injection. Secondly, Rust does not
+enforce privacy for functions, meaning that tests can access public or private
+behavior.
+
+The below functions will run with the `cargo test` command. Rust uses multiple
+threads by default, so make sure to avoid using shared state. If you want
+predictable control of shared state, use the `--test-threads=1` flag to only
+use a single thread.
+
+Rust does not display any output from the code, such as from println!, by
+default. You can enable it with the `--show-output` flag.
+
+Tests can be ignored by default with the #[ignore] attribute. This is commonly
+used on long-duration tests to prevent a full test run from taking forever. The
+ignored tests can be run with the `--ignored` flag. ALl tests, regardless of
+status, can be run with `--include-ignored`.
+
+Specific tests can be run using the same double-colon path syntax used to
+reference modules.
+
+    cargo test testing_stuff::test_panic 
+
+The above will only run one test. To run multiple tests, passing in any
+incompletely identifier will run all tests that match the provided string.
+
+    cargo test testing_stuff
+
+The above will run all tests in the testing_stuff module.
+
+    cargo test multiplier -- --include-ignored
+
+The above will match "multiplier" to test names. This means that both tests
+with the word "multiplier" in their identifier will run. */
+
+#[allow(dead_code)]
+fn mult_by_two(x: i32) -> i32 {
+    println!("Multiplying");
+    x * 2
+}
+
+#[cfg(test)]
+mod testing_stuff {
+    use crate::mult_by_two;
+
+    #[test]
+    fn test_multiplier() {
+        let result = mult_by_two(21);
+        println!("The test result is {result}");
+        assert_eq!(result, 42); // Change this to see a failure.
+        assert_ne!(result, 41);
+    }
+
+    #[test]
+    #[ignore]
+    fn test_multiplier_2() {
+        let result = mult_by_two(21);
+        assert_eq!(result, 42); // Change this to see a failure.
+    }
+
+    #[test]
+    #[should_panic(expected = "ran away")]
+    fn test_panic() {
+        panic!("I got scared and ran away");
+    }
+}
+
+
+/*** Integration Tests ***/
+
+/* As mentioned, Rust allows unit testing of private functions. Rust instead
+uses privacy restriction as the primary differentiator between unit tests and
+integration tests. Integration tests are again similar to how they exist in
+other languages. They consume your code as though they were an external entity.
+Integration tests turn each test file into its own crate which imports your
+code, meaning that integration tests are best used when writing a library.
+
+Appropriately, the tests sit inside the /tests directory that is a sibling of
+the /src directory. Since the test files must exist in this location for the
+compiler to correctly manage them, they are outside the scope of this one-page
+tutorial. For full details see the Rust docs. */
+
+
+/*----------------------------------------------
+* Modules Part Deux
+*----------------------------------------------
+*/
 
 /* This content is part of a section in the above function. Do not read it
 separately.
@@ -3025,19 +3473,6 @@ mod more_external_stuff {
             x: 42,
             y: 2001,
         }
-    }
-}
-
-/* This section is dedicated to testing since tests cannot be nested. They must
-be direct descendents of a module. They are wrapped in their own module here
-because how the test attribute is interpreted is based on what imports are
-found in the module. The conflict for this tutorial comes from the Tokio
-import. */
-
-mod testing_stuff {
-    #[test]
-    fn testing_testing_123() {
-        println!("This is only a test")
     }
 }
 ```
