@@ -103,7 +103,8 @@ call it BLAML.
 Cargo assumes a standard file structure. The Cargo.toml and Cargo.lock files
 are at the root of a project. The src/ directory contains the main.rs file
 which contains the main() function. The benches/ directory contains performance
-tests. And the tests/ directory contains... tests.
+tests. And the tests/ directory contains... tests. Specifically integration
+tests.
 
 Similar to newer JavaScript package managers and Go, Cargo centralizes
 downloaded dependencies in its "home" directory. As such, you will likely only
@@ -131,11 +132,10 @@ guide does not cover the structure of Rust applications. It focuses on the
 syntax and semantics. For the purposes of this guide, it is sufficient to know
 that Rust applications have a main function.
 
-The syntax structures above the function are called attributes. They allow a
-developer to specify how the function is the be handled by the compiler. In
-these examples, four linting settings are being disabled and an attribute for
-the library Tokio is being applied to enable async. Async will be discussed
-later. More attributes will be covered shortly.
+The syntax structure above the function is called an attribute. They allow a
+developer to specify how the function is the be handled by the compiler. In this
+case specifically the attribute specifies that this is the root function for the
+async runtime Tokio. Tokio and async in general are discussed later.
 
 The tutorial is structured such that the main function calls supporting
 functions that each explain an element of Rust. This allows usage of an IDE
@@ -178,18 +178,18 @@ fn atributes() {
     errors, transform code, generate code, communicate with 3rd party tools, or
     enable features that are not active by default. They cannot be used to
     break the type system or suppress errors. Many attributes will be shown in
-    thie tutorial.
+    this tutorial.
     
     There are two forms of attributes: outer and inner. Outer attributes are
-    like the examples above main(). They affect the thing they are declared
-    directly before. Inner attributes affect the thing in which they exist.
-    Inner attributes do not work lexically. They apply to the entire entity in
-    which they are declared. The primary use of inner attributes is for being
-    declared at the top of a module or file, thus affecting all of its members.
-    */
+    like the example above attributes(). They affect the thing that they are
+    declared directly before. Inner attributes affect the thing in which they
+    exist. Inner attributes do not work lexically. They apply to the entire
+    entity in which they are declared. The primary use of inner attributes is
+    for being declared at the top of a module or file, thus affecting all of
+    its members. */
 
-    /* The below applies to all children of main(). It could have easily been
-    declared as an outer attribute as well. */
+    /* The below applies to all children of attributes(). It could have easily
+    been declared as an outer attribute as well. */
     #![allow(unused_variables)]
     
     /* Attributes in Rust have similar abilities to some code hygiene and
@@ -303,6 +303,10 @@ fn variables_and_bindings() {
     let mut mutable_value = 42;
     mutable_value = 2001;
 
+    // Let identifiers can be initially unbound then bound later.
+    let an_unbound_identifier;
+    an_unbound_identifier = 1984;
+
     /* At this point, it is important to discuss the relationship of values and
     identifiers. Both values and identifiers are entities existing in memory. It
     is the identifier that determines how the program will interact with the
@@ -314,14 +318,6 @@ fn variables_and_bindings() {
     This may seem like an esoteric restatement of what was already said, but it
     is important to understand this relationship to better grasp the later
     discussion of Rust's party piece, ownership. */
-
-    // In essence, the only permanent
-    // value assocaited with `catcher_in_the_rust` is the type of value that can be
-    // bound to it, in the above case `&str`. By using variable shdowing, the value
-    // that `catcher_in_the_rust` owns can change. 
-
-    /* TODO: Talk about how variable names can reference earlier versions of the
-    same name and how this pertains to ownership. */
 
 
     /*** Constants ***/
@@ -347,7 +343,7 @@ fn variables_and_bindings() {
     visible to everything within their scope, regardless of where they appear
     lexically. This is because they are one of the earlier-mentioned items.
     Since all items are created in global memory, they can be referenced
-    anywhere within the scope in which they were written. */
+    anywhere within the scope in which they are visible. */
 
     /* Constants cannot be shadowed within the same scope, but they can be
     shadowed in nested scopes. */
@@ -375,7 +371,7 @@ fn variables_and_bindings() {
     By and large, constants will be used far more often than statics. The
     primary use case for statics over constants is when large amounts of data
     is being referenced. Constants are "inlined" during compilation. This means
-    that everywhere where a constant is referenced, the value behind that
+    that everywhere that a constant is referenced, the value behind that
     constant replaces the reference. If the constant represents a lot of data,
     or if the constant is referenced many times, that could cause a huge
     increase in the size of the compiled binary. Statics put the data in one
@@ -448,7 +444,7 @@ fn variables_and_bindings() {
     that has been bound with `let`. An innocuous variable is one that has not.*/
 
     // To see the unused variable warnings below, comment out
-    // #[allow(unused_variables)] near the top of this file.
+    // #[allow(unused_variables)] near the top of this function.
     let block_scope = {
         let variable = 42;           // This triggers a warning.
         let _casual_variable = 2001; // This does not trigger a warning.
@@ -482,19 +478,18 @@ fn variables_and_bindings() {
     println!("{first_value}"); // Prints 2001
     println!("{second_value}"); // Prints 42
 
-    /* All of the various forms of value access are allowed. */
-
     // This ignores the first value.
     let (_, only_value) = (2001, 42);
 
     /* This assigns the identifiers to the indices, starting with index 0, it
     then ignores everything until the final two values, where it saves the
-    sixth index and ignores the last. */
-     let [index_0, .., index_6, _] = [0, 1, 2, 3, 4, 5, 6, 7];
+    penultimate index and ignores the last. */
+    let [index_0, .., index_6, _] = [0, 1, 2, 3, 4, 5, 6, 7];
 
     println!("{index_0}"); // Prints 0
     println!("{index_6}"); // Prints 6
 
+    // Values can be destructured from structs.
     struct CustomStruct {
         id: String,
         value: i32,
@@ -523,9 +518,9 @@ fn variables_and_bindings() {
     _outside_ of the function. That is because what you passed into the function
     was a reference to the object or array, not the object or array itself.
     
-    The only major difference in Rust is an engineer can explicitly reference
-    _any_ value, not just objects or arrays, by prepending an ampersand to the
-    value name. */
+    The only major difference in Rust is that an engineer can explicitly
+    reference _any_ value, not just objects or arrays, by prepending an
+    ampersand to the value name. */
 
     let a_basic_number = 42; // type of i32
     let another_number = a_basic_number; // another i32
@@ -558,9 +553,8 @@ fn variables_and_bindings() {
     "unsafe" Rust.
     
     Except for library writing, unsafe Rust is something that the average
-    developer will never do. "Safe" Rust's performance is already so good that
-    unsafe Rust is unnecessary in all but the most demanding situations. Unsafe
-    Rust will be explored fully later.
+    developer will never do. "Safe" Rust performance is already so good that
+    unsafe Rust is unnecessary in all but the most demanding situations.
 
     There is a lot of unsafe geekery online and it is best to ignore this.
     Unsafe Rust can indeed be more performant, but it requires stepping outside
@@ -569,15 +563,22 @@ fn variables_and_bindings() {
     bytes in memory. These common use cases almost always have a module in the
     standard library.
     
-    For the time being, a cursory explanation of pointers will suffice. */
+    For the time being, a cursory explanation of pointers will suffice.
 
-    /* The most common way to create a pointer is to bind the memory location of
-    a reference. */
+    The most common way to create a pointer is to bind the memory location
+    of a reference. This is done through a new type signature that will be
+    familiar to C developers, the asterisk. */
 
     let a_number_in_memory: i32 = 42;
+
+    // Creating a pointer is safe.
     let a_pointer_to_a_number: *const i32 = &a_number_in_memory;
 
-    /* Pointers are determined by the type signature of the identifier. */
+    unsafe{
+        // Only consuming a pointer is unsafe.
+        let pointer_to_a_new_number = a_pointer_to_a_number.add(42);
+    }
+
 }
 
 #[allow(unused_variables)]
@@ -606,8 +607,7 @@ fn ownership_and_borrowing() {
     restricting, confusing, and the compile errors that it produces can
     sometimes seem strange.
     
-    But before that,
-    let us go over the basics. */
+    But before that, let us go over the basics. */
 
     let catcher_in_the_rust = "Holden Caulfield";
 
@@ -629,6 +629,11 @@ fn ownership_and_borrowing() {
 
     let catcher_in_the_stack = catcher_in_the_rust;
     let catcher_in_the_heap = catcher_in_the_string;
+
+        // In essence, the only permanent
+    // value assocaited with `catcher_in_the_rust` is the type of value that can be
+    // bound to it, in the above case `&str`. By using variable shdowing, the value
+    // that `catcher_in_the_rust` owns can change. 
 
     /* Both of these actions are copying from the previous variables, but _what_
     is being copied is very different. `catcher_in_the_rust` is on the stack,
