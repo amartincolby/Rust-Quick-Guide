@@ -143,11 +143,8 @@ like VSCode to collapse the supporting functions to make scrolling easier and
 faster while also using the function calls to jump to the function definitions
 like a table of contents. */
 
-#[allow(unused_mut)]
-#[allow(unused_macros)]
 #[tokio::main]
 async fn main() {
-
     atributes();
     items();
     variables_and_bindings();
@@ -176,11 +173,12 @@ fn atributes() {
     *----------------------------------------------
     */
 
-    /* Attributes, as seen at the top of the main() function, are simply
-    metadata for the compiler. They let you ignore certain errors, transform
-    code, generate code, communicate with 3rd party tools, or enable features
-    that are not active by default. They cannot be used to break the type
-    system or suppress errors. Many attributes will be shown in thie tutorial.
+    /* Attributes, as seen at the top of the various functions in this
+    tutorial, are simply metadata for the compiler. They let you ignore certain
+    errors, transform code, generate code, communicate with 3rd party tools, or
+    enable features that are not active by default. They cannot be used to
+    break the type system or suppress errors. Many attributes will be shown in
+    thie tutorial.
     
     There are two forms of attributes: outer and inner. Outer attributes are
     like the examples above main(). They affect the thing they are declared
@@ -2831,6 +2829,7 @@ async fn async_syntax() {
 }
 
 #[allow(unused_variables)]
+#[doc(hidden)]
 fn macros() {
     /*----------------------------------------------
     * Macros
@@ -2933,6 +2932,11 @@ fn macros() {
 
 }
 
+/// This is a Rustdoc outer document comment.
+/// 
+/// It can stretch over multiple lines.
+/// Most IDEs will allow you to collapse it.
+#[doc(alias("documentation", "bingpot"))]
 fn rustdoc() {
     /*----------------------------------------------
     * Rustdoc
@@ -2942,7 +2946,37 @@ fn rustdoc() {
     /* Rustdoc is similar in intent to JSDoc for those coming from JavaScript.
     Unlike JS, though, the tool is included in the standard Rust distribution.
     Rustdoc will take the documentation blocks at the top of functions and
-    objects and generate a web page that allows people to explore the code. */
+    other objects and generate a web page that allows people to explore the API.
+    
+    It is important to note that Rustdoc does not rely on Cargo. Instead, it
+    relies on the same things on which Cargo also relies, notably the Rust
+    compiler. This means that correctly configuring your Cargo.toml file does
+    not necessarily mean that Rustdoc will work or that it will work as
+    expected. In most cases, this simply means that your Rustdoc command will
+    make use of numerous flags. But of course, you can also just run Rustdoc
+    _through_ Cargo, which will correctly handle all of the various flags. This
+    is how most engineers will generate docs. Simply run this command:
+
+        cargo doc
+
+    Navigate to /target\doc\rust_quick_guide and open the index.html file in a
+    browser.
+    
+    Just as with attributes, Rust differentiates between inner and outer doc
+    comments. Outer comments are similar to systems like JSDoc, where the
+    comment directly precedes the entity it documents. These outer comments are
+    preceded by _three_ forward slashes. You can see one of these comments
+    directly above the rustdoc() function.
+
+    A useful tool for organizing large libraries and applications are the
+    documentation aliases seen above this function. It allows for arbitrary
+    strings to be attached to a function for the purpose of searching.
+    
+    Finally, often, functionality that is not meant for public consumption may
+    have documentation automatically generated. To prevent this, use the
+    #[doc(hidden)] attrbitue. An example of this can be found above the macro()
+    function just above the rustdoc() function. When docs are generated,
+    macros() will not be included in the output. */
 
 }
 
