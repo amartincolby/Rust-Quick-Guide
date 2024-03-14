@@ -2,12 +2,7 @@
 
 # Rust Quick Guide
 
-This will be a quick guide to learning Rust. I'm beginning work at the date of
-this commit (10/23/23) and hope to have it complete by the end of 2023.
-
-UPDATE: Nope. Not gonna' have it done.
-
-UPDATE 2: It's hard to reduce some Rust concepts to a single sentence.
+This tutorial is a work in progress.
 
 This tutorial is not meant for people absolutely brand new to programming. It is
 intended for people with at least some degree of experience and makes frequent
