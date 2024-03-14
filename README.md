@@ -153,7 +153,7 @@ Unfortunately, the consequence of this is an entire industry that never fully
 embraced either perspective. As computing power increased, higher-level
 languages became more common, such as COBOL and Fortran in the 60's, BASIC and
 Pascal in the 70's, Ada in the 80's, Java in the 90's, and perhaps the
-Frieza-style **Final Form** of messy languages, JavaScript, in the 2000's.<sup>[[4](#fn4)] But
+Frieza-style **Final Form** of messy languages, JavaScript, in the 2000's.<sup>[[4](#fn4)]</sup> But
 these languages rarely came from academic research and were instead
 Frankenstein monsters that emerged from the needs of _business_ or simple
 creations aimed at educating laypeople.<sup>[[5, 6, 7](#fn5)]</sup> Their _raison d'etre_
