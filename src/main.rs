@@ -296,24 +296,26 @@ fn variables_and_bindings() {
     let immutable_value = 42;
 
     /* NOTE: The above binding is an "evaluation," meaning the right-hand side
-    is an "expression." Expressions are code that return a value. The majority
-    of Rust code statements are expressions. The above is identical to: */
+    is an "expression." Expressions are code that return a value. "Statements"
+    are any valid and complete arrangement of symbols. The majority of Rust
+    code statements are expressions. The above is identical to: */
 
     let immutable_value = { 42 };
 
     /* The above code is short but expressions can be long and have multiple
-    sub-expressions and side-effects.
+    sub-expressions and even side-effects. All that matters is that a value is
+    ultimately returned.
     
     This also illustrates a concept in Rust called variable shadowing. This is
     far from unique to Rust but allows an engineer to re-declare a variable and
     have the new value apply henceforth. Shadowing allows the type to be
     changed because, even though the identifier name is the same, it is
-    actually a _different_ identifier, which is why we can re-declare the value
-    as mutable. */
-
-    let mut immutable_value = 2001;
+    actually a _different_ identifier, which is why we can even re-declare the
+    value as mutable. */
 
     // A mutable value is created with the `mut` modifier.
+    let mut immutable_value = 2001;
+
     // New values must still abide by the type of the original binding.
     let mut mutable_value = 42;
     mutable_value = 2001;
@@ -356,7 +358,7 @@ fn variables_and_bindings() {
     /* Pay special attention to the constants HALF_THE_ANSWER and THE_ANSWER.
     Notice how THE_ANSWER is referenced _before_ it is declared. Constants are
     visible to everything within their scope, regardless of where they appear
-    lexically. This is because they are one of the earlier-mentioned items.
+    lexically. This is because they are one of the earlier-mentioned "items."
     Since all items are created in global memory, they can be referenced
     anywhere within the scope in which they are visible. */
 
@@ -455,8 +457,9 @@ fn variables_and_bindings() {
     Unused variable warnings only apply to block scopes and will not be
     raised on variables declared at the global or module level. 
     
-    There are two kinds of unused variable. A suspicious unused variable is one
-    that has been bound with `let`. An innocuous variable is one that has not.*/
+    There are two kinds of unused variable. A "suspicious" unused variable is
+    one that has been bound with `let`. An "innocuous" variable is one that has
+    not.*/
 
     // To see the unused variable warnings below, comment out
     // #[allow(unused_variables)] near the top of this function.
