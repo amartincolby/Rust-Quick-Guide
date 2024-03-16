@@ -83,16 +83,18 @@ for more information. */
 
 
 /*----------------------------------------------
-* Cargo
+* Cargo & Crates
 *----------------------------------------------
 */
+
+/*** Cargo ***/
 
 /* Cargo is Rust's standard package manager/build tool. Conceptually it is
 identical to NPM. Most Rust applications will be tested, built, published, and
 have their dependencies managed with Cargo. Chances are, most new projects will
 be bootstrapped with it as well. Cargo uses Crates.io as its standard publish
 target, but just as with NPM, you can easily set up private registries. The
-standard compiler used by Crate is rustc.
+standard compiler used by Cargo is rustc.
 
 Cargo uses the Cargo.toml file instead of package.json, but again, they are
 extremely similar. And yes, Cargo uses yet another goddamned markup language.
@@ -119,7 +121,20 @@ You will interact with Cargo primarily through the basic Cargo commands:
 `cargo run` : Builds _and_ executes your program.
 `cargo test` : Rust functions labeled as tests.
 
-There are many other commands and configurations. See the Cargo docs. */
+There are many other commands and configurations. See the Cargo docs.
+
+
+/*** Crates ***/
+
+A crate is a unit of compilation. That is to say that a crate is a tree of
+modules that is collapsed down to a single "thing." There are two types of
+crates: binary and library. Binary crates are what an application is, namely a
+tree of modules that gets turned into a binary executable. Library crates do
+not have a main file and thus do not compile into a binary. They instead
+compile into behaviors that can be used by other libraries or binary
+applications. Most usage of the term "crate" is referring to library crates. In
+that sense, if coming from JavaScript, you can think of a crate as an NPM
+package. */
 
 
 /*----------------------------------------------
@@ -1910,7 +1925,7 @@ fn smart_pointers() {
 #[allow(unused_variables)]
 fn modules_and_crates() {
     /*----------------------------------------------
-    * Modules & Crates
+    * Modules
     *-----------------------------------------------
     */
 
@@ -1918,12 +1933,6 @@ fn modules_and_crates() {
     comparison to other, object-oriented languages, a module also has passing
     similarities to classes. The primary purpose of modules is to hide types
     and/or functionality from other parts of the program.
-
-    Crates are a unit of compilation. That is to say that a crate is the result
-    of a compilation. There is some syntactic similarities when interacting with
-    modules or crates. The imports at the top of this file reference a crate,
-    then use double-colons to traverse modules within that crate to reach
-    entities. The root of a crate is also a module.
 
     Every file in Rust is a module. Modules can have nested modules within them.
     Functions, too, can have modules in them. The visibility of modules, though,
