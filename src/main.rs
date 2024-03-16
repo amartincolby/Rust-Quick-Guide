@@ -795,7 +795,7 @@ fn primitive_types() {
     *-----------------------------------------------
     */
 
-    /*** > Integer ***/
+    /*** Integer ***/
 
     let val1 = 1 + 1;          // i32 = 2
     let val2 = 25 - 11;        // i32 = 11
@@ -820,7 +820,7 @@ fn primitive_types() {
     let arch_s_int: isize = 42;
     let arch_u_int: usize = 42;
 
-    /*** > Float ***/
+    /*** Float ***/
 
     let float1 = 1.1 + 1.5;     // float = 2.6
     let float2 = 18.0 - 24.5;   // float = -6.5
@@ -832,7 +832,7 @@ fn primitive_types() {
     let formatted_int = 12_34_56;       // i32 = 123456
     let formatted_float = 12_34_56.0;   // f64 = 123456.0
 
-    /*** > Char ***/
+    /*** Char ***/
 
     /* Char represents Rust's true text primitive. Strings are best thought of
     as an array of chars. Rust supports unicode and as such a char is actually
@@ -851,7 +851,7 @@ fn primitive_types() {
     let kannada_char_unicode = '\u{0ca0}';
 
 
-    /*** > Array ***/
+    /*** Array ***/
 
     /* If you are coming from C, Java, or Go, then arrays in Rust will be
     immediately familiar. If you are coming from TypeScript or JavaScript, they
@@ -882,12 +882,9 @@ fn primitive_types() {
     mutable_array_of_five[2] = 314;
 
     println!("{}", the_number_3);
-    
-    // TODO: Talk about arrays being on the stack instead of the heap.
-    // TODO: Talk about how accessing an index does not take ownership. Only the whole array access.
 
 
-    /*** > Slice ***/
+    /*** Slice ***/
 
     /* Slices are the primary tool with which you will interact with arrays.
     Slices are very similar to slices in C++ but notably different than in Go.
@@ -911,7 +908,7 @@ fn primitive_types() {
     used with strings, which will be discussed now. */
 
 
-    /*** > Vector ***/
+    /*** Vector ***/
 
     /* For Go developers accustomed to slices and JavaScript/TypeScript
     developers accustomed to arrays, Rust has a "vector." Vector is not a true
@@ -954,7 +951,7 @@ fn primitive_types() {
     let johnny = &v[1..3];
 
 
-    /*** > String & str ***/
+    /*** String & str ***/
 
     /* Like vectors, strings in Rust are not true primitives in the sense that
     a primitive is a thing of known, fixed size. They are like C strings in that
@@ -2018,30 +2015,15 @@ fn modules_and_crates() {
 #[allow(unused_variables)]
 fn basic_operators() {
     /*----------------------------------------------
-    * Basic operators
+    * Operators
     *-----------------------------------------------
     */
 
     /* The reason for putting basic operators so late into this tutorial is
     because they are somewhat supercharged in Rust. Instead of relying on fixed
     operators, custom evaluators can be written, thus allowing engineers to
-    decide how operators such as `>` or `==` function. */
-
-    /*** > Boolean ***/
-
-    // Operators on the standard primitive types work as you would expect. 5 is
-    // indeed larger than 2.
-
-    let is_learning = true;
-
-    let logical_and = true && false; // - : bool = false; 
-    let logical_or = true || false;  // - : bool = true;
-    let logical_not = !true;         // - : bool = false;
-
-    let char_comparison = 'a' > 'b'; // - bool : false
-    let number_comparison = 5 < 42;    // - bool : true
-
-    println!("{} {}", char_comparison, number_comparison);
+    decide how operators such as `>` or `==` function. Since this tutorial is
+    not meant for beginners, I am not covering many of the absolute basics. */
 
 
     /*** Equality ***/
@@ -2083,12 +2065,12 @@ fn basic_operators() {
 
     /* Arrays support ordinal operators by default, but the arrays must be of
     equal lengths, because remember, in Rust, the length of an array is
-    actually part of its type.  */
+    actually part of its type. */
 
-    let big_obj = [10, 10000000, 10000000];
-    let small_obj = [11, 1, 1];
+    let big_array = [10, 10000000, 10000000];
+    let small_array = [11, 1, 1];
 
-    let big_array = big_obj == small_obj; // - : bool = false
+    let big_array = big_array == small_array; // - : bool = false
 
     println!("{}", big_array);
 
@@ -2096,23 +2078,11 @@ fn basic_operators() {
     let compare_authors_2 = author1 == author1; // - : bool = true
 
 
-    /*** Comparing Values ***/
+    /*** Custom/Overloaded Operators ***/
 
-    // The equality operators work differently for values instead of structures.
-    // Attempting to compare two different types will cause a compile error.
-
-    let my_string_1 = "A world without string is chaos.";
-    let my_string_2 = "A world without string is chaos.";
-
-    let compare_strings = "A string" == "A string"; // - : bool = true
-    let compare_integers = 42 == 42;                // - : bool = true
-    // let compare_number_string = 42 == "A string" ;     // Error
-
-
-    /*** Custom Operators ***/
-
-    /* Operators in Rust are actually just traits. For example, the equality
-    comparisons above can be written thusly: */
+    /* Operators in Rust are actually just traits. As such, they can be
+    "overloaded." For example, the equality comparisons above can be written
+    thusly: */
 
     let compare_authors_3 = author1.eq(&author2);
 
@@ -2126,7 +2096,9 @@ fn basic_operators() {
     
     /* For a full list of operators that can be overloaded, see the Rust docs.
     What this means it that a developer can create a custom .eq() trait that
-    will be called when the `==` operator is used. */
+    will be called when the `==` operator is used.
+    
+    Be careful when overloading operators. Things can get confusing quickly.*/
 
 }
 
