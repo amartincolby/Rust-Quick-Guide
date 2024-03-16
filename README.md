@@ -281,7 +281,7 @@ JavaScript, even though the languages are _completely_ different.
 
 <a name="fn9">9</a>: The examples of this are too numerous to list, but some
 glaring examples are Toyota's unintended acceleration debacle, the Therac 25,
-the Boeing 737 MAX, Tesla's Autopilot, and the countless industiral accidents
+the Boeing 737 MAX, Tesla's Autopilot, and the countless industrial accidents
 involving manufacturing robots.
 
 <a name="fn10">10</a>: Deloitte and its multiple lawsuits over its disastrous
