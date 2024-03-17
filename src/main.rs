@@ -538,20 +538,39 @@ fn variables_and_bindings() {
     
     The only major difference in Rust is that an engineer can explicitly
     reference _any_ value, not just objects or arrays, by prepending an
-    ampersand to the value name. */
+    ampersand to the value name. This is not a surprise to C or Go developers,
+    so you can skip ahead. */
 
     let a_basic_number = 42; // type of i32
     let another_number = a_basic_number; // another i32
     let a_basic_reference = &a_basic_number; // type of &i32
 
-    /* In the above, `a_basic_number` is a 32-bit integer. When referencing
+    /* In the above, `a_basic_number` is a 32-bit integer. When aliasing
     primitives, they are copied by default, so `another_number` is also a 32-bit
     integer. But if an ampersand is prepended to the variable usage, it becomes
     a reference that holds no value, but instead points to the location of
     another value. The copy does not occur.
-    
-    There is more to be said about references, since Rust's management of values
-    is its party trick, but we will get to that in the section on ownership. */
+
+    This default copy behavior is only true for values that exist on the stack.
+    For heap-allocated values, such as vectors, copying must be explicitly
+    performed. This should be familiar to JavaScript developers who have used
+    libraries such as ImmutableJS to prevent sharing of arrays and objects.
+    Vectors will be covered later, but for now, just know that they are very
+    similar to JavaScript arrays and they exist on the heap. If you did not
+    already know, all values in JavaScript exist on the heap; there is no
+    stack. */
+
+    let a_vector = vec![1, 2, 3, 5, 7];
+    let not_another_vector = a_vector;
+    // let still_not_another_vector = a_vector; // This fails
+
+    /* In the above, the identifier `not_another_vector` is not bound to a copy
+    of `a_vector`, it has instead been bound to the reference that points to
+    the value `[1, 2, 3, 5, 7]`. In Rust, this means that `a_vector` is no
+    longer a valid identifier. This part is not familiar to JavaScript
+    developers but is a key part of Rust's safety system, that is to say,
+    "ownership." Ownership is Rust's party piece. Both it, and what happened
+    above, will be discussed in a dedicated section. */
 
 
     /*** Pointers ***/
@@ -597,6 +616,10 @@ fn variables_and_bindings() {
         let pointer_to_a_new_number = a_pointer_to_a_number.add(42);
     }
 
+    /* Rust also enables direct memory access via memory addresses. This is
+    perhaps _maximally_ usafe Rust and is thus far outside the scope of this
+    tutorial. */
+
 }
 
 #[allow(unused_variables)]
@@ -606,12 +629,7 @@ fn ownership_and_borrowing() {
     *----------------------------------------------
     */
 
-    /* Before the more complex elements of Rust are explored, it will behoove us
-    to analyze Rust's party piece.
-    
-    Ownership.
-    
-    In Rust, every value has an "owner". An owner is also known as an
+    /* In Rust, every value has an "owner". An owner is also known as an
     identifier since only through the identifier can a value be accessed. When
     an owner goes out of scope, such as when a function completes, the value is
     "dropped" from memory. Rust does this automatically, but also supports an
@@ -628,6 +646,19 @@ fn ownership_and_borrowing() {
     But before that, let us go over the basics. */
 
     let catcher_in_the_rust = "Holden Caulfield";
+    let mut _2 = [1, 2, 3];
+
+    {
+        let mut inner_test = _2;
+        inner_test[1] = 42;
+        let inner_2 = _2;
+    }
+
+    let inner_test = _2;
+    let inner_val = inner_test[1];
+
+    println!("inner val");
+    println!("{inner_val}");
 
     /* In the above, the value of "Holden Caulfield" is owned by the entity
     `catcher_in_the_rust`. They are "bound". That means that
