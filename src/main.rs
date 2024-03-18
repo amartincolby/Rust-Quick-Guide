@@ -866,10 +866,10 @@ fn primitive_types() {
     /*** Char ***/
 
     /* Char represents Rust's true text primitive. Strings are best thought of
-    as an array of chars. Rust supports unicode and as such a char is actually
-    a scalar value. In code, a char can be represented either as a glyph or as
-    the scalar values as found on the Wikipedia page for Unicode characters:
-    https://en.wikipedia.org/wiki/List_of_Unicode_characters 
+    as an array or vector of chars. Rust supports unicode and as such a char is
+    actually a scalar value. In code, a char can be represented either as a
+    glyph or as the scalar values as found on the Wikipedia page for Unicode
+    characters: https://en.wikipedia.org/wiki/List_of_Unicode_characters
     
     Be careful, though, because treating a glyph like a char is not always
     correct. There are many singular glyphs that actually require multiple chars
@@ -891,7 +891,7 @@ fn primitive_types() {
     array's length must be set when it is instantiated. JavaScript runtimes hide
     this complexity from you when using arrays. */
 
-    // The length of an array is part of the identifier.
+    // The length of an array is part of the type.
     let array_of_five: [i32; 5] = [1, 2, 3, 42, 5];
 
     // Arrays cannot be instantied with no values. Unless the length is
@@ -910,9 +910,22 @@ fn primitive_types() {
     // Array lengths can obviously not be changed, but neither can values.
     // Arrays must be declared as mutable to do this.
     let mut mutable_array_of_five: [i32; 5] = [1, 2, 3, 42, 5];
+    let value_from_mutable_array = mutable_array_of_five[2];
     mutable_array_of_five[2] = 314;
 
-    println!("{}", the_number_3);
+    /* When index accessed, primitive values are copied. As such, even though this
+    index was changed in the above line, this value is still 3 and not 314. */
+    println!("{}", value_from_mutable_array);
+
+    // But this value is 314.
+    println!("{}", mutable_array_of_five[2]);
+
+    /* When values from arrays are borrowed, the entire array is locked. This is
+    because when an array is dropped, so to are all its values. */
+
+    let borrowed_value_from_mutable_array = &mutable_array_of_five[2];
+    // mutable_array_of_five[2] = 314; // Borrow error.
+    println!("{}", borrowed_value_from_mutable_array);
 
 
     /*** Slice ***/
@@ -928,15 +941,17 @@ fn primitive_types() {
     slice. This makes the developer experience nicer but has performance
     implications. Rust does not do this and a slice must have data behind it. */
 
+    let base_array = [1, 2, 3, 4, 5];
+
     // Slices are created by providing bounds with indices.
-    let slice_of_three = &array_of_five[1..4];
+    let slice_of_three = &base_array[1..4];
 
     // Slicing the entire array can be done by omitting the values.
-    let slice_of_five = &array_of_five[..];
+    let slice_of_five = &base_array[..];
 
     /* Slices are more generic in Rust than other languages, and as such they
-    can be used with more than just Arrays. Most importantly, slices can be
-    used with strings, which will be discussed now. */
+    can be used with more than just arrays. Most importantly, slices can be
+    used with vectors and strings, which will be discussed now. */
 
 
     /*** Vector ***/
@@ -944,7 +959,7 @@ fn primitive_types() {
     /* For Go developers accustomed to slices and JavaScript/TypeScript
     developers accustomed to arrays, Rust has a "vector." Vector is not a true
     primitive and is instead part of the standard library. Vectors are typed
-    lists, similar to arrays, but are dynamically sized and exist in the heap.
+    lists, similar to arrays, but are dynamically sized and exist on the heap.
     The Rust documentation calls them a "collection." Vectors are essentially
     syntactic sugar over implementations and as such rely on "generics."
     Generics are common in other languages like TypeScript or C++, so this
@@ -957,7 +972,7 @@ fn primitive_types() {
     // Vectors can infer types as well when created with the vector macro.
     let v = vec![42, 2001, 314, 1999];
 
-    // Vectors behave similarly to arrays.
+    // Vectors behave similarly to JavaScript arrays.
     viktor.push(42);
     viktor.push(2001);
     viktor.push(314);
@@ -971,8 +986,7 @@ fn primitive_types() {
     // Using the get method safely returns an option.
     let invalid_index = viktor.get(9);
 
-    // Borrowing any index from the vector will lock the entire vector.
-    // This is because when a vector is destroyed, all of its elements are too.
+    // Just like arrays, borrowing an index from a vector will lock the vector.
     let index_1 = &viktor[1];
     viktor.push(1999);
     // println!("{}", index_1); // Causes borrowing error.
