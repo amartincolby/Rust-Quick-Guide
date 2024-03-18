@@ -646,43 +646,28 @@ fn ownership_and_borrowing() {
     But before that, let us go over the basics. */
 
     let catcher_in_the_rust = "Holden Caulfield";
-    let mut _2 = [1, 2, 3];
-
-    {
-        let mut inner_test = _2;
-        inner_test[1] = 42;
-        let inner_2 = _2;
-    }
-
-    let inner_test = _2;
-    let inner_val = inner_test[1];
-
-    println!("inner val");
-    println!("{inner_val}");
 
     /* In the above, the value of "Holden Caulfield" is owned by the entity
     `catcher_in_the_rust`. They are "bound". That means that
     `catcher_in_the_rust` _owns_ that value. The value is a string literal,
-    meaning a sequence of chars of known length, hard-coded into the binary, and
-    which sits on the stack and not the heap. In this scenario, "Holden
-    Caulfield" exists on the stack. Ownership gets interesting when using the
-    heap. */
+    meaning a sequence of chars of known length, hard-coded into the binary,
+    and which sits on the stack and not the heap. In this scenario, "Holden
+    Caulfield" exists on the stack. It is on the unpredictable heap where
+    things get interesting. */
 
-    // Using the String crate from the standard library allows us to create a
-    // string of unknown size on the heap.
+    /* Using the String crate from the standard library allows us to create a
+    string of unknown size on the heap. By unknown, I mean that the compiler
+    does not know how long the string will be at compile time. It can only be
+    known for sure during runtime. */
+
     let catcher_in_the_string = String::from(catcher_in_the_rust);
 
-    /* The identifier `catcher_in_the_string` now stores a pointer to the heap
-    which contains the string "Holden Caulfield". So here, things get
-    interesting. */
+    /* The identifier `catcher_in_the_string` now stores a pointer to a
+    location on the heap which contains the string "Holden Caulfield". So here,
+    things get interesting. */
 
     let catcher_in_the_stack = catcher_in_the_rust;
     let catcher_in_the_heap = catcher_in_the_string;
-
-        // In essence, the only permanent
-    // value assocaited with `catcher_in_the_rust` is the type of value that can be
-    // bound to it, in the above case `&str`. By using variable shdowing, the value
-    // that `catcher_in_the_rust` owns can change. 
 
     /* Both of these actions are copying from the previous variables, but _what_
     is being copied is very different. `catcher_in_the_rust` is on the stack,
@@ -708,10 +693,11 @@ fn ownership_and_borrowing() {
     nearly identical line succeeds. */
 
     let successful_move = catcher_in_the_heap;
-    // Now, `successful_move` owns the value and trying to reference 
-    // `catcher_in_the_heap` again would fail.
 
-    /* Ownership tracking is Rust's safety net. Because remember, Rust clears
+    /* Now, `successful_move` owns the value and trying to reference 
+    `catcher_in_the_heap` again would fail.
+
+    Ownership tracking is Rust's safety net. Because remember, Rust clears
     memory when an identifier goes out of scope. See below. */
 
     let thats_what_i_want = String::from("Gimme money!");
@@ -719,7 +705,7 @@ fn ownership_and_borrowing() {
     {
         let new_owner = thats_what_i_want;
         // After this, `new_owner` falls out of scope, and thus its memory is
-        // cleared.
+        // cleared and the value dropped.
     }
 
     /* From this point forward, the value "Gimme money!" no longer exists
@@ -736,18 +722,19 @@ fn ownership_and_borrowing() {
 
     fn memory_destroyer(x: String) {
         println!("{}", x);
-        // x is now destroyed.
+        // x is now dropped.
     }
 
     memory_destroyer(istanbul);
-    // "was Constantinople." is now destroyed.
+    // "was Constantinople." is now dropped.
 
     // Thus this will not work.
     // println!("{}", istanbul);
 
-    /* Obvously, being able to only use a value once will not take you far. To
-    allow values to be used without transferring ownership, Rust leverages the
-    concept of "borrowing".
+    /* In the above, `x` could theoretically be returned, and thus have
+    ownership transferred back out of the function, but this is an unwieldy
+    pattern. To allow values to be used without transferring ownership, Rust
+    leverages the concept of "borrowing".
    
     This process is called borrowing because ownership is not transferred but
     only one entity can borrow a value at a time. The below is identical to the
@@ -756,13 +743,22 @@ fn ownership_and_borrowing() {
     let respect = String::from("Find out what it means to me.");
 
     {
-        let new_owner = &respect;
+        let new_borrower = &respect;
         /* Note the ampersand before the value, indicating that this is a
         reference. After this, only the reference is destroyed. The value is
         untouched. Because it is only a reference, multiple aliases to the
         original value are possible. */
-        let another_new_owner = &respect;
+        let another_new_borrower = &respect;
     }
+
+    /* A function works the same way. */
+
+    fn borrower(x: &str) {
+        println!("{}", x);
+    }
+
+    borrower(&respect);
+    // "Find out what it means to me." is not dropped.
 
     /* Just as normal variable declarations are immutable by default, so are
     references. References have two layers of protection in that both the
@@ -780,20 +776,21 @@ fn ownership_and_borrowing() {
     let mut jeremiah = String::from("was a bullfrog.");
 
     {
-        let new_owner = &mut jeremiah;
-        let another_new_owner = &mut jeremiah;
-        let yet_another_new_owner = &mut jeremiah;
+        let new_borrower = &mut jeremiah;
+        let another_new_borrower = &mut jeremiah;
+        let yet_another_new_borrower = &mut jeremiah;
         // Uncomment this line to see errors.
-        // println!("{}", new_owner)
+        // println!("{}", new_borrower)
 
         // Meanwhile this succeeds because it was the most recent borrow.
-        println!("{}", yet_another_new_owner);
+        println!("{}", yet_another_new_borrower);
     }
 
-    /* The naked scope is now closed and all references are destroyed. */
+    /* The naked scope is now closed and all references are dropped. We can now
+    freely borrow `jeremiah` again. */
 
-    let new_owner = &mut jeremiah;
-    println!("{}", new_owner);
+    let new_borrower = &mut jeremiah;
+    println!("{}", new_borrower);
 
     /* The mechanism performing these checks is called the "borrow checker." The
     point of the borrow checker is to prevent unexpected changes to values while
