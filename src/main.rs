@@ -779,8 +779,7 @@ fn ownership_and_borrowing() {
         let new_borrower = &mut jeremiah;
         let another_new_borrower = &mut jeremiah;
         let yet_another_new_borrower = &mut jeremiah;
-        // Uncomment this line to see errors.
-        // println!("{}", new_borrower)
+        // println!("{}", new_borrower) // Throws borrow error
 
         // Meanwhile this succeeds because it was the most recent borrow.
         println!("{}", yet_another_new_borrower);
@@ -828,14 +827,11 @@ fn primitive_types() {
 
     /*** Integer ***/
 
-    let val1 = 1 + 1;          // i32 = 2
-    let val2 = 25 - 11;        // i32 = 11
-    let val3 = 5 * 2 * 3;      // i32 = 30
-    let val4 = 8 / 2;          // i32 = 4
+    let val1: i32 = 1 + 1; // i32 = 2
 
     // Integer division will round results
-    let val5 = 8 / 3;           // i32 = 2
-    let val6 = 8 / 5;           // i32 = 1
+    let val2 = 8 / 3; // i32 = 2
+    let val3 = 8 / 5; // i32 = 1
 
     /* All integers in Rust are 32-bit signed integers by default, as you can
     see above. Rust supports 8, 16, 32, 64, and 128-bit signed and unsigned
@@ -854,9 +850,6 @@ fn primitive_types() {
     /*** Float ***/
 
     let float1 = 1.1 + 1.5;     // float = 2.6
-    let float2 = 18.0 - 24.5;   // float = -6.5
-    let float3 = 2.5 * 2.0;     // float = 5.0
-    let float4 = 16.0 / 4.0;    // float = 4.0
 
     // Floats and integers can be formatted with underscores. These underscores
     // are purely visual.
@@ -898,7 +891,7 @@ fn primitive_types() {
     // specified as zero. An element type is still required.
     let array_of_none: [i32; 0] = [];
 
-    // Arrays can be instantiated with the same value in all indices, though.
+    // Arrays can be initialized with the same value in all indices, though.
     let array_of_ten: [i32; 10] = [42; 10];
 
     /* The value syntax above is simply saying to create an array with the value
@@ -1030,28 +1023,25 @@ fn primitive_types() {
     I'm a
     multi-line string";
 
-    // The key difference is that str is of known length, while String is not.
-
     /* The `String` type that was used in earlier examples to create a string
     on the heap is actually part of the standard library and is fundamentally a
     wrapper around `str` that provides helpful functionality. Because of the
     common usage of `String`, the two types are often confused in conversation,
     with people using the term "string" to refer to either `String` or `str`.
-    */
-
-    /* To reiterate, using the String crate from the standard library creates a
+    
+    To reiterate, using the String crate from the standard library creates a
     sequence of chars on the heap. This string can be added to and reduced, but
     as it is a collection, interactions with it are similar to a vector.
     Indeed, this is because under the covers, String _is_ a vector. */
 
     let mut heap_of_chars = String::from("A few of my favorite things: ");
     
-    heap_of_chars.push_str("raindrops on roses ");
-    heap_of_chars.push_str("whiskers on kittens ");
+    heap_of_chars.push_str("raindrops on roses, ");
+    heap_of_chars.push_str("whiskers on kittens. ");
 
     let string_slice = &heap_of_chars[1..3];
 
-    /* String can also be coerced into &str via the type of a function parameter. */
+    /* String can be coerced into &str via the type of a function parameter. */
 
     fn str_coercer(s: &str) {
         println!("{s}")
@@ -1072,7 +1062,8 @@ fn primitive_types() {
     // Instantiate a map of default size.
     let mut inventory = HashMap::new();
 
-    // Inserting accepts a key and value tuple.
+    // Inserting accepts a key and value tuple. The hash map will take ownership
+    // of the key and value where appropriate.
     inventory.insert("dune", 10);
 
     // Interacting with a map, since keys are unknown, uses options.
@@ -1083,12 +1074,12 @@ fn primitive_types() {
     // Duplicate values return None.
     let dupe_value = inventory.insert("dune", 10); // None
 
-    // Getting values relies on matching.
-    // Note the use of references for anything in the map.
-    match inventory.get(&"krull") {
-        Some(&amount) => println!("There are {amount} units of krull"),
-        _ => println!("There is no krull in stock"),
-    }
+    // Getting values also return an option.
+    let krull_copies = inventory.get("krull"); // Some(&5)
+
+    /* Make note of the reference in the above return value. Remember how all
+    values from vectors must be references that lock the vector? The same is
+    true for hash maps. Hash maps own their contents. */
 
 }
 
