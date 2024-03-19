@@ -921,7 +921,8 @@ fn primitive_types() {
     println!("{}", mutable_array_of_five[2]);
 
     /* When values from arrays are borrowed, the entire array is locked. This is
-    because when an array is dropped, so to are all its values. */
+    because when an array is dropped, so to are all its values. As far as memory
+    is concerned, an array and its values are tied. */
 
     let borrowed_value_from_mutable_array = &mutable_array_of_five[2];
     // mutable_array_of_five[2] = 314; // Borrow error.
@@ -988,8 +989,8 @@ fn primitive_types() {
 
     // Just like arrays, borrowing an index from a vector will lock the vector.
     let index_1 = &viktor[1];
-    viktor.push(1999);
-    // println!("{}", index_1); // Causes borrowing error.
+    // viktor.push(1999); // Causes borrowing error.
+    println!("{}", index_1);
 
     /* Slice syntax on vectors is identical to arrays. */
     let rogue = &v[..];
@@ -1064,29 +1065,29 @@ fn primitive_types() {
 
     /* Hash maps in Rust are conceptually similar to objects in JavaScript.
     Whereas vectors store data by index, hash maps store data by key. They
-    exist on the heap and can grow and shrink dynamically. Unlike vectors, hasp
+    exist on the heap and can grow and shrink dynamically. Unlike vectors, hash
     maps are not ambiently available like vectors and strings and must be
-    imported to use. */
+    imported to use. You can see the imported crate at the top of this file. */
 
     // Instantiate a map of default size.
     let mut inventory = HashMap::new();
 
     // Inserting accepts a key and value tuple.
-    inventory.insert("bread", 10);
+    inventory.insert("dune", 10);
 
     // Interacting with a map, since keys are unknown, uses options.
 
     // New values return the inserted value in Some().
-    let new_value = inventory.insert("cheddar", 5); // Some(5)
+    let new_value = inventory.insert("krull", 5); // Some(5)
 
     // Duplicate values return None.
-    let dupe_value = inventory.insert("bread", 10); // None
+    let dupe_value = inventory.insert("dune", 10); // None
 
     // Getting values relies on matching.
     // Note the use of references for anything in the map.
-    match inventory.get(&"cheddar") {
-        Some(&amount) => println!("There are {amount} units of cheddar"),
-        _ => println!("There is no cheddar in stock"),
+    match inventory.get(&"krull") {
+        Some(&amount) => println!("There are {amount} units of krull"),
+        _ => println!("There is no krull in stock"),
     }
 
 }
