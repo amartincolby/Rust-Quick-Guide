@@ -1094,15 +1094,15 @@ fn type_structures() {
     */
 
     /* As I mentioned, Rust is heavily inspired by OCaml. It tries to bridge the
-    conceptual gap between academic and highly symbolic languages like ML and
+    conceptual gap between highly symbolic, academic languages like ML and
     hardware-oriented languages like C. This means that the linguistic
     traditions of both languages sit sometimes uneasily next to one another.
     
     An excellent example of this is the distinction between "types", as
-    illustrated above, and structs, tuples, traits, interfaces, and
+    illustrated earlier, and structs, tuples, traits, interfaces, and
     implementations. In C, these are different things because they represent
     different things in memory. In OCaml, there is no significant difference;
-    they are all just types. A type is simply a description of the ways with
+    they are all just "types." A type is simply a description of the ways with
     which a thing can be interacted, and anything that fulfills that is simply
     declared with `type`.
     
@@ -1170,8 +1170,19 @@ fn type_structures() {
     TypeScript will infer an anonymous type that will then be used to type-check
     later uses of this object. This sort of entity in JavaScript and TypeScript
     is called an object literal. Rust also has the term "struct literal" but it
-    denotes the entity created when instantiated with a struct. */
+    denotes the entity created when instantiating a struct. */
 
+    /*** Struct Updating ***/
+
+    /* Structs can be partially copied with spread-like syntax that should be
+    familiar to JavaScript developers. Be aware of ownership, though. `name`
+    and `display_name` are now no longer valid on `a_user`. */
+
+    let another_user = UserData {
+        id: String::from("efg456"),
+        ..a_user
+    };
+    
 
     /*** Unit Struct ***/
 
@@ -1204,11 +1215,12 @@ fn type_structures() {
     confusingly declared with the `type` keyword. This is one of the few areas
     of Rust's syntax with which I strongly disagree. `type` is from OCaml and
     they should have left it there. Aliases are intended to enable semantic
-    naming of broad, generic types. For example, below, a linked list
-    representing stops on a trip can have the type aliased so the type of the
-    list itself provides semantic information. Now, regardless of the
-    identifier used, it could even be the dreaded "data", semantic information
-    about what the identifier represents is not lost. */
+    naming of broad, generic types. For example, below, a vector representing
+    stops on a trip can have the type aliased so the type of the list itself
+    provides semantic information. Now, regardless of the identifier used, it
+    could even be the dreaded "data", semantic information about what the
+    identifier represents is not lost. This is a powerful tool for self-
+    documenting code and is common in TypeScript. */
 
     type JarJarBinksQuotes = Vec<String>;
 
@@ -1242,7 +1254,7 @@ fn type_structures() {
     while structs cannot. My criticism is not with the implementation. It is
     with the term usage because terms are important. */
 
-    /*Tuples can be dot-accessed with a zero-based index, similar to arrays or
+    /* Tuples can be dot-accessed with a zero-based index, similar to arrays or
     lists in some other languages. */
 
     let the_tuple_says = an_untyped_tuple.1; // 42
@@ -1252,7 +1264,7 @@ fn type_structures() {
 
     /* As mentioned, structs are just grouped data. They are not like classic
     "objects" in the sense of having behavior and data. To add behaviors, aka
-    methods, to a struct, it must be "implemented". Implementations exist
+    methods, to a struct, they must be "implemented". Implementations exist
     separate from the struct in memory. */
 
     struct Square {
@@ -1271,11 +1283,9 @@ fn type_structures() {
     written in any other module are visible only in that module, thus allowing
     a module to use a struct and have private functionality tied to that
     struct. If importing a struct from another module, visibility of the
-    contents of an implementation block follow similar rules to modules, where
-    methods to be labeled as public if they are to be used outside of the scope
-    in which they are declared. */
-
-    // TODO: Add struct merging
+    contents of an implementation follow similar rules to modules, where
+    methods need to be labeled as public if they are to be used outside of the
+    scope in which they are declared. */
 
     
     /*** Traits ***/
