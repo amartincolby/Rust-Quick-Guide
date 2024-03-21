@@ -1182,7 +1182,7 @@ fn type_structures() {
         id: String::from("efg456"),
         ..a_user
     };
-    
+
 
     /*** Unit Struct ***/
 
@@ -1536,7 +1536,7 @@ fn lifetimes() {
     contents.
 
     Rust's compiler is capable of sub-lexical lifetimes and allows entities to
-    be in scope but at the end of their lives. The compiler can tell if a
+    still be in scope but at the end of their lives. The compiler can tell if a
     reference is declared and then used before the end of a scope. Thus, the
     lifetime of a reference is actually from the point at which it is declared
     to when it is finally used. This is a key part of the borrow checker.
@@ -1574,7 +1574,7 @@ fn lifetimes() {
 
     /* In the above, lifetimes must be annotated because the compiler cannot
     infer the lifetimes of argument references passed in. The argument
-    annotations declare a function lifetime of 'a. Using single letters is
+    annotations declare a generic lifetime of 'a. Using single letters is
     simply convention, not a requirement. Next, `x` and `y` must have the _same
     as or greater than_ the base lifetime of the function. lifetime, and that
     the return value will have that lifetime as well. Essentially identical
@@ -1595,40 +1595,6 @@ fn lifetimes() {
 
     let static_string: &'static str = "Getting nothing but static on channel Z";
 
-
-    /*** panic! ***/
-
-    /* While most errors will be handled with Results or Options, there are
-    always scenarios where the failure should be terminal. For this situations,
-    Rust has `panic!()`. panic is a macro that, when called, terminates the
-    process in which it is called and "unwinds" its stack. Basically,
-    everything in scope is destroyed and memory is freed. Since a panic exits
-    the control flow of the program, the reason for the panic is likely unique,
-    and thus the only information required by the compiler is a string. The key
-    thing to remember is that if a function panics, the function that called
-    the panic will also unwind. */
-
-    fn maybe_panic() {
-        println!("I'm looking for an answer");
-        let what_im_looking_for = if rand::random::<bool>() {
-            panic!("I panicked!")
-        } else {
-            42
-        };
-        println!("I found what I'm looking for. It's {what_im_looking_for}")
-    }
-
-    maybe_panic();
-
-    /* If the above panics, the main thread is unwound and the rest of the
-    program will not run.
-    
-    Panic should be a relatively rare tool, because most of the time you want
-    to catch and handle errors. Panics should be used when your logic
-    determines that the program has entered an entirely unexpected state. In
-    essense, panics in Rust are what exceptions in other languages _should_ be:
-    the machine state has fallen out of alignment with the symbolic state.
-    Panics are used to fail tests. */
 }
 
 #[allow(unused_variables)]
@@ -2366,6 +2332,7 @@ fn functions() {
     `adder_closure` as a callback argument, the typing it acquires there will
     apply henceforth. */
 
+
     /*** A Note On Idiomatic Rust ***/
 
     /* The idiomatic use of closures in Rust is for small pieces of behavior
@@ -2464,6 +2431,41 @@ fn functions() {
 
     /* The above function expects to return nothing and will throw a compile
     error if anything is returned. */
+
+
+    /*** panic! ***/
+
+    /* While most errors will be handled with Results or Options, there are
+    always scenarios where the failure should be terminal. For these situations,
+    Rust has `panic!()`. panic is a macro that, when called, terminates the
+    process in which it is called and "unwinds" its stack. Basically,
+    everything in scope is destroyed and memory is freed. Since a panic exits
+    the control flow of the program, the reason for the panic is likely unique,
+    and thus the only information required by the compiler is a string. The key
+    thing to remember is that if a function panics, the function that called
+    the panic will also unwind. */
+
+    fn maybe_panic() {
+        println!("I'm looking for an answer");
+        let what_im_looking_for = if rand::random::<bool>() {
+            panic!("I panicked!")
+        } else {
+            42
+        };
+        println!("I found what I'm looking for. It's {what_im_looking_for}")
+    }
+
+    maybe_panic();
+
+    /* If the above panics, the main thread is unwound and the rest of the
+    program will not run.
+    
+    Panic should be a relatively rare tool, because most of the time you want
+    to catch and handle errors. Panics should be used when your logic
+    determines that the program has entered an entirely unexpected state. In
+    essense, panics in Rust are what exceptions in other languages _should_ be:
+    the machine state has fallen out of alignment with the symbolic state.
+    Panics are used to fail tests. */
 
 }
 
