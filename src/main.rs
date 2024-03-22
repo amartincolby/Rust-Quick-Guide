@@ -1749,12 +1749,13 @@ fn opaque_types() {
     opaque types "specifics" to contrast them with generics. A generic means
     that a struct or function accepts one of all possible types, while a
     specific restricts the accepted type to a subset of all possible types.
+
     Opaque types can be bound to an identifier with the `type` keyword like so:
     
-    type ThingWithToString = impl ToString;
+        type ThingWithToString = impl ToString;
 
     This is considered "unstable". This will be implemented at some point in
-    the future. */
+    the future. Moving on. */
 
     fn specific_function(x : impl ToString) -> impl ToString {
         print!("{}", x.to_string());
@@ -1767,8 +1768,7 @@ fn opaque_types() {
     implement the `ToString` trait. The function then returns any type that
     likewise implements ToString. The returned &str implements ToString, so
     this works, as does the integer below it. The array below that does not
-    implement ToString and thus fails. Similar logic applies to calling the
-    function and passing in an argument. 
+    implement ToString and thus fails. Similar logic applies to arguments. 
     
     An important point to recognize is that while the return type is restricted
     to types that implement ToString, the function evaluation must collapse
@@ -1788,7 +1788,7 @@ fn opaque_types() {
     the ToString trait, the hidden type of the function must be one or the
     other, &str or i32, it cannot be both.
     
-    Unlike anonymous types with un-typed parameters, calling a function with an
+    Unlike closures with un-typed parameters, calling a function with an
     opaque parameter type does not harden its hidden type. For example, the
     above specific_function() accepts an argument that implements ToString, so
     an integer would work. If specific_function() is called with an integer, it
@@ -2130,8 +2130,8 @@ fn functions() {
     
     To reiterate, Rust has en explicit `return` statement as a concession to the
     C tradition, but it also has implicit final return as denoted by the lack
-    of semicolon. In most cases, the final statement of a block being used as 
-    the implicit return will be the ideal and idiomatic pattern.
+    of a semicolon. In most cases, the final statement of a block being used as 
+    its implicit return will be the ideal and idiomatic pattern.
 
     All evaluation blocks, and thus all functions, _must_ return something. If
     no final value is present, the block will return the special value `unit`,
@@ -2184,11 +2184,12 @@ fn functions() {
     If the second if/else is uncommented, a similar problem arises. The second
     if/else becomes the implicit return of the function block, and thus the
     booleans contained therein become the return value of the entire function.
+
     The compiler knows that the implicit returns of the first if/else block are
     now not being caught by anything and will thus throw an error indicating
-    that an explicit `return`, to thus break out of the function, was likely
-    intended. This is why uncommenting the `return true` line does not throw an
-    error, it will instead throw a warning of unreachable code.
+    that an explicit `return`, to thus break out of the entire function, was
+    likely intended. This is why uncommenting the `return true` line does not
+    throw an error, but instead throws a warning of unreachable code.
     
     This illustrates how the need for an explicit return likely means that the
     function has been poorly designed. Composing a function of evaluation blocks
@@ -2269,9 +2270,10 @@ fn functions() {
     let closure_food = |x: i32| println!("You have {x} {food}");
 
     // Values captured by closures are borrowed by default.
+
     // let attempted_move = food; // This fails.
-    // While a simple reference use succeeds.
-    println!("{food}");
+    println!("{food}"); // A simple reference use succeeds.
+    
     closure_food(42);
 
     /* Just as earlier, mutable borrows are treated more strictly. Any closure
@@ -2282,25 +2284,28 @@ fn functions() {
     let mut drink = String::from("coffee");
     let mut closure_drink = |x: i32| drink.push('s');
 
-    // println!("{drink}"); // This fails.
+    // println!("{drink}"); // Simple references now fail.
     closure_drink(42);
 
     /* Borrowing is the default behavior but ownership can be transferred via
-    the `move` keyword. The primary use of this is to transfer a closure to
-    another thread. Multithreading will be discussed later. */
+    the `move` keyword. The primary use of this is to transfer a closure, and
+    everything it needs, to another thread. Multithreading will be discussed
+    later. */
 
     let dessert = String::from("cheesecakes");
     let closure_dessert = move |x: i32| println!("You have {x} {dessert}");
 
     // println!("{dessert}"); // This fails.
 
-    /* At this point, the value "cheesecakes" has not been destroyed. It is
+    /* At this point, the value "cheesecakes" has not been dropped. It is
     instead bound to the identifier for the closure `closure_dessert`. Only
-    once `closure_dessert` falls out of scope will the value be destroyed. */
+    once `closure_dessert` falls out of scope will the value be dropped. */
 
     /* Because closures are bound by let declarations, they are part of the
     dynamic environment along with the let values. As such, they can "see" each
-    other. Just as let values and closures are part of the dynamic environment,
+    other.
+    
+    But Just as entities from the dynamic environment can enclose one another,
     functions can enclose other entities from the static environment. Both the
     below static value and constant value exist in the same realm as the
     function, so the function can indeed "enclose" them. */
@@ -2350,7 +2355,10 @@ fn functions() {
 
     /*** First Class Functions & Dynamic Dispatch ***/
 
-    /* Just as with most modern languages, Rust allows passing functions as values. Anonymous functions are truly first class and are passed like any other value, but regular functions can be passed as "function pointers," which are preicely that: pointers to a single function sitting in memory. */
+    /* Just as with most modern languages, Rust allows passing functions as
+    values. Anonymous functions are truly first class and are passed like any
+    other value, but regular functions can be passed as "function pointers,"
+    which are preicely that: pointers to a function sitting in memory. */
 
     fn get_closure() -> Box<dyn Fn() -> i32> {
         Box::new(|| 42)
@@ -2374,24 +2382,65 @@ fn functions() {
     let a_function_alias = a_function;
     let another_value_from_function = a_function_alias(); // 42
 
-    /* Because function pointers are of constant size, they can be included on structs without any special considerations. */
+    /* Because function pointers are of constant size, they can be included on
+    structs without any special considerations. */
 
     struct Strunction {
         func: fn(x: i32) -> i32,
         val: i32,
     }
 
-    /* There are two things to note in the above: the usage of the `dyn` keyword and the capital F in Fn for the closure example.
+    /* There are two things to note in the above: the usage of the `dyn`
+    keyword and the capital F in Fn for the closure example.
     
-    The type signature for get_function() makes sense. Functions are declared with fn, thus a function pointer is typed with fn. But the signature for get_closure() uses a capital F. This is because a closure is actually a trait.Closures are compiled into struct instances with a method attached to them that contains the actual logic of your closure.
+    The type signature for get_function() makes sense. Functions are declared
+    with fn, thus a function pointer is typed with fn. But the signature for
+    get_closure() uses a capital F. This is because a closure is actually a
+    trait. Closures are compiled into struct instances with a method attached
+    to them that contains the actual logic of your closure. As such, the type
+    signature of the closure is as a trait on that struct.
     
-    Even though closures are traits, the `impl` keyword is not used because, as mentioned when discussing opaque types and monomorphization, when `impl` is used in a function signature, that signature represents an underlying concrete type. Closures have no underlying type. When pointing to a trait that exists on the heap, such as when having a Box<Trait> like in the above example, it is referred to as a "trait object." The `dyn` keyword was created to more clearly differentiate between implementations and trait objects. */
+    Even though closures are traits, the `impl` keyword is not used because, as
+    mentioned when discussing opaque types and monomorphization, when `impl` is
+    used in a function signature, that signature represents an underlying
+    concrete type. Closures have no underlying type. When pointing to a trait
+    that exists on the heap, such as when having a Box<Trait> like in the above
+    example, it is referred to as a "trait object." The `dyn` keyword was
+    created to more clearly differentiate between implementations and trait
+    objects. */
 
-    /* Trait objects are Rust's way of handling what is known as "dynamic dispatch." If you are coming from JavaScript, or any scripting language, the concept of dispatch will be new to you. In compiled languages, there is a distinction between knowing what function will run, i.e. be dispatched, at compile time versus at runtime. For example, if an integer is greater than 0, function A will run, and function B will run if less than 0. The compiler does not necessarily know the value of the integer, but it doesn't need to. It knowns both roads perfectly, so it can walk either one equally quickly.
+    /* Trait objects are Rust's way of handling what is known as "dynamic
+    dispatch." If you are coming from JavaScript, or any scripting language,
+    the concept of dispatch will be new to you. In compiled languages, there is
+    a distinction between knowing what function will run, i.e. be dispatched,
+    at compile time versus at runtime. For example, if an integer is greater
+    than 0, function A will run, and function B will run if less than 0. The
+    compiler does not necessarily know the value of the integer, but it doesn't
+    need to. It knowns both roads perfectly, so it can walk either one equally
+    quickly.
     
-    But if the _function_ is not known, the compiler needs to find out what road it is to walk. If the function called is determined at compile time, it is called "static dispatch," meaning the behavior that is "dispatched" never changes. Dyanmic dispatch is the opposite of that. A synonymous description is "early binding" versus "late binding," where binding refers to the act of binding a value or behavior to an identifier. For example, `let x = 42;`. Rust's compiler knows that `x` is `42`, so it does not bother to check the value of `x` when running. This check is called "indirection." In JavaScript, every call to `x` theoretically requires the runtime to check `x` to see its value, although in practice runtimes will attempt to optimize this away.
+    But if the _function_ is not known, the compiler needs to find out what
+    road it is to walk. If the function called is determined at compile time,
+    it is called "static dispatch," meaning the behavior that is "dispatched"
+    never changes. Dyanmic dispatch is the opposite of that. A synonymous
+    description is "early binding" versus "late binding," where binding refers
+    to the act of binding a value or behavior to an identifier. For example,
+    `let x = 42;`. Rust's compiler knows that `x` is `42`, so it does not
+    bother to check the value of `x` when running. This check is called
+    "indirection." In JavaScript, every call to `x` theoretically requires the
+    runtime to check `x` to see its value, although in practice runtimes will
+    attempt to optimize this away.
     
-    Dynamic dispatch provides significant flexibility in how a program runs but achieves it with a performance hit that can be similarly significant. In languages such as Python or JavaScript, the dispatch consideration is completely hidden. By and large, Rust's structure negates the need to consider dispatch. As mentioned, one of Rust's goals was "zero-cost abstractions," meaning that Rust features many very high-level language structures with great flexibility, but these "polymorphic" abstractions are made "monomorphic" at compile time. This means code can feel as though it is dynamically dispatching procedures while all functionality is actually static. */
+    Dynamic dispatch provides significant flexibility in how a program runs but
+    achieves it with a performance hit that can be similarly significant. In
+    languages such as Python or JavaScript, the dispatch consideration is
+    completely hidden. By and large, Rust's structure negates the need to
+    consider dispatch. As mentioned, one of Rust's goals was "zero-cost
+    abstractions," meaning that Rust features many very high-level language
+    structures with great flexibility, but these "polymorphic" abstractions are
+    made "monomorphic" at compile time. This means code can feel as though it
+    is dynamically dispatching procedures while all functionality is actually
+    static. */
 
 
     /*** Unit ***/
