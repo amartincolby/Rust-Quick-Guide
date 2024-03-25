@@ -388,16 +388,18 @@ for more information. */
 
 
 /*----------------------------------------------
-* Cargo
+* Cargo & Crates
 *----------------------------------------------
 */
+
+/*** Cargo ***/
 
 /* Cargo is Rust's standard package manager/build tool. Conceptually it is
 identical to NPM. Most Rust applications will be tested, built, published, and
 have their dependencies managed with Cargo. Chances are, most new projects will
 be bootstrapped with it as well. Cargo uses Crates.io as its standard publish
 target, but just as with NPM, you can easily set up private registries. The
-standard compiler used by Crate is rustc.
+standard compiler used by Cargo is rustc.
 
 Cargo uses the Cargo.toml file instead of package.json, but again, they are
 extremely similar. And yes, Cargo uses yet another goddamned markup language.
@@ -408,7 +410,8 @@ call it BLAML.
 Cargo assumes a standard file structure. The Cargo.toml and Cargo.lock files
 are at the root of a project. The src/ directory contains the main.rs file
 which contains the main() function. The benches/ directory contains performance
-tests. And the tests/ directory contains... tests.
+tests. And the tests/ directory contains... tests. Specifically integration
+tests.
 
 Similar to newer JavaScript package managers and Go, Cargo centralizes
 downloaded dependencies in its "home" directory. As such, you will likely only
@@ -423,7 +426,20 @@ You will interact with Cargo primarily through the basic Cargo commands:
 `cargo run` : Builds _and_ executes your program.
 `cargo test` : Rust functions labeled as tests.
 
-There are many other commands and configurations. See the Cargo docs. */
+There are many other commands and configurations. See the Cargo docs.
+
+
+/*** Crates ***/
+
+A crate is a unit of compilation. That is to say that a crate is a tree of
+modules that is collapsed down to a single "thing." There are two types of
+crates: binary and library. Binary crates are what an application is, namely a
+tree of modules that gets turned into a binary executable. Library crates do
+not have a main file and thus do not compile into a binary. They instead
+compile into behaviors that can be used by other libraries or binary
+applications. Most usage of the term "crate" is referring to library crates. In
+that sense, if coming from JavaScript, you can think of a crate as an NPM
+package. */
 
 
 /*----------------------------------------------
@@ -436,11 +452,10 @@ guide does not cover the structure of Rust applications. It focuses on the
 syntax and semantics. For the purposes of this guide, it is sufficient to know
 that Rust applications have a main function.
 
-The syntax structures above the function are called attributes. They allow a
-developer to specify how the function is the be handled by the compiler. In
-these examples, four linting settings are being disabled and an attribute for
-the library Tokio is being applied to enable async. Async will be discussed
-later. More attributes will be covered shortly.
+The syntax structure above the function is called an attribute. They allow a
+developer to specify how the function is the be handled by the compiler. In this
+case specifically the attribute specifies that this is the root function for the
+async runtime Tokio. Tokio and async in general are discussed later.
 
 The tutorial is structured such that the main function calls supporting
 functions that each explain an element of Rust. This allows usage of an IDE
@@ -483,18 +498,18 @@ fn atributes() {
     errors, transform code, generate code, communicate with 3rd party tools, or
     enable features that are not active by default. They cannot be used to
     break the type system or suppress errors. Many attributes will be shown in
-    thie tutorial.
+    this tutorial.
     
     There are two forms of attributes: outer and inner. Outer attributes are
-    like the examples above main(). They affect the thing they are declared
-    directly before. Inner attributes affect the thing in which they exist.
-    Inner attributes do not work lexically. They apply to the entire entity in
-    which they are declared. The primary use of inner attributes is for being
-    declared at the top of a module or file, thus affecting all of its members.
-    */
+    like the example above attributes(). They affect the thing that they are
+    declared directly before. Inner attributes affect the thing in which they
+    exist. Inner attributes do not work lexically. They apply to the entire
+    entity in which they are declared. The primary use of inner attributes is
+    for being declared at the top of a module or file, thus affecting all of
+    its members. */
 
-    /* The below applies to all children of main(). It could have easily been
-    declared as an outer attribute as well. */
+    /* The below applies to all children of attributes(). It could have easily
+    been declared as an outer attribute as well. */
     #![allow(unused_variables)]
     
     /* Attributes in Rust have similar abilities to some code hygiene and
@@ -586,27 +601,33 @@ fn variables_and_bindings() {
     let immutable_value = 42;
 
     /* NOTE: The above binding is an "evaluation," meaning the right-hand side
-    is an "expression." Expressions are code that return a value. The majority
-    of Rust code statements are expressions. The above is identical to: */
+    is an "expression." Expressions are code that return a value. "Statements"
+    are any valid and complete arrangement of symbols. The majority of Rust
+    code statements are expressions. The above is identical to: */
 
     let immutable_value = { 42 };
 
     /* The above code is short but expressions can be long and have multiple
-    sub-expressions and side-effects.
+    sub-expressions and even side-effects. All that matters is that a value is
+    ultimately returned.
     
     This also illustrates a concept in Rust called variable shadowing. This is
     far from unique to Rust but allows an engineer to re-declare a variable and
     have the new value apply henceforth. Shadowing allows the type to be
     changed because, even though the identifier name is the same, it is
-    actually a _different_ identifier, which is why we can re-declare the value
-    as mutable. */
-
-    let mut immutable_value = 2001;
+    actually a _different_ identifier, which is why we can even re-declare the
+    value as mutable. */
 
     // A mutable value is created with the `mut` modifier.
+    let mut immutable_value = 2001;
+
     // New values must still abide by the type of the original binding.
     let mut mutable_value = 42;
     mutable_value = 2001;
+
+    // Let identifiers can be initially unbound then bound later.
+    let an_unbound_identifier;
+    an_unbound_identifier = 1984;
 
     /* At this point, it is important to discuss the relationship of values and
     identifiers. Both values and identifiers are entities existing in memory. It
@@ -619,14 +640,6 @@ fn variables_and_bindings() {
     This may seem like an esoteric restatement of what was already said, but it
     is important to understand this relationship to better grasp the later
     discussion of Rust's party piece, ownership. */
-
-    // In essence, the only permanent
-    // value assocaited with `catcher_in_the_rust` is the type of value that can be
-    // bound to it, in the above case `&str`. By using variable shdowing, the value
-    // that `catcher_in_the_rust` owns can change. 
-
-    /* TODO: Talk about how variable names can reference earlier versions of the
-    same name and how this pertains to ownership. */
 
 
     /*** Constants ***/
@@ -650,9 +663,9 @@ fn variables_and_bindings() {
     /* Pay special attention to the constants HALF_THE_ANSWER and THE_ANSWER.
     Notice how THE_ANSWER is referenced _before_ it is declared. Constants are
     visible to everything within their scope, regardless of where they appear
-    lexically. This is because they are one of the earlier-mentioned items.
+    lexically. This is because they are one of the earlier-mentioned "items."
     Since all items are created in global memory, they can be referenced
-    anywhere within the scope in which they were written. */
+    anywhere within the scope in which they are visible. */
 
     /* Constants cannot be shadowed within the same scope, but they can be
     shadowed in nested scopes. */
@@ -680,7 +693,7 @@ fn variables_and_bindings() {
     By and large, constants will be used far more often than statics. The
     primary use case for statics over constants is when large amounts of data
     is being referenced. Constants are "inlined" during compilation. This means
-    that everywhere where a constant is referenced, the value behind that
+    that everywhere that a constant is referenced, the value behind that
     constant replaces the reference. If the constant represents a lot of data,
     or if the constant is referenced many times, that could cause a huge
     increase in the size of the compiled binary. Statics put the data in one
@@ -749,11 +762,12 @@ fn variables_and_bindings() {
     Unused variable warnings only apply to block scopes and will not be
     raised on variables declared at the global or module level. 
     
-    There are two kinds of unused variable. A suspicious unused variable is one
-    that has been bound with `let`. An innocuous variable is one that has not.*/
+    There are two kinds of unused variable. A "suspicious" unused variable is
+    one that has been bound with `let`. An "innocuous" variable is one that has
+    not.*/
 
     // To see the unused variable warnings below, comment out
-    // #[allow(unused_variables)] near the top of this file.
+    // #[allow(unused_variables)] near the top of this function.
     let block_scope = {
         let variable = 42;           // This triggers a warning.
         let _casual_variable = 2001; // This does not trigger a warning.
@@ -787,19 +801,18 @@ fn variables_and_bindings() {
     println!("{first_value}"); // Prints 2001
     println!("{second_value}"); // Prints 42
 
-    /* All of the various forms of value access are allowed. */
-
     // This ignores the first value.
     let (_, only_value) = (2001, 42);
 
     /* This assigns the identifiers to the indices, starting with index 0, it
     then ignores everything until the final two values, where it saves the
-    sixth index and ignores the last. */
-     let [index_0, .., index_6, _] = [0, 1, 2, 3, 4, 5, 6, 7];
+    penultimate index and ignores the last. */
+    let [index_0, .., index_6, _] = [0, 1, 2, 3, 4, 5, 6, 7];
 
     println!("{index_0}"); // Prints 0
     println!("{index_6}"); // Prints 6
 
+    // Values can be destructured from structs.
     struct CustomStruct {
         id: String,
         value: i32,
@@ -828,22 +841,41 @@ fn variables_and_bindings() {
     _outside_ of the function. That is because what you passed into the function
     was a reference to the object or array, not the object or array itself.
     
-    The only major difference in Rust is an engineer can explicitly reference
-    _any_ value, not just objects or arrays, by prepending an ampersand to the
-    value name. */
+    The only major difference in Rust is that an engineer can explicitly
+    reference _any_ value, not just objects or arrays, by prepending an
+    ampersand to the value name. This is not a surprise to C or Go developers,
+    so you can skip ahead. */
 
     let a_basic_number = 42; // type of i32
     let another_number = a_basic_number; // another i32
     let a_basic_reference = &a_basic_number; // type of &i32
 
-    /* In the above, `a_basic_number` is a 32-bit integer. When referencing
+    /* In the above, `a_basic_number` is a 32-bit integer. When aliasing
     primitives, they are copied by default, so `another_number` is also a 32-bit
     integer. But if an ampersand is prepended to the variable usage, it becomes
     a reference that holds no value, but instead points to the location of
     another value. The copy does not occur.
-    
-    There is more to be said about references, since Rust's management of values
-    is its party trick, but we will get to that in the section on ownership. */
+
+    This default copy behavior is only true for values that exist on the stack.
+    For heap-allocated values, such as vectors, copying must be explicitly
+    performed. This should be familiar to JavaScript developers who have used
+    libraries such as ImmutableJS to prevent sharing of arrays and objects.
+    Vectors will be covered later, but for now, just know that they are very
+    similar to JavaScript arrays and they exist on the heap. If you did not
+    already know, all values in JavaScript exist on the heap; there is no
+    stack. */
+
+    let a_vector = vec![1, 2, 3, 5, 7];
+    let not_another_vector = a_vector;
+    // let still_not_another_vector = a_vector; // This fails
+
+    /* In the above, the identifier `not_another_vector` is not bound to a copy
+    of `a_vector`, it has instead been bound to the reference that points to
+    the value `[1, 2, 3, 5, 7]`. In Rust, this means that `a_vector` is no
+    longer a valid identifier. This part is not familiar to JavaScript
+    developers but is a key part of Rust's safety system, that is to say,
+    "ownership." Ownership is Rust's party piece. Both it, and what happened
+    above, will be discussed in a dedicated section. */
 
 
     /*** Pointers ***/
@@ -863,9 +895,8 @@ fn variables_and_bindings() {
     "unsafe" Rust.
     
     Except for library writing, unsafe Rust is something that the average
-    developer will never do. "Safe" Rust's performance is already so good that
-    unsafe Rust is unnecessary in all but the most demanding situations. Unsafe
-    Rust will be explored fully later.
+    developer will never do. "Safe" Rust performance is already so good that
+    unsafe Rust is unnecessary in all but the most demanding situations.
 
     There is a lot of unsafe geekery online and it is best to ignore this.
     Unsafe Rust can indeed be more performant, but it requires stepping outside
@@ -874,15 +905,26 @@ fn variables_and_bindings() {
     bytes in memory. These common use cases almost always have a module in the
     standard library.
     
-    For the time being, a cursory explanation of pointers will suffice. */
+    For the time being, a cursory explanation of pointers will suffice.
 
-    /* The most common way to create a pointer is to bind the memory location of
-    a reference. */
+    The most common way to create a pointer is to bind the memory location
+    of a reference. This is done through a new type signature that will be
+    familiar to C developers, the asterisk. */
 
     let a_number_in_memory: i32 = 42;
+
+    // Creating a pointer is safe.
     let a_pointer_to_a_number: *const i32 = &a_number_in_memory;
 
-    /* Pointers are determined by the type signature of the identifier. */
+    unsafe{
+        // Only consuming a pointer is unsafe.
+        let pointer_to_a_new_number = a_pointer_to_a_number.add(42);
+    }
+
+    /* Rust also enables direct memory access via memory addresses. This is
+    perhaps _maximally_ usafe Rust and is thus far outside the scope of this
+    tutorial. */
+
 }
 
 #[allow(unused_variables)]
@@ -892,12 +934,7 @@ fn ownership_and_borrowing() {
     *----------------------------------------------
     */
 
-    /* Before the more complex elements of Rust are explored, it will behoove us
-    to analyze Rust's party piece.
-    
-    Ownership.
-    
-    In Rust, every value has an "owner". An owner is also known as an
+    /* In Rust, every value has an "owner". An owner is also known as an
     identifier since only through the identifier can a value be accessed. When
     an owner goes out of scope, such as when a function completes, the value is
     "dropped" from memory. Rust does this automatically, but also supports an
@@ -911,26 +948,28 @@ fn ownership_and_borrowing() {
     restricting, confusing, and the compile errors that it produces can
     sometimes seem strange.
     
-    But before that,
-    let us go over the basics. */
+    But before that, let us go over the basics. */
 
     let catcher_in_the_rust = "Holden Caulfield";
 
     /* In the above, the value of "Holden Caulfield" is owned by the entity
     `catcher_in_the_rust`. They are "bound". That means that
     `catcher_in_the_rust` _owns_ that value. The value is a string literal,
-    meaning a sequence of chars of known length, hard-coded into the binary, and
-    which sits on the stack and not the heap. In this scenario, "Holden
-    Caulfield" exists on the stack. Ownership gets interesting when using the
-    heap. */
+    meaning a sequence of chars of known length, hard-coded into the binary,
+    and which sits on the stack and not the heap. In this scenario, "Holden
+    Caulfield" exists on the stack. It is on the unpredictable heap where
+    things get interesting. */
 
-    // Using the String crate from the standard library allows us to create a
-    // string of unknown size on the heap.
+    /* Using the String crate from the standard library allows us to create a
+    string of unknown size on the heap. By unknown, I mean that the compiler
+    does not know how long the string will be at compile time. It can only be
+    known for sure during runtime. */
+
     let catcher_in_the_string = String::from(catcher_in_the_rust);
 
-    /* The identifier `catcher_in_the_string` now stores a pointer to the heap
-    which contains the string "Holden Caulfield". So here, things get
-    interesting. */
+    /* The identifier `catcher_in_the_string` now stores a pointer to a
+    location on the heap which contains the string "Holden Caulfield". So here,
+    things get interesting. */
 
     let catcher_in_the_stack = catcher_in_the_rust;
     let catcher_in_the_heap = catcher_in_the_string;
@@ -959,10 +998,11 @@ fn ownership_and_borrowing() {
     nearly identical line succeeds. */
 
     let successful_move = catcher_in_the_heap;
-    // Now, `successful_move` owns the value and trying to reference 
-    // `catcher_in_the_heap` again would fail.
 
-    /* Ownership tracking is Rust's safety net. Because remember, Rust clears
+    /* Now, `successful_move` owns the value and trying to reference 
+    `catcher_in_the_heap` again would fail.
+
+    Ownership tracking is Rust's safety net. Because remember, Rust clears
     memory when an identifier goes out of scope. See below. */
 
     let thats_what_i_want = String::from("Gimme money!");
@@ -970,7 +1010,7 @@ fn ownership_and_borrowing() {
     {
         let new_owner = thats_what_i_want;
         // After this, `new_owner` falls out of scope, and thus its memory is
-        // cleared.
+        // cleared and the value dropped.
     }
 
     /* From this point forward, the value "Gimme money!" no longer exists
@@ -987,18 +1027,19 @@ fn ownership_and_borrowing() {
 
     fn memory_destroyer(x: String) {
         println!("{}", x);
-        // x is now destroyed.
+        // x is now dropped.
     }
 
     memory_destroyer(istanbul);
-    // "was Constantinople." is now destroyed.
+    // "was Constantinople." is now dropped.
 
     // Thus this will not work.
     // println!("{}", istanbul);
 
-    /* Obvously, being able to only use a value once will not take you far. To
-    allow values to be used without transferring ownership, Rust leverages the
-    concept of "borrowing".
+    /* In the above, `x` could theoretically be returned, and thus have
+    ownership transferred back out of the function, but this is an unwieldy
+    pattern. To allow values to be used without transferring ownership, Rust
+    leverages the concept of "borrowing".
    
     This process is called borrowing because ownership is not transferred but
     only one entity can borrow a value at a time. The below is identical to the
@@ -1007,13 +1048,22 @@ fn ownership_and_borrowing() {
     let respect = String::from("Find out what it means to me.");
 
     {
-        let new_owner = &respect;
+        let new_borrower = &respect;
         /* Note the ampersand before the value, indicating that this is a
         reference. After this, only the reference is destroyed. The value is
         untouched. Because it is only a reference, multiple aliases to the
         original value are possible. */
-        let another_new_owner = &respect;
+        let another_new_borrower = &respect;
     }
+
+    /* A function works the same way. */
+
+    fn borrower(x: &str) {
+        println!("{}", x);
+    }
+
+    borrower(&respect);
+    // "Find out what it means to me." is not dropped.
 
     /* Just as normal variable declarations are immutable by default, so are
     references. References have two layers of protection in that both the
@@ -1031,20 +1081,20 @@ fn ownership_and_borrowing() {
     let mut jeremiah = String::from("was a bullfrog.");
 
     {
-        let new_owner = &mut jeremiah;
-        let another_new_owner = &mut jeremiah;
-        let yet_another_new_owner = &mut jeremiah;
-        // Uncomment this line to see errors.
-        // println!("{}", new_owner)
+        let new_borrower = &mut jeremiah;
+        let another_new_borrower = &mut jeremiah;
+        let yet_another_new_borrower = &mut jeremiah;
+        // println!("{}", new_borrower) // Throws borrow error
 
         // Meanwhile this succeeds because it was the most recent borrow.
-        println!("{}", yet_another_new_owner);
+        println!("{}", yet_another_new_borrower);
     }
 
-    /* The naked scope is now closed and all references are destroyed. */
+    /* The naked scope is now closed and all references are dropped. We can now
+    freely borrow `jeremiah` again. */
 
-    let new_owner = &mut jeremiah;
-    println!("{}", new_owner);
+    let new_borrower = &mut jeremiah;
+    println!("{}", new_borrower);
 
     /* The mechanism performing these checks is called the "borrow checker." The
     point of the borrow checker is to prevent unexpected changes to values while
@@ -1080,16 +1130,13 @@ fn primitive_types() {
     *-----------------------------------------------
     */
 
-    /*** > Integer ***/
+    /*** Integer ***/
 
-    let val1 = 1 + 1;          // i32 = 2
-    let val2 = 25 - 11;        // i32 = 11
-    let val3 = 5 * 2 * 3;      // i32 = 30
-    let val4 = 8 / 2;          // i32 = 4
+    let val1: i32 = 1 + 1; // i32 = 2
 
     // Integer division will round results
-    let val5 = 8 / 3;           // i32 = 2
-    let val6 = 8 / 5;           // i32 = 1
+    let val2 = 8 / 3; // i32 = 2
+    let val3 = 8 / 5; // i32 = 1
 
     /* All integers in Rust are 32-bit signed integers by default, as you can
     see above. Rust supports 8, 16, 32, 64, and 128-bit signed and unsigned
@@ -1105,25 +1152,22 @@ fn primitive_types() {
     let arch_s_int: isize = 42;
     let arch_u_int: usize = 42;
 
-    /*** > Float ***/
+    /*** Float ***/
 
     let float1 = 1.1 + 1.5;     // float = 2.6
-    let float2 = 18.0 - 24.5;   // float = -6.5
-    let float3 = 2.5 * 2.0;     // float = 5.0
-    let float4 = 16.0 / 4.0;    // float = 4.0
 
     // Floats and integers can be formatted with underscores. These underscores
     // are purely visual.
     let formatted_int = 12_34_56;       // i32 = 123456
     let formatted_float = 12_34_56.0;   // f64 = 123456.0
 
-    /*** > Char ***/
+    /*** Char ***/
 
     /* Char represents Rust's true text primitive. Strings are best thought of
-    as an array of chars. Rust supports unicode and as such a char is actually
-    a scalar value. In code, a char can be represented either as a glyph or as
-    the scalar values as found on the Wikipedia page for Unicode characters:
-    https://en.wikipedia.org/wiki/List_of_Unicode_characters 
+    as an array or vector of chars. Rust supports unicode and as such a char is
+    actually a scalar value. In code, a char can be represented either as a
+    glyph or as the scalar values as found on the Wikipedia page for Unicode
+    characters: https://en.wikipedia.org/wiki/List_of_Unicode_characters
     
     Be careful, though, because treating a glyph like a char is not always
     correct. There are many singular glyphs that actually require multiple chars
@@ -1136,7 +1180,7 @@ fn primitive_types() {
     let kannada_char_unicode = '\u{0ca0}';
 
 
-    /*** > Array ***/
+    /*** Array ***/
 
     /* If you are coming from C, Java, or Go, then arrays in Rust will be
     immediately familiar. If you are coming from TypeScript or JavaScript, they
@@ -1145,14 +1189,14 @@ fn primitive_types() {
     array's length must be set when it is instantiated. JavaScript runtimes hide
     this complexity from you when using arrays. */
 
-    // The length of an array is part of the identifier.
+    // The length of an array is part of the type.
     let array_of_five: [i32; 5] = [1, 2, 3, 42, 5];
 
     // Arrays cannot be instantied with no values. Unless the length is
     // specified as zero. An element type is still required.
     let array_of_none: [i32; 0] = [];
 
-    // Arrays can be instantiated with the same value in all indices, though.
+    // Arrays can be initialized with the same value in all indices, though.
     let array_of_ten: [i32; 10] = [42; 10];
 
     /* The value syntax above is simply saying to create an array with the value
@@ -1164,15 +1208,26 @@ fn primitive_types() {
     // Array lengths can obviously not be changed, but neither can values.
     // Arrays must be declared as mutable to do this.
     let mut mutable_array_of_five: [i32; 5] = [1, 2, 3, 42, 5];
+    let value_from_mutable_array = mutable_array_of_five[2];
     mutable_array_of_five[2] = 314;
 
-    println!("{}", the_number_3);
-    
-    // TODO: Talk about arrays being on the stack instead of the heap.
-    // TODO: Talk about how accessing an index does not take ownership. Only the whole array access.
+    /* When index accessed, primitive values are copied. As such, even though this
+    index was changed in the above line, this value is still 3 and not 314. */
+    println!("{}", value_from_mutable_array);
+
+    // But this value is 314.
+    println!("{}", mutable_array_of_five[2]);
+
+    /* When values from arrays are borrowed, the entire array is locked. This is
+    because when an array is dropped, so to are all its values. As far as memory
+    is concerned, an array and its values are tied. */
+
+    let borrowed_value_from_mutable_array = &mutable_array_of_five[2];
+    // mutable_array_of_five[2] = 314; // Borrow error.
+    println!("{}", borrowed_value_from_mutable_array);
 
 
-    /*** > Slice ***/
+    /*** Slice ***/
 
     /* Slices are the primary tool with which you will interact with arrays.
     Slices are very similar to slices in C++ but notably different than in Go.
@@ -1185,23 +1240,25 @@ fn primitive_types() {
     slice. This makes the developer experience nicer but has performance
     implications. Rust does not do this and a slice must have data behind it. */
 
+    let base_array = [1, 2, 3, 4, 5];
+
     // Slices are created by providing bounds with indices.
-    let slice_of_three = &array_of_five[1..4];
+    let slice_of_three = &base_array[1..4];
 
     // Slicing the entire array can be done by omitting the values.
-    let slice_of_five = &array_of_five[..];
+    let slice_of_five = &base_array[..];
 
     /* Slices are more generic in Rust than other languages, and as such they
-    can be used with more than just Arrays. Most importantly, slices can be
-    used with strings, which will be discussed now. */
+    can be used with more than just arrays. Most importantly, slices can be
+    used with vectors and strings, which will be discussed now. */
 
 
-    /*** > Vector ***/
+    /*** Vector ***/
 
     /* For Go developers accustomed to slices and JavaScript/TypeScript
     developers accustomed to arrays, Rust has a "vector." Vector is not a true
     primitive and is instead part of the standard library. Vectors are typed
-    lists, similar to arrays, but are dynamically sized and exist in the heap.
+    lists, similar to arrays, but are dynamically sized and exist on the heap.
     The Rust documentation calls them a "collection." Vectors are essentially
     syntactic sugar over implementations and as such rely on "generics."
     Generics are common in other languages like TypeScript or C++, so this
@@ -1214,7 +1271,7 @@ fn primitive_types() {
     // Vectors can infer types as well when created with the vector macro.
     let v = vec![42, 2001, 314, 1999];
 
-    // Vectors behave similarly to arrays.
+    // Vectors behave similarly to JavaScript arrays.
     viktor.push(42);
     viktor.push(2001);
     viktor.push(314);
@@ -1228,18 +1285,17 @@ fn primitive_types() {
     // Using the get method safely returns an option.
     let invalid_index = viktor.get(9);
 
-    // Borrowing any index from the vector will lock the entire vector.
-    // This is because when a vector is destroyed, all of its elements are too.
+    // Just like arrays, borrowing an index from a vector will lock the vector.
     let index_1 = &viktor[1];
-    viktor.push(1999);
-    // println!("{}", index_1); // Causes borrowing error.
+    // viktor.push(1999); // Causes borrowing error.
+    println!("{}", index_1);
 
     /* Slice syntax on vectors is identical to arrays. */
     let rogue = &v[..];
     let johnny = &v[1..3];
 
 
-    /*** > String & str ***/
+    /*** String & str ***/
 
     /* Like vectors, strings in Rust are not true primitives in the sense that
     a primitive is a thing of known, fixed size. They are like C strings in that
@@ -1272,28 +1328,25 @@ fn primitive_types() {
     I'm a
     multi-line string";
 
-    // The key difference is that str is of known length, while String is not.
-
     /* The `String` type that was used in earlier examples to create a string
     on the heap is actually part of the standard library and is fundamentally a
     wrapper around `str` that provides helpful functionality. Because of the
     common usage of `String`, the two types are often confused in conversation,
     with people using the term "string" to refer to either `String` or `str`.
-    */
-
-    /* To reiterate, using the String crate from the standard library creates a
+    
+    To reiterate, using the String crate from the standard library creates a
     sequence of chars on the heap. This string can be added to and reduced, but
     as it is a collection, interactions with it are similar to a vector.
     Indeed, this is because under the covers, String _is_ a vector. */
 
     let mut heap_of_chars = String::from("A few of my favorite things: ");
     
-    heap_of_chars.push_str("raindrops on roses ");
-    heap_of_chars.push_str("whiskers on kittens ");
+    heap_of_chars.push_str("raindrops on roses, ");
+    heap_of_chars.push_str("whiskers on kittens. ");
 
     let string_slice = &heap_of_chars[1..3];
 
-    /* String can also be coerced into &str via the type of a function parameter. */
+    /* String can be coerced into &str via the type of a function parameter. */
 
     fn str_coercer(s: &str) {
         println!("{s}")
@@ -1307,30 +1360,31 @@ fn primitive_types() {
 
     /* Hash maps in Rust are conceptually similar to objects in JavaScript.
     Whereas vectors store data by index, hash maps store data by key. They
-    exist on the heap and can grow and shrink dynamically. Unlike vectors, hasp
+    exist on the heap and can grow and shrink dynamically. Unlike vectors, hash
     maps are not ambiently available like vectors and strings and must be
-    imported to use. */
+    imported to use. You can see the imported crate at the top of this file. */
 
     // Instantiate a map of default size.
     let mut inventory = HashMap::new();
 
-    // Inserting accepts a key and value tuple.
-    inventory.insert("bread", 10);
+    // Inserting accepts a key and value tuple. The hash map will take ownership
+    // of the key and value where appropriate.
+    inventory.insert("dune", 10);
 
     // Interacting with a map, since keys are unknown, uses options.
 
     // New values return the inserted value in Some().
-    let new_value = inventory.insert("cheddar", 5); // Some(5)
+    let new_value = inventory.insert("krull", 5); // Some(5)
 
     // Duplicate values return None.
-    let dupe_value = inventory.insert("bread", 10); // None
+    let dupe_value = inventory.insert("dune", 10); // None
 
-    // Getting values relies on matching.
-    // Note the use of references for anything in the map.
-    match inventory.get(&"cheddar") {
-        Some(&amount) => println!("There are {amount} units of cheddar"),
-        _ => println!("There is no cheddar in stock"),
-    }
+    // Getting values also return an option.
+    let krull_copies = inventory.get("krull"); // Some(&5)
+
+    /* Make note of the reference in the above return value. Remember how all
+    values from vectors must be references that lock the vector? The same is
+    true for hash maps. Hash maps own their contents. */
 
 }
 
@@ -1345,15 +1399,15 @@ fn type_structures() {
     */
 
     /* As I mentioned, Rust is heavily inspired by OCaml. It tries to bridge the
-    conceptual gap between academic and highly symbolic languages like ML and
+    conceptual gap between highly symbolic, academic languages like ML and
     hardware-oriented languages like C. This means that the linguistic
     traditions of both languages sit sometimes uneasily next to one another.
     
     An excellent example of this is the distinction between "types", as
-    illustrated above, and structs, tuples, traits, interfaces, and
+    illustrated earlier, and structs, tuples, traits, interfaces, and
     implementations. In C, these are different things because they represent
     different things in memory. In OCaml, there is no significant difference;
-    they are all just types. A type is simply a description of the ways with
+    they are all just "types." A type is simply a description of the ways with
     which a thing can be interacted, and anything that fulfills that is simply
     declared with `type`.
     
@@ -1421,7 +1475,18 @@ fn type_structures() {
     TypeScript will infer an anonymous type that will then be used to type-check
     later uses of this object. This sort of entity in JavaScript and TypeScript
     is called an object literal. Rust also has the term "struct literal" but it
-    denotes the entity created when instantiated with a struct. */
+    denotes the entity created when instantiating a struct. */
+
+    /*** Struct Updating ***/
+
+    /* Structs can be partially copied with spread-like syntax that should be
+    familiar to JavaScript developers. Be aware of ownership, though. `name`
+    and `display_name` are now no longer valid on `a_user`. */
+
+    let another_user = UserData {
+        id: String::from("efg456"),
+        ..a_user
+    };
 
 
     /*** Unit Struct ***/
@@ -1455,11 +1520,12 @@ fn type_structures() {
     confusingly declared with the `type` keyword. This is one of the few areas
     of Rust's syntax with which I strongly disagree. `type` is from OCaml and
     they should have left it there. Aliases are intended to enable semantic
-    naming of broad, generic types. For example, below, a linked list
-    representing stops on a trip can have the type aliased so the type of the
-    list itself provides semantic information. Now, regardless of the
-    identifier used, it could even be the dreaded "data", semantic information
-    about what the identifier represents is not lost. */
+    naming of broad, generic types. For example, below, a vector representing
+    stops on a trip can have the type aliased so the type of the list itself
+    provides semantic information. Now, regardless of the identifier used, it
+    could even be the dreaded "data", semantic information about what the
+    identifier represents is not lost. This is a powerful tool for self-
+    documenting code and is common in TypeScript. */
 
     type JarJarBinksQuotes = Vec<String>;
 
@@ -1493,7 +1559,7 @@ fn type_structures() {
     while structs cannot. My criticism is not with the implementation. It is
     with the term usage because terms are important. */
 
-    /*Tuples can be dot-accessed with a zero-based index, similar to arrays or
+    /* Tuples can be dot-accessed with a zero-based index, similar to arrays or
     lists in some other languages. */
 
     let the_tuple_says = an_untyped_tuple.1; // 42
@@ -1503,7 +1569,7 @@ fn type_structures() {
 
     /* As mentioned, structs are just grouped data. They are not like classic
     "objects" in the sense of having behavior and data. To add behaviors, aka
-    methods, to a struct, it must be "implemented". Implementations exist
+    methods, to a struct, they must be "implemented". Implementations exist
     separate from the struct in memory. */
 
     struct Square {
@@ -1522,11 +1588,9 @@ fn type_structures() {
     written in any other module are visible only in that module, thus allowing
     a module to use a struct and have private functionality tied to that
     struct. If importing a struct from another module, visibility of the
-    contents of an implementation block follow similar rules to modules, where
-    methods to be labeled as public if they are to be used outside of the scope
-    in which they are declared. */
-
-    // TODO: Add struct merging
+    contents of an implementation follow similar rules to modules, where
+    methods need to be labeled as public if they are to be used outside of the
+    scope in which they are declared. */
 
     
     /*** Traits ***/
@@ -1777,7 +1841,7 @@ fn lifetimes() {
     contents.
 
     Rust's compiler is capable of sub-lexical lifetimes and allows entities to
-    be in scope but at the end of their lives. The compiler can tell if a
+    still be in scope but at the end of their lives. The compiler can tell if a
     reference is declared and then used before the end of a scope. Thus, the
     lifetime of a reference is actually from the point at which it is declared
     to when it is finally used. This is a key part of the borrow checker.
@@ -1815,7 +1879,7 @@ fn lifetimes() {
 
     /* In the above, lifetimes must be annotated because the compiler cannot
     infer the lifetimes of argument references passed in. The argument
-    annotations declare a function lifetime of 'a. Using single letters is
+    annotations declare a generic lifetime of 'a. Using single letters is
     simply convention, not a requirement. Next, `x` and `y` must have the _same
     as or greater than_ the base lifetime of the function. lifetime, and that
     the return value will have that lifetime as well. Essentially identical
@@ -1836,40 +1900,6 @@ fn lifetimes() {
 
     let static_string: &'static str = "Getting nothing but static on channel Z";
 
-
-    /*** panic! ***/
-
-    /* While most errors will be handled with Results or Options, there are
-    always scenarios where the failure should be terminal. For this situations,
-    Rust has `panic!()`. panic is a macro that, when called, terminates the
-    process in which it is called and "unwinds" its stack. Basically,
-    everything in scope is destroyed and memory is freed. Since a panic exits
-    the control flow of the program, the reason for the panic is likely unique,
-    and thus the only information required by the compiler is a string. The key
-    thing to remember is that if a function panics, the function that called
-    the panic will also unwind. */
-
-    fn maybe_panic() {
-        println!("I'm looking for an answer");
-        let what_im_looking_for = if rand::random::<bool>() {
-            panic!("I panicked!")
-        } else {
-            42
-        };
-        println!("I found what I'm looking for. It's {what_im_looking_for}")
-    }
-
-    maybe_panic();
-
-    /* If the above panics, the main thread is unwound and the rest of the
-    program will not run.
-    
-    Panic should be a relatively rare tool, because most of the time you want
-    to catch and handle errors. Panics should be used when your logic
-    determines that the program has entered an entirely unexpected state. In
-    essense, panics in Rust are what exceptions in other languages _should_ be:
-    the machine state has fallen out of alignment with the symbolic state.
-    Panics are used to fail tests. */
 }
 
 #[allow(unused_variables)]
@@ -2024,12 +2054,13 @@ fn opaque_types() {
     opaque types "specifics" to contrast them with generics. A generic means
     that a struct or function accepts one of all possible types, while a
     specific restricts the accepted type to a subset of all possible types.
+
     Opaque types can be bound to an identifier with the `type` keyword like so:
     
-    type ThingWithToString = impl ToString;
+        type ThingWithToString = impl ToString;
 
     This is considered "unstable". This will be implemented at some point in
-    the future. */
+    the future. Moving on. */
 
     fn specific_function(x : impl ToString) -> impl ToString {
         print!("{}", x.to_string());
@@ -2042,8 +2073,7 @@ fn opaque_types() {
     implement the `ToString` trait. The function then returns any type that
     likewise implements ToString. The returned &str implements ToString, so
     this works, as does the integer below it. The array below that does not
-    implement ToString and thus fails. Similar logic applies to calling the
-    function and passing in an argument. 
+    implement ToString and thus fails. Similar logic applies to arguments. 
     
     An important point to recognize is that while the return type is restricted
     to types that implement ToString, the function evaluation must collapse
@@ -2063,7 +2093,7 @@ fn opaque_types() {
     the ToString trait, the hidden type of the function must be one or the
     other, &str or i32, it cannot be both.
     
-    Unlike anonymous types with un-typed parameters, calling a function with an
+    Unlike closures with un-typed parameters, calling a function with an
     opaque parameter type does not harden its hidden type. For example, the
     above specific_function() accepts an argument that implements ToString, so
     an integer would work. If specific_function() is called with an integer, it
@@ -2210,7 +2240,7 @@ fn smart_pointers() {
 #[allow(unused_variables)]
 fn modules_and_crates() {
     /*----------------------------------------------
-    * Modules & Crates
+    * Modules
     *-----------------------------------------------
     */
 
@@ -2218,12 +2248,6 @@ fn modules_and_crates() {
     comparison to other, object-oriented languages, a module also has passing
     similarities to classes. The primary purpose of modules is to hide types
     and/or functionality from other parts of the program.
-
-    Crates are a unit of compilation. That is to say that a crate is the result
-    of a compilation. There is some syntactic similarities when interacting with
-    modules or crates. The imports at the top of this file reference a crate,
-    then use double-colons to traverse modules within that crate to reach
-    entities. The root of a crate is also a module.
 
     Every file in Rust is a module. Modules can have nested modules within them.
     Functions, too, can have modules in them. The visibility of modules, though,
@@ -2309,30 +2333,15 @@ fn modules_and_crates() {
 #[allow(unused_variables)]
 fn basic_operators() {
     /*----------------------------------------------
-    * Basic operators
+    * Operators
     *-----------------------------------------------
     */
 
     /* The reason for putting basic operators so late into this tutorial is
     because they are somewhat supercharged in Rust. Instead of relying on fixed
     operators, custom evaluators can be written, thus allowing engineers to
-    decide how operators such as `>` or `==` function. */
-
-    /*** > Boolean ***/
-
-    // Operators on the standard primitive types work as you would expect. 5 is
-    // indeed larger than 2.
-
-    let is_learning = true;
-
-    let logical_and = true && false; // - : bool = false; 
-    let logical_or = true || false;  // - : bool = true;
-    let logical_not = !true;         // - : bool = false;
-
-    let char_comparison = 'a' > 'b'; // - bool : false
-    let number_comparison = 5 < 42;    // - bool : true
-
-    println!("{} {}", char_comparison, number_comparison);
+    decide how operators such as `>` or `==` function. Since this tutorial is
+    not meant for beginners, I am not covering many of the absolute basics. */
 
 
     /*** Equality ***/
@@ -2374,12 +2383,12 @@ fn basic_operators() {
 
     /* Arrays support ordinal operators by default, but the arrays must be of
     equal lengths, because remember, in Rust, the length of an array is
-    actually part of its type.  */
+    actually part of its type. */
 
-    let big_obj = [10, 10000000, 10000000];
-    let small_obj = [11, 1, 1];
+    let big_array = [10, 10000000, 10000000];
+    let small_array = [11, 1, 1];
 
-    let big_array = big_obj == small_obj; // - : bool = false
+    let big_array = big_array == small_array; // - : bool = false
 
     println!("{}", big_array);
 
@@ -2387,23 +2396,11 @@ fn basic_operators() {
     let compare_authors_2 = author1 == author1; // - : bool = true
 
 
-    /*** Comparing Values ***/
+    /*** Custom/Overloaded Operators ***/
 
-    // The equality operators work differently for values instead of structures.
-    // Attempting to compare two different types will cause a compile error.
-
-    let my_string_1 = "A world without string is chaos.";
-    let my_string_2 = "A world without string is chaos.";
-
-    let compare_strings = "A string" == "A string"; // - : bool = true
-    let compare_integers = 42 == 42;                // - : bool = true
-    // let compare_number_string = 42 == "A string" ;     // Error
-
-
-    /*** Custom Operators ***/
-
-    /* Operators in Rust are actually just traits. For example, the equality
-    comparisons above can be written thusly: */
+    /* Operators in Rust are actually just traits. As such, they can be
+    "overloaded." For example, the equality comparisons above can be written
+    thusly: */
 
     let compare_authors_3 = author1.eq(&author2);
 
@@ -2417,7 +2414,9 @@ fn basic_operators() {
     
     /* For a full list of operators that can be overloaded, see the Rust docs.
     What this means it that a developer can create a custom .eq() trait that
-    will be called when the `==` operator is used. */
+    will be called when the `==` operator is used.
+    
+    Be careful when overloading operators. Things can get confusing quickly.*/
 
 }
 
@@ -2436,8 +2435,8 @@ fn functions() {
     
     To reiterate, Rust has en explicit `return` statement as a concession to the
     C tradition, but it also has implicit final return as denoted by the lack
-    of semicolon. In most cases, the final statement of a block being used as 
-    the implicit return will be the ideal and idiomatic pattern.
+    of a semicolon. In most cases, the final statement of a block being used as 
+    its implicit return will be the ideal and idiomatic pattern.
 
     All evaluation blocks, and thus all functions, _must_ return something. If
     no final value is present, the block will return the special value `unit`,
@@ -2490,11 +2489,12 @@ fn functions() {
     If the second if/else is uncommented, a similar problem arises. The second
     if/else becomes the implicit return of the function block, and thus the
     booleans contained therein become the return value of the entire function.
+
     The compiler knows that the implicit returns of the first if/else block are
     now not being caught by anything and will thus throw an error indicating
-    that an explicit `return`, to thus break out of the function, was likely
-    intended. This is why uncommenting the `return true` line does not throw an
-    error, it will instead throw a warning of unreachable code.
+    that an explicit `return`, to thus break out of the entire function, was
+    likely intended. This is why uncommenting the `return true` line does not
+    throw an error, but instead throws a warning of unreachable code.
     
     This illustrates how the need for an explicit return likely means that the
     function has been poorly designed. Composing a function of evaluation blocks
@@ -2575,9 +2575,10 @@ fn functions() {
     let closure_food = |x: i32| println!("You have {x} {food}");
 
     // Values captured by closures are borrowed by default.
+
     // let attempted_move = food; // This fails.
-    // While a simple reference use succeeds.
-    println!("{food}");
+    println!("{food}"); // A simple reference use succeeds.
+    
     closure_food(42);
 
     /* Just as earlier, mutable borrows are treated more strictly. Any closure
@@ -2588,25 +2589,28 @@ fn functions() {
     let mut drink = String::from("coffee");
     let mut closure_drink = |x: i32| drink.push('s');
 
-    // println!("{drink}"); // This fails.
+    // println!("{drink}"); // Simple references now fail.
     closure_drink(42);
 
     /* Borrowing is the default behavior but ownership can be transferred via
-    the `move` keyword. The primary use of this is to transfer a closure to
-    another thread. Multithreading will be discussed later. */
+    the `move` keyword. The primary use of this is to transfer a closure, and
+    everything it needs, to another thread. Multithreading will be discussed
+    later. */
 
     let dessert = String::from("cheesecakes");
     let closure_dessert = move |x: i32| println!("You have {x} {dessert}");
 
     // println!("{dessert}"); // This fails.
 
-    /* At this point, the value "cheesecakes" has not been destroyed. It is
+    /* At this point, the value "cheesecakes" has not been dropped. It is
     instead bound to the identifier for the closure `closure_dessert`. Only
-    once `closure_dessert` falls out of scope will the value be destroyed. */
+    once `closure_dessert` falls out of scope will the value be dropped. */
 
     /* Because closures are bound by let declarations, they are part of the
     dynamic environment along with the let values. As such, they can "see" each
-    other. Just as let values and closures are part of the dynamic environment,
+    other.
+    
+    But Just as entities from the dynamic environment can enclose one another,
     functions can enclose other entities from the static environment. Both the
     below static value and constant value exist in the same realm as the
     function, so the function can indeed "enclose" them. */
@@ -2638,6 +2642,7 @@ fn functions() {
     `adder_closure` as a callback argument, the typing it acquires there will
     apply henceforth. */
 
+
     /*** A Note On Idiomatic Rust ***/
 
     /* The idiomatic use of closures in Rust is for small pieces of behavior
@@ -2655,7 +2660,10 @@ fn functions() {
 
     /*** First Class Functions & Dynamic Dispatch ***/
 
-    /* Just as with most modern languages, Rust allows passing functions as values. Anonymous functions are truly first class and are passed like any other value, but regular functions can be passed as "function pointers," which are preicely that: pointers to a single function sitting in memory. */
+    /* Just as with most modern languages, Rust allows passing functions as
+    values. Anonymous functions are truly first class and are passed like any
+    other value, but regular functions can be passed as "function pointers,"
+    which are preicely that: pointers to a function sitting in memory. */
 
     fn get_closure() -> Box<dyn Fn() -> i32> {
         Box::new(|| 42)
@@ -2679,24 +2687,65 @@ fn functions() {
     let a_function_alias = a_function;
     let another_value_from_function = a_function_alias(); // 42
 
-    /* Because function pointers are of constant size, they can be included on structs without any special considerations. */
+    /* Because function pointers are of constant size, they can be included on
+    structs without any special considerations. */
 
     struct Strunction {
         func: fn(x: i32) -> i32,
         val: i32,
     }
 
-    /* There are two things to note in the above: the usage of the `dyn` keyword and the capital F in Fn for the closure example.
+    /* There are two things to note in the above: the usage of the `dyn`
+    keyword and the capital F in Fn for the closure example.
     
-    The type signature for get_function() makes sense. Functions are declared with fn, thus a function pointer is typed with fn. But the signature for get_closure() uses a capital F. This is because a closure is actually a trait.Closures are compiled into struct instances with a method attached to them that contains the actual logic of your closure.
+    The type signature for get_function() makes sense. Functions are declared
+    with fn, thus a function pointer is typed with fn. But the signature for
+    get_closure() uses a capital F. This is because a closure is actually a
+    trait. Closures are compiled into struct instances with a method attached
+    to them that contains the actual logic of your closure. As such, the type
+    signature of the closure is as a trait on that struct.
     
-    Even though closures are traits, the `impl` keyword is not used because, as mentioned when discussing opaque types and monomorphization, when `impl` is used in a function signature, that signature represents an underlying concrete type. Closures have no underlying type. When pointing to a trait that exists on the heap, such as when having a Box<Trait> like in the above example, it is referred to as a "trait object." The `dyn` keyword was created to more clearly differentiate between implementations and trait objects. */
+    Even though closures are traits, the `impl` keyword is not used because, as
+    mentioned when discussing opaque types and monomorphization, when `impl` is
+    used in a function signature, that signature represents an underlying
+    concrete type. Closures have no underlying type. When pointing to a trait
+    that exists on the heap, such as when having a Box<Trait> like in the above
+    example, it is referred to as a "trait object." The `dyn` keyword was
+    created to more clearly differentiate between implementations and trait
+    objects. */
 
-    /* Trait objects are Rust's way of handling what is known as "dynamic dispatch." If you are coming from JavaScript, or any scripting language, the concept of dispatch will be new to you. In compiled languages, there is a distinction between knowing what function will run, i.e. be dispatched, at compile time versus at runtime. For example, if an integer is greater than 0, function A will run, and function B will run if less than 0. The compiler does not necessarily know the value of the integer, but it doesn't need to. It knowns both roads perfectly, so it can walk either one equally quickly.
+    /* Trait objects are Rust's way of handling what is known as "dynamic
+    dispatch." If you are coming from JavaScript, or any scripting language,
+    the concept of dispatch will be new to you. In compiled languages, there is
+    a distinction between knowing what function will run, i.e. be dispatched,
+    at compile time versus at runtime. For example, if an integer is greater
+    than 0, function A will run, and function B will run if less than 0. The
+    compiler does not necessarily know the value of the integer, but it doesn't
+    need to. It knowns both roads perfectly, so it can walk either one equally
+    quickly.
     
-    But if the _function_ is not known, the compiler needs to find out what road it is to walk. If the function called is determined at compile time, it is called "static dispatch," meaning the behavior that is "dispatched" never changes. Dyanmic dispatch is the opposite of that. A synonymous description is "early binding" versus "late binding," where binding refers to the act of binding a value or behavior to an identifier. For example, `let x = 42;`. Rust's compiler knows that `x` is `42`, so it does not bother to check the value of `x` when running. This check is called "indirection." In JavaScript, every call to `x` theoretically requires the runtime to check `x` to see its value, although in practice runtimes will attempt to optimize this away.
+    But if the _function_ is not known, the compiler needs to find out what
+    road it is to walk. If the function called is determined at compile time,
+    it is called "static dispatch," meaning the behavior that is "dispatched"
+    never changes. Dyanmic dispatch is the opposite of that. A synonymous
+    description is "early binding" versus "late binding," where binding refers
+    to the act of binding a value or behavior to an identifier. For example,
+    `let x = 42;`. Rust's compiler knows that `x` is `42`, so it does not
+    bother to check the value of `x` when running. This check is called
+    "indirection." In JavaScript, every call to `x` theoretically requires the
+    runtime to check `x` to see its value, although in practice runtimes will
+    attempt to optimize this away.
     
-    Dynamic dispatch provides significant flexibility in how a program runs but achieves it with a performance hit that can be similarly significant. In languages such as Python or JavaScript, the dispatch consideration is completely hidden. By and large, Rust's structure negates the need to consider dispatch. As mentioned, one of Rust's goals was "zero-cost abstractions," meaning that Rust features many very high-level language structures with great flexibility, but these "polymorphic" abstractions are made "monomorphic" at compile time. This means code can feel as though it is dynamically dispatching procedures while all functionality is actually static. */
+    Dynamic dispatch provides significant flexibility in how a program runs but
+    achieves it with a performance hit that can be similarly significant. In
+    languages such as Python or JavaScript, the dispatch consideration is
+    completely hidden. By and large, Rust's structure negates the need to
+    consider dispatch. As mentioned, one of Rust's goals was "zero-cost
+    abstractions," meaning that Rust features many very high-level language
+    structures with great flexibility, but these "polymorphic" abstractions are
+    made "monomorphic" at compile time. This means code can feel as though it
+    is dynamically dispatching procedures while all functionality is actually
+    static. */
 
 
     /*** Unit ***/
@@ -2736,6 +2785,41 @@ fn functions() {
 
     /* The above function expects to return nothing and will throw a compile
     error if anything is returned. */
+
+
+    /*** panic! ***/
+
+    /* While most errors will be handled with Results or Options, there are
+    always scenarios where the failure should be terminal. For these situations,
+    Rust has `panic!()`. panic is a macro that, when called, terminates the
+    process in which it is called and "unwinds" its stack. Basically,
+    everything in scope is destroyed and memory is freed. Since a panic exits
+    the control flow of the program, the reason for the panic is likely unique,
+    and thus the only information required by the compiler is a string. The key
+    thing to remember is that if a function panics, the function that called
+    the panic will also unwind. */
+
+    fn maybe_panic() {
+        println!("I'm looking for an answer");
+        let what_im_looking_for = if rand::random::<bool>() {
+            panic!("I panicked!")
+        } else {
+            42
+        };
+        println!("I found what I'm looking for. It's {what_im_looking_for}")
+    }
+
+    maybe_panic();
+
+    /* If the above panics, the main thread is unwound and the rest of the
+    program will not run.
+    
+    Panic should be a relatively rare tool, because most of the time you want
+    to catch and handle errors. Panics should be used when your logic
+    determines that the program has entered an entirely unexpected state. In
+    essense, panics in Rust are what exceptions in other languages _should_ be:
+    the machine state has fallen out of alignment with the symbolic state.
+    Panics are used to fail tests. */
 
 }
 
