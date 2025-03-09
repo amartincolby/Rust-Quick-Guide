@@ -62,6 +62,7 @@ inspired Rust's semantics.
 - [The official docs for Actix-Web](https://actix.rs/docs) *Rust's most popular web framework. Relies on Tokio.*
 - [Rayon Github](https://github.com/rayon-rs/rayon) *Rayon is a high-level library for making sequential processes concurrent*
 - [The Little Book Of Rust Macros](https://veykril.github.io/tlborm/) *Documentation specifically for macros*
+- [Compiler Explorer](https://godbolt.org/) *An amazing tool for looking at compiled code to get a feel for low-level behavior*
 
 # The Guide
 
