@@ -177,7 +177,7 @@ async fn main() {
     multithreading_and_concurrency();
     async_syntax().await;
     macros();
-    actix_web();
+    actix_web_and_axum();
     rustdoc();
 }
 
@@ -3064,7 +3064,7 @@ fn rustdoc() {
 
 }
 
-fn actix_web() {
+fn actix_web_and_axum() {
     /*----------------------------------------------
     * Actix-Web
     *----------------------------------------------
@@ -3082,14 +3082,25 @@ fn actix_web() {
     easily be cantilevered into most use cases while maintaining development
     speed.
     
-    The ne plus ultra exemplar of this can be found in Actix-Web. Rust was
+    The ne plus ultra of this was previously found in Actix-Web. Rust was
     already well known, but the emergence of Actix-Web was one of the most
     salient moments driving Rust's fame and recognition. When a new framework
     comes out of nowhere and promptly tops every benchmark, people take notice.
-    This early fame means that Actix has become the default framework. I am
-    including this section here to show how easy n-tier development can be and
-    how familiar it can feel. Also of note, Actix relies on Tokio for its async
-    runtime and the previous section on async nicely connects here. */
+    This early fame put wind beneath Actix's wings and it became the near-
+    default choice for rapid back-end development.
+
+    Actix-Web remains popular, but it must now share the throne with a newer
+    framework developed by the same group as Tokio: Axum. Since Actix-Web also
+    uses Tokio under the covers, I see Axum almost as the more pure alternative
+    to Actix. Actix-Web also suffered something of a blowup with the creator
+    and the community, pushing people away. Actix and Axum are both being
+    actively developed, though, have similar performance, similar developer
+    experiences, and comparable ecosystems.
+
+    Since the primary goals of this guide is to aid n-tier application
+    development, Rust best competes with Go when using a framework. As such, I
+    can't leave one of these frameworks uncovered, and will thus briefly cover
+    both. */
 }
 
 /*----------------------------------------------
