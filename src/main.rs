@@ -160,7 +160,7 @@ like a table of contents. */
 
 #[tokio::main]
 async fn main() {
-    atributes();
+    attributes();
     items();
     variables_and_bindings();
     ownership_and_borrowing();
@@ -182,7 +182,7 @@ async fn main() {
 }
 
 #[allow(dead_code)]
-fn atributes() {
+fn attributes() {
     /*----------------------------------------------
     * Attributes
     *----------------------------------------------
