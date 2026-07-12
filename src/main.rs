@@ -1290,12 +1290,13 @@ fn functions() {
     calls all anonymous functions "closures" as a way to differentiate them
     from normal functions. */
 
-    let food = String::from("cookies");
+    let food = String::from("apples");
 
     // Values captured by closures are borrowed by default.
     let closure_food = |x: i32| println!("You have {x} {food}");
 
     // let attempted_move = food; // This fails.
+
     println!("{food}"); // A simple reference use succeeds.
     
     closure_food(42);
@@ -2795,11 +2796,11 @@ fn multithreading_and_concurrency() {
     cores, CPU-level multithreading, or specialized external processors such as
     audio chips, GPUs, NPUs, or in the olden days, math coprocessors.
 
-    When writing Rust, all you can write are _concurrent_ processes. Whether
-    they happen in parallel or not is out of your control. To a large degree,
-    this is for the best. As a programmer, you cannot (easily) know how the
-    hardware can most effectively run instructions simultaneously. For some
-    interesting history on this, read about Intel's Itanium CPUs and their EPIC
+    When writing Rust, you can only write _concurrent_ processes. Whether they
+    happen in parallel or not is out of your control. To a large degree, this
+    is for the best. As a programmer, you cannot (easily) know how the hardware
+    can most effectively run instructions simultaneously. For some interesting
+    history on this, read about Intel's Itanium CPUs and their EPIC
     architecture. */
 
 
@@ -2829,11 +2830,15 @@ fn multithreading_and_concurrency() {
     
     Just as all Rust applications have the main function, so too does that
     function represent the main thread. It is also the parent thread to any
-    threads it spawns. Threads can spawn their own child threads. */
+    threads it spawns. Threads can spawn their own child threads. Now let's
+    spawn some threads. */
+
+
+    /*** Thread Spawning and Management ***/
 
     /* All threads require a closure that encapsulates the desired behavior.
     Threads cannot borrow, though, so the below thread will fail to compile
-    unless the `move` keyword is applied.*/
+    unless the `move` keyword is applied. */
     
     let external_value = String::from("nee");
 
