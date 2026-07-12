@@ -17,6 +17,7 @@ const _GREETING: &str = "Stay awhile. Stay forever.";
 
 /* Comment blocks start with slash-star,
    and end with star-slash. */
+
 // Line comments begin with a double slash.
 
 /*** A note on the stack and heap: ***/
@@ -26,16 +27,16 @@ familiar and your knowledge perfectly translates to Rust. If you are coming from
 Go or TypeScript/JavaScript, some explanation may be required.
 
 Data is stored in memory in two ways. The first is called the "stack" and the
-name hints to its design. When a program or function is started, it gets a hunk
+name hints at its design. When a program or function is started, it gets a hunk
 of memory given to it. This memory space is clear, contiguous, and entirely
 owned by the program or function. The compiler knows how much memory space the
-stack will require based its analysis of the code. For example, if a function
+stack will require based on its analysis of the code. For example, if a function
 has five 32-bit integers in it, the compiler only reserves enough space in
 memory to store five 32-bit integers. When the program or function is complete,
 the memory is cleared. One of the most common memory errors is when the program
 does something that exceeds the stack that was allocated, resulting in the
 famous _stack overflow_, from which the website gets its name. Entities on the
-stack are added to the "top" and removed from top in a "last-in-first-out", aka
+stack are added to and removed from the "top" in a "last-in-first-out", aka
 LIFO, pattern. Imagine plates stacked; you always take the top plate.
 
 The heap is precisely that: a big pile of memory space. The primary
@@ -51,21 +52,25 @@ these considerations are not new to you. If you are coming from TypeScript, then
 don't even worry about it. Rust written in even the most naive way is still an
 order of magnitude faster that JavaScript. If you are debating using Rust over
 Go, on the other hand, be aware that naive Rust in the realm of n-tier
-applications can often be _slower_ than naive Go. */
+applications can often be _slower_ than naive Go. If you wish to quickly set up
+a simple back-end application, and were perhaps considering Node or Bun along
+with Express or Koa, Go is perhaps a better choice, even though I ultimately
+chose Rust even for small projects. */
 
 /*** A note on macros ***/
 
 /* Throughtout this tutorial, you will see some commands appended with an
 exclamation mark, like `println!`. This mark indicates that this command is a
 "macro". Macros are _old_ in programming, having been first used in the 50's
-and added to Lisp in 1963. A macro is something that evaluates a string of
-tokens and then interprets it at compile time. A macro, when compiled,
-"expands" into a larger amount of code. You can think of a macro as a compiler
-that transforms provided glyphs into an implementation. A programmer could
-genuinely implement their own programming language within a macro. Macros are
-one of the constructs in Rust that most programmers are not likely to have
-encountered. Macros will be discussed near the end of this tutorial. For the
-time being, just be aware that the exclamation mark syntax indicates a macro. */
+and added to Lisp in 1963. A macro, at least in Rust, is something that
+evaluates a string of tokens and then interprets it at compile time. A macro,
+when compiled, "expands" into a larger amount of code. You can think of a macro
+as a compiler that transforms provided glyphs into an implementation. A
+programmer could genuinely implement their own programming language within a
+macro. Macros are one of the constructs in Rust that most programmers are not
+likely to have encountered. Macros will be discussed near the end of this
+tutorial. For the time being, just be aware that the exclamation mark syntax
+indicates a macro. */
 
 /*** A note on "unsafe" Rust ***/
 
@@ -171,6 +176,7 @@ async fn main() {
     pattern_matching();
     opaque_types();
     smart_pointers();
+    function_pointers_and_dynamic_dispatch();
     modules_and_crates();
     basic_operators();
     functions();
@@ -819,6 +825,7 @@ fn generics() {
 }
 
 #[allow(unused_variables)]
+#[allow(dead_code)]
 fn primitive_types() {
     /*----------------------------------------------
     * Primitive Types
@@ -913,9 +920,9 @@ fn primitive_types() {
     // But this value is 314.
     println!("{}", mutable_array_of_five[2]);
 
-    /* When values from arrays are borrowed, the entire array is locked. This is
-    because when an array is dropped, so to are all its values. As far as memory
-    is concerned, an array and its values are tied. */
+    /* When values from arrays are borrowed, the entire array is locked. This
+    is because when an array is dropped, so too are all its values. As far as
+    memory is concerned, an array and its values are tied. */
 
     let borrowed_value_from_mutable_array = &mutable_array_of_five[2];
     // mutable_array_of_five[2] = 314; // Borrow error.
@@ -1081,6 +1088,340 @@ fn primitive_types() {
     values from vectors must be references that lock the vector? The same is
     true for hash maps. Hash maps own their contents. */
 
+
+    /*** Unit ***/
+
+    /* 
+   
+    Unit is an interesting concept. It is the concept of a "thing" that is
+    "nothing." It is different from `None` in that `None` is the state of
+    nothing being where `Some()` could also have been. `Unit` is the state of
+    expected nothing. It is similar to `void` in other languages, but unlike
+    `void`, `unit` is actually a type.
+        
+    From a mathematical perspective, it could be seen as the empty set, in
+    that it is still a set, but it is a set of nothing. That is why the
+    syntactic representation of `unit` is an empty tuple. */
+        
+    // Unit's first use is in declaring functions that take no arguments.
+    fn no_argument() -> String {
+        String::from("I've got nothing")
+    }
+
+    /* All functions necessarily return something, so if there is no expression
+    intended for return, such as in functions that only handle side-effects,
+    then that function will return `unit`. Functions that return `unit` can be
+    explicitly typed. */
+        
+    fn no_return(input: String) -> () {
+        println!("I just print {}", input)
+        // "bingpot!" // This fails.
+    }
+
+    /* The above function expects to return nothing and will throw a compile
+    error if anything is returned.
+    
+    If coming from JavaScript or TypeScript, this may sound like `undefined`,
+    but oh lord, it is not. Undefined is a type disaster, where everything and
+    anything can be undefined. It is the default state of any reference or
+    entity. I want a t-shirt that says `undefined is not a function.` `Unit` is
+    very much defined. It is more similar to `null` in that `null` is actually
+    an object with nothing in it. You cannot stumble into `unit`. */
+
+}
+
+#[allow(dead_code)]
+#[allow(unused_variables)]
+fn functions() {
+    /*----------------------------------------------
+    * Functions
+    *----------------------------------------------
+    */
+
+    /* Rust is deeply inspired by functional languages, so unsurprisingly its
+    functions are distinctly different from many other languages, such as those
+    from the C family. This difference was briefly discussed earlier where the
+    semantic use of semicolons was pointed out.
+    
+    To reiterate, Rust has en explicit `return` statement as a concession to the
+    C tradition, but it also has implicit final return as denoted by the lack
+    of a semicolon. In most cases, the final statement of a block being used as 
+    its implicit return will be the ideal and idiomatic pattern.
+
+    All evaluation blocks, and thus all functions, _must_ return something. If
+    no final value is present, the block will return the special value `unit`,
+    which was just discussed. (There is a special case known as the `never`
+    type that functions can also return, but this is esoteric and not useful to
+    discuss or learn in this tutorial)
+
+    For example, the below function has one evaluation block: the if/else. As
+    such, this entire block is actually the return of the function. The if/else
+    is composed of two evaluation blocks that each return a value. Thus, the
+    two booleans count as the final return value of the function. */
+
+    fn greater_than_42(x: i32) -> bool {
+        if x <= 42 {
+            false
+        } else {
+            true
+        }
+    }
+
+    /* It is important to note that, even though Rust has a return statement,
+    it applies only to the _function_ level, and not the level of general
+    evaluation blocks. And only through the return statement can early return be
+    achieved. To wit, while Rust allows a return statement, it restricts the
+    semantics to avoid mixing up paradigms. Within evaluation blocks, only
+    implicit returns are allowed, and Rust bars implicit early return.
+    
+    Let's invalidate the below function to illustrate. */
+
+    fn less_than_42(x: i32) -> bool {
+        if x >= 42 {
+            // false
+            false
+        } else {
+            // return true;
+            true
+        }
+        // if x < 42 {
+        //     false
+        // } else {
+        //     true
+        // }
+    }
+
+    /* if the first `false` is uncommented, it would lack a semicolon, and
+    Rust's compiler would think that it is thus meant to be the block's return.
+    But since there is a statement _after_ that, it knows that it cannot be the
+    implicit return. It will thus throw a missing semicolon error.
+    
+    If the second if/else is uncommented, a similar problem arises. The second
+    if/else becomes the implicit return of the function block, and thus the
+    booleans contained therein become the return value for the entire function.
+
+    The compiler knows that the implicit returns of the first if/else block are
+    now not being caught by anything and will thus throw an error indicating
+    that an explicit `return`, to thus break out of the entire function, was
+    likely intended. This is why uncommenting the `return true` line does not
+    throw an error, but instead throws a warning of unreachable code.
+    
+    This illustrates how the need for an explicit return likely means that the
+    function has been poorly designed. Composing a function of evaluation blocks
+    that all return values, and having the function itself finally evaluate to
+    an ultimate value, should be the ideal pattern.
+    
+    You may have noticed that if you uncommented the second if/else block, the
+    specific error that was displayed was how "()" was expected, but a boolean
+    was returned. Previously, I used the term "caught" when describing that the
+    first if/else was returning something to nothing. That lack of a catcher
+    for the evaluation's return means that Rust expected that block to return
+    `unit`, or nothing. If there is no catcher, there should be nothing to
+    catch. Rust will not allow free-floating values; they must be bound to an
+    identifier. */
+
+
+    /*** Anonymous Functions ***/
+
+    /* Just like JavaScript and TypeScript, Rust functions can be "anonymous",
+    meaning that the function itself has no identifier, but is instead bound to
+    an identifier. The syntax is slightly different but likely very familiar to
+    TypeScript developers who frequently use fat arrow function syntax. */
+
+    let sign_up_to_newsletter = |email: &str| -> String {
+        format!("{} {}", String::from("Thanks for signing up"), email)
+    };
+
+    /* In TypeScript, the above would look like this:
+    
+        let sign_up_to_newsletter = (email: string) : string => {
+            return(`Thanks for signing up ${email}``);
+        };
+
+    */
+
+    sign_up_to_newsletter("hello@rust_lovers.org");
+
+    /* One of the most significant differences of Rust if coming from
+    JavaScript/TypeScript or Go is that functions cannot access values declared
+    outside of their scope. This is known as "capturing" a value. The common
+    term is "enclosing," to wit you are writing a "closure", a concept I am
+    sure many JavaScript developers remember from their job interviews. */
+
+    let outer_var = 22;
+
+    fn normal_function() -> i32 {
+        let inner_var = 22;
+        inner_var + 20 // This works.
+        // outer_var + 20 // This does not.
+    }
+
+    /* The above is not possible because a `let` binding is part of the
+    "dynamic" environment of the program. The dynamic environment is the part
+    of the program that can change based on how the program runs. The "static"
+    environment is the part of the program that is the same whenever the
+    application runs. Because functions are static items, they do not exist on
+    the same level as let declarations.
+    
+    If you are coming from TypeScript or JavaScript, you may interpret this as
+    similar to hoisting, and while that is not entirely wrong, it is not
+    entirely right. Functions do not get moved to the top of a scope, as they
+    do in JavaScript. Functions, like all items, are lifted into a different
+    realm. That said, the problems inherent to hoisting gives us a good
+    illustration for why Rust works as it does.
+
+        displayMessage();
+
+        let message = "a message for you";
+
+        function displayMessage() {
+            console.log(message);
+        }
+    
+    In the above JavaScript code, a function can be used before its
+    declaration. But this code will fail because the `displayMessage` call is
+    relying on `message`, which is declared _after_ the call. If Rust tried to
+    allow the usage of functions with outside values, the function would not be
+    able to know where to find this value. Thus, Rust simply prevents this.
+    
+    There are many uses for this pattern, though, and Rust allows it through
+    the use of the aforementioned anonymous functions. Unlike JavaScript, where
+    a function is only a closure if it encloses external values, Rust simply
+    calls all anonymous functions "closures" as a way to differentiate them
+    from normal functions. */
+
+    let food = String::from("cookies");
+
+    // Values captured by closures are borrowed by default.
+    let closure_food = |x: i32| println!("You have {x} {food}");
+
+    // let attempted_move = food; // This fails.
+    println!("{food}"); // A simple reference use succeeds.
+    
+    closure_food(42);
+
+    /* Just as earlier, mutable borrows are treated more strictly. Any closure
+    which mutates its mutable captured values must also be labeled with the
+    `mut` keyword and no references can be created between the declaration of
+    the closure and its use. */
+
+    let mut drink = String::from("coffee");
+    let mut closure_drink = |x: i32| drink.push('s');
+
+    // println!("{drink}"); // Simple references now fail.
+
+    // But if the below call is moved above the println!(), it works.
+    closure_drink(42);
+
+    /* Borrowing is the default behavior but ownership can be transferred via
+    the `move` keyword. The primary use of this is to transfer a closure, and
+    everything it needs, to another thread. Multithreading will be discussed
+    later. */
+
+    let dessert = String::from("cheesecakes");
+    let closure_dessert = move |x: i32| println!("You have {x} {dessert}");
+
+    // println!("{dessert}"); // This fails.
+
+    /* At this point, the value "cheesecakes" has not been dropped. It is
+    instead bound to the identifier for the closure `closure_dessert`. Only
+    once `closure_dessert` falls out of scope will the value be dropped. */
+
+    /* Because closures are bound by let declarations, they are part of the
+    dynamic environment along with the let values. As such, they can "see" each
+    other.
+    
+    But just as entities from the dynamic environment can enclose one another,
+    functions can enclose other entities from the static environment. Both the
+    below static value and constant value exist in the same realm as the
+    function, so the function can indeed "enclose" them. */
+
+    const OUTER_CONST: i32 = 42;
+    static OUTER_STATIC: &str = "cookies";
+
+    fn function_enclosure() -> String {
+        format!("You have {OUTER_CONST} {OUTER_STATIC}")
+    }
+
+    /* Closures do not need type annotation. Since they exist within the
+    lexical scope, the Rust compiler can infer types based on how the closure
+    is used. This does not mean that the closure can be treated like a generic.
+    The compiler will in fact harden the types after the first use. */
+
+    let adder_closure = |x, y| {
+        x + y
+    };
+
+    let answer_integer = adder_closure(20, 22);
+    // let answer_float = adder_closure(2.0, 1.4159);
+
+    /* If you uncomment the above, you will get a type error. This is because
+    the usage of integers for `answer_integer` made the compiler infer the
+    types of `adder_closure` to be integers. Thus, from that point forward,
+    that is the type of `adder_closure`. This is true for all scopes in which
+    `adder_closure` is visible. This is a hard restriction. Even if you pass
+    `adder_closure` as a callback argument, the typing it acquires there will
+    apply henceforth. */
+
+    
+    /*** A Note On Idiomatic Rust ***/
+
+    /* The idiomatic use of closures in Rust is for small pieces of behavior
+    that exist in small contexts. For example, a great many Rust libraries
+    accept zero-parameter functions as arguments. These are usually written as
+    inline, unbound closures. If coming from JavaScript, this will be
+    exceedingly familiar with the .then() syntax.
+    
+    That said, the Rust compiler is intelligent. The ultimate difference
+    between a closure with no captured values and a function is very small.
+    While only using closures in restricted scenarios is considered idiomatic,
+    if you want to use them in nearly every scenario, there is no real
+    downside. */
+
+
+    /*** Function Pointers ***/
+
+    /* Orindary functions are not exactly first-class citizens in the sense that
+    they can be passed as values, but _pointers_ to those functions can be.
+    These are aptly-named "function pointers." A discussion of these needs to
+    include information on "smart pointers" first, so they have a dedicated
+    section later. */
+
+
+    /*** panic! ***/
+
+    /* While most errors will be handled with Results or Options, there are
+    always scenarios where the failure should be terminal. For these situations,
+    Rust has `panic!()`. panic is a macro that, when called, terminates the
+    process in which it is called and "unwinds" its stack. Basically,
+    everything in scope is destroyed and memory is freed. Since a panic exits
+    the control flow of the program, the reason for the panic is likely unique,
+    and thus the only information required by the compiler is a string. The key
+    thing to remember is that if a function panics, the function that called
+    the panic will also unwind. */
+
+    fn maybe_panic() {
+        println!("I'm looking for an answer");
+        let what_im_looking_for = if rand::random::<bool>() {
+            panic!("I panicked!")
+        } else {
+            42
+        };
+        println!("I found what I'm looking for. It's {what_im_looking_for}")
+    }
+
+    maybe_panic();
+
+    /* If the above panics, the main thread is unwound and the rest of the
+    program will not run.
+    
+    Panic should be a relatively rare tool, because most of the time you want
+    to catch and handle errors. Panics should be used when your logic
+    determines that the program has entered an entirely unexpected state. In
+    essense, panics in Rust are what exceptions in other languages _should_ be:
+    the machine state has fallen out of alignment with the symbolic state.
+    Panics are used to fail tests. */
+
 }
 
 #[allow(unused_variables)]
@@ -1119,7 +1460,7 @@ fn type_structures() {
     /*** Structs ***/
     
     /* A struct is a grouping of entities under a single name and usually
-    sitting together in memory. The terminology and symblic nature are from C,
+    sitting together in memory. The terminology and symbolic nature are from C,
     which itself took the concept from ALGOL.
 
     From the developer perspective, a struct is like a blueprint that is built
@@ -1175,13 +1516,45 @@ fn type_structures() {
     /*** Struct Updating ***/
 
     /* Structs can be partially copied with spread-like syntax that should be
-    familiar to JavaScript developers. Be aware of ownership, though. `name`
-    and `display_name` are now no longer valid on `a_user`. */
+    familiar to JavaScript developers. Be aware of ownership, though. `name`,
+    `display_name`, and `bank_balance` are now no longer valid on `a_user`. */
 
     let another_user = UserData {
         id: String::from("efg456"),
         ..a_user
     };
+
+    
+    /*** Tuples ***/
+
+    /* In Rust, tuples are considered a form of struct. I disagree with this
+    and think that it comes from the conflating of OCaml and C terminology. In
+    Rust, "struct" is used in a broadly similar way to "type" in OCaml, as
+    illustrated above with the unit struct, but because structs represent
+    physical memory, the analogy necessarily breaks.
+    
+    Like a traditional struct, a tuple contains data packed together in memory,
+    but unlike a struct, the constituents of the tuple are unnamed. Instead,
+    they are defined by their order. */
+
+    struct ATuple (String, i32);
+    let the_answer = ATuple(String::from("The answer is "), 42);
+
+    /* An important difference between structs and tuples, and a major reason
+    why I think calling tuples a form of struct is a mistake, is that tuples can
+    be instantiated _without_ a declared struct type. */
+    
+    let an_untyped_tuple = ("The answer is ", 42);
+
+    /* The above will evaluate to an anonymous type of (&str, i32). There are
+    good reasons for why tuples can be type-inferred like integers or strings
+    while structs cannot. My criticism is not with the implementation. It is
+    with the term usage because terms are important. */
+
+    /* Tuples can be dot-accessed with a zero-based index, similar to arrays or
+    lists in some other languages. */
+
+    let the_tuple_says = an_untyped_tuple.1; // 42
 
 
     /*** Unit Struct ***/
@@ -1190,7 +1563,10 @@ fn type_structures() {
     identifier and value in both the logic and the type structure, was to have
     _unbound_ type identifiers that had no values. These are known as
     _abstract_ types. In Rust, the language is a bit muddled and they instead
-    refer to them as "unit structs". A discussion of `unit` will come later.
+    refer to them as "unit structs". They are a struct with nothing in them, 
+    and since `unit` is represented as an empty tuple, which is a struct,
+    
+    called a unit struct: it is actually an alias for `unit`.
 
     The below struct is a unit struct. Any entity using this struct does not
     need to know its structure just so long as usage of the type is consistent.
@@ -1228,38 +1604,6 @@ fn type_structures() {
     types." These are addressed later because they do not work at the moment. */
 
 
-    /*** Tuples ***/
-
-    /* In Rust, tuples are considered a form of struct. I disagree with this
-    and think that it comes from the conflating of OCaml and C terminology. In
-    Rust, "struct" is used in a broadly similar way to "type" in OCaml, as
-    illustrated above with the unit struct, but because structs represent
-    physical memory, the analogy necessarily breaks.
-    
-    Like a traditional struct, a tuple contains data packed together in memory,
-    but unlike a struct, the constituents of the tuple are unnamed. Instead,
-    they are defined by their order. */
-
-    struct ATuple (String, i32);
-    let the_answer = ATuple(String::from("The answer is "), 42);
-
-    /* An important difference between structs and tuples, and a major reason
-    why I think calling tuples a form of struct is a mistake, is that tuples can
-    be instantiated _without_ a declared struct type. */
-    
-    let an_untyped_tuple = ("The answer is ", 42);
-
-    /* The above will evaluate to an anonymous type of (&str, i32). There are
-    good reasons for why tuples can be type-inferred like integers or strings
-    while structs cannot. My criticism is not with the implementation. It is
-    with the term usage because terms are important. */
-
-    /* Tuples can be dot-accessed with a zero-based index, similar to arrays or
-    lists in some other languages. */
-
-    let the_tuple_says = an_untyped_tuple.1; // 42
-
-
     /*** Struct Methods ***/
 
     /* As mentioned, structs are just grouped data. They are not like classic
@@ -1295,7 +1639,7 @@ fn type_structures() {
     added to a type or interface. In Rust they are separate. Traits are how
     shared behavior can be defined. For example, a for_each() method can be
     defined that can be implemented for any entity. The specific implementation
-    for each entity type may be different, but they share the name and
+    for each entity type may be different, but they share the same name and
     signature. */
 
     trait Extend {
@@ -1312,11 +1656,16 @@ fn type_structures() {
     impl Extend for Square {
         fn extend(&self, amount: f64) -> f64 {
             let area = self.area();
+            println!("Extend method!");
             area * amount
         }
         // Since say_something has a default implementation, it does not need to
         // be specified here.
     }
+
+   /* Even though the function names in a trait do not need to be unique
+    across all traits, if you attempt to implement two trait blocks with
+    colliding names, Rust will throw an error and fail to compile. */
 
     let new_square = Square{
         width: 5.0,
@@ -1351,7 +1700,10 @@ fn type_structures() {
     /*** Supertraits ***/
 
     /* Traits can be tied to one another in a parent-child relationship,
-    meaning that if the child is implemented, so to must the parent. */
+    meaning that if the child is implemented, so too must the parent. I am
+    choosing to use the terms "parent" and "child" because it is easily
+    understandable. Rust uses the terms "supertrait" and "subtrait" where the
+    supertrait is the required trait. */
 
     trait Vehicle {
         fn honk() -> String;
@@ -1362,9 +1714,10 @@ fn type_structures() {
     }
 
     /* In the above, if Engine is implemented, Vehicle must also be
-    implemented. Just like trait type parameters, supertraits can contain
-    multiple traits via the `+` operator, e.g. Engine: Vehicle + Transmission.
-    */
+    implemented. As such, Vehicle is the supertrait and Engine is the subtrait.
+    
+    Just like trait type parameters, supertraits can contain multiple traits
+    via the `+` operator, e.g. Engine: Vehicle + Transmission. */
 
 
     /*** Union ***/
@@ -1411,12 +1764,13 @@ fn type_structures() {
         BMW,
     }
 
+    // Notice the double-colon. An enum is like a tiny module.
     let my_car: Car = Car::BMW;
 
     /* Each possible state of an enum is called a variant, since they are the
     varied ways in which an enum can exist. The variants are distinguished from
     one another via the aforementioned tag or discriminant. The above Car enum
-    has implicit discriminants, integers starting with 0. Thus, Ford is 0,
+    has implicit discriminants: integers starting with 0. Thus, Ford is 0,
     Toyota is 1, and BMW is 2. This should be familiar to anyone coming from
     TypeScript, C, C++, or really any number of languages. Discriminants can be
     any integer. */
@@ -1430,7 +1784,8 @@ fn type_structures() {
     /* Notice in the above enum how the three trucks were not declared as
     structs before. An enum necessarily contains other types, meaning that any
     variant that has not been previously declared is automatically declared as
-    a unit struct. More complex type structures can be represented as well. */
+    a unit struct. More complex type structures can be represented as well.
+    These structures will be discussed shortly. */
     
     enum Motorcycle {
         Harley{exhaust: String},
@@ -1438,18 +1793,19 @@ fn type_structures() {
         Honda{has_vanilla_ice: bool},
     }
 
-    /*** > Option ***/
+
+    /*** Option ***/
 
     /* I originally had Option in the section on language primitives. That is
-    how foundational it is to Rust's functioning. Option is discussed bere
+    how foundational it is to Rust's functioning. Option is discussed here
     because it is actually an enum, but one so common it is included with the
     language itself.
     
     As mentioned, Rust was inspired by functional languages, and one great
     thing in them is the ability to reliably represent nothing, as with unit,
     and also the _possibility_ of something or nothing. Whenever an Option is
-    used, what is actually passed is a "box" that either has the specified type
-    or is empty. This pattern enforces robust null checks.
+    used, what is actually passed is a "container" that either has the
+    specified type or is empty. This pattern enforces robust null checks.
     
     Further, Rust does not support optional arguments as it is found in many
     other languages. Instead, Options are used to again enforce type safety.
@@ -1474,7 +1830,7 @@ fn type_structures() {
 
     /* Rust differentiates its error types between "recoverable" and
     "unrecoverable" errors. Recoverable errors mean that the symbolic state of
-    the program is correct, something expected but undesriable has occured, and
+    the program is valid, something expected but undesirable has occured, and
     later control flows will direct the program into a state intended to handle
     the error. This form of error is handled with `Result`. Unrecoverable
     errors mean that the symbolic state of the system has been violated and as
@@ -1514,8 +1870,170 @@ fn type_structures() {
 
     let possible_result = generate_result();
 
-    /* NOTE: The value of enums like Option and Result will be discussed shortly
-    in the section on "Pattern Matching". */
+    // The Result is being opened with a closure function that will be discussed
+    // later. It is syntactically similar to TS/JS (x) => x === 42;
+    if possible_result.is_ok_and(|x| x == 42) {
+        println!("Result is the answer!");
+    }
+
+    /* NOTE: The value of enums like Option and Result, and how to effectively
+    consume them, will be discussed shortly in the section on "Pattern
+    Matching". */
+
+}
+
+#[allow(unused_variables)]
+#[allow(dead_code)]
+fn pattern_matching() {
+
+    /*----------------------------------------------
+    * Pattern Matching
+    *-----------------------------------------------
+    */
+
+    /* Along with the usual forms of control flow, Rust includes the positively
+    divine semantics of pattern matching. Pattern matching is the use of a
+    "pattern" that is used to analyze something and determine the next step in
+    the logical flow. The basic matching concept is similar to a regex, but
+    full-featured pattern matching is much more powerful. To initially
+    illustrate, let's use the Option from earlier. */
+
+    fn generate_answer() -> Option<i32> {
+        if rand::random::<bool>() {
+            Some(42)
+        } else {
+            None
+        }
+    }
+
+    let possible_answer = generate_answer();
+
+    if possible_answer == Some(42) {
+        println!("The answer is 42")
+    }
+    
+    match possible_answer {
+        Some(x) => println!("There is an answer and it is {x}!"),
+        None => println!("There is no answer"),
+    }
+
+    /* Notice how the `Some()` is unpacked and its contents are given an
+    identifier? Seems a bit heavy, no? The Rust team agrees. Options were
+    common enough to earn inclusion in the language, and as such specialized
+    syntax was also included for consuming them: the `if let`.
+    
+    `if let` allows for the `None` case to be silently ignored. If you delete
+    the `None` part of the above `match`, you will get an error because the
+    match cases are not exhaustive. You _must_ handle all possible cases in a
+    match. */
+
+    if let Some(x) = possible_answer {
+        println!("There is an answer and it is {x}!")
+    }
+
+    // The same syntax can be used to implement a while loop.
+    let mut random = Some(rand::random::<bool>());
+    while let Some(true) = random {
+        println!("It's true!");
+        random = Some(rand::random::<bool>());
+    }
+
+    /* Just as Option has syntax shorthand, so does Result. Instead of having
+    to chain `match` expressions, a call that could return an `Err()` can
+    simply have ? appended to it. In the below, both `result` and
+    `another_result` can return errors. Chaining matches results in deeply
+    nested pyramids almost like the old "Callback Hell" of JavaScript. With the
+    `?`, if the error occurs, the function simply returns that error. Think of
+    this like shorthand for a try/catch block. */
+
+    enum ResultError {
+        ErrOne(String),
+        ErrTwo(String),
+    }
+
+    type TestResult = Result<i32, ResultError>;
+
+    fn generate_result() -> TestResult {
+        if rand::random::<bool>() {
+            Ok(42)
+        } else {
+            Err(ResultError::ErrTwo(String::from("There was no answer")))
+        }
+    }
+
+    fn check_result() -> TestResult {
+        let result: i32 = generate_result()?;
+        let another_result: i32 = generate_result()?;
+
+        Ok(result + another_result)
+    }
+
+    let final_result = check_result();
+
+    // if let syntax works for Results as well.
+    if let Ok(value) = final_result {
+        println!("Final result is {}", value)
+    }
+
+    // You can then use the .is_ok_and() function from the earlier type
+    // structures section to validate.
+    if final_result.is_ok_and(|x| x == 84) {
+        println!("Final result is twice the answer!");
+    }
+
+    /* As mentioned earlier, optional arguments for functions require the use
+    of Option(), which is best handled with pattern matching. Options _can_ be
+    unsafely unwrapped, but since you shouldn't do that, I won't show you how.
+    If you desire forbidden knowledge, see the official docs.
+
+    Again, if coming from a more free-wheeling language, this inability to
+    elide arguments may seem overly restrictive, but it is those very
+    restrictions that provide the extreme safety that is Rust's party piece.
+    Learn it, live it, love it. */
+
+    fn optional_args(op_arg: Option<i32>) {
+        if let Some(val) = op_arg {
+            println!("Found optional argument {val}")
+        } else {
+            println!("Found no argument")
+        }
+    }
+
+    optional_args(None);
+    optional_args(Some(42));
+
+    /* The real power of pattern matching comes from more complex scenarios. */
+
+    enum Magic {
+        MagicMissile(i32),
+        Fireball(i32),
+        LightingBolt(i32),
+    }
+
+    fn generate_spell(spell: Magic) {
+        match spell {
+            Magic::MagicMissile(x) => println!("You cast magic missile and do {x} damage"),
+            Magic::Fireball(x) => println!("You cast fireball and do {x} damage"),
+            Magic::LightingBolt(x) => println!("You cast lighthing bolt and do {x} damage"),
+        }
+    }
+
+    fn cast_spell() {
+        let mut rng = rand::thread_rng();
+        let spell = rng.gen_range(1..3);
+        let power = rng.gen_range(0..99);
+        match spell {
+            1 => generate_spell(Magic::MagicMissile(power)),
+            2 => generate_spell(Magic::Fireball(power)),
+            3 => generate_spell(Magic::LightingBolt(power)),
+            // This catch-all is required since the compiler does not know that
+            // the value is within 1 to 3, it only knows i32. The choice of
+            // `other` is arbitrary.
+            other => println!("Invalid value of {other} submitted"),
+        }
+    }
+
+    cast_spell();
 }
 
 #[allow(unused_assignments)]
@@ -1562,7 +2080,8 @@ fn lifetimes() {
     equal or greater_ lifetime. */
         
     /* Lifetime annotations do not change an entity's lifetime. Instead, they
-    are saving an entity's lifetime as an identifier. See the below: */
+    are saving an entity's lifetime as an identifier. See the below, and take
+    time to read it over: */
 
     fn some_function<'a>(x: &'a str, y: &'a str) -> &'a str {
         if rand::random::<bool>() {
@@ -1580,8 +2099,34 @@ fn lifetimes() {
     the return value will have that lifetime as well. Essentially identical
     syntax is applied to implementation blocks.
     
-    Lifetime annotations are not needed in many scenarios. The compiler will
-    hold your hand. */
+    Lifetime annotations are not needed in many, if not most, scenarios. The 
+    compiler will hold your hand. In the above example, the annotations are
+    required only because the function _returns_ a reference and the compiler
+    needs to know if the return value is of x's or y's lifetimes. In this
+    scenario, since the function randomly returns either x or y, their lifetimes
+    must either be identical or one must be explicitly set as greater. The
+    syntax for this is similar to supertraits' super/sub structure but the
+    semantics are slightly different.
+    
+    With traits, declaring a subtrait requires the implementation of its
+    supertraits. In lifetimes, since lifetimes do not need to be implemented by
+    the programmer, simply declaring them acts as the implementation. */
+
+    fn some_more_function<'a, 'b: 'a>(x: &'a str, y: &'b str) -> &'a str {
+        if rand::random::<bool>() {
+            x
+        } else {
+            y
+        }
+    }
+
+    /* In the above, 'a is a supertype to b', meaning that 'b must include at
+    least all of 'a. Stated plainly, the lifetime 'b must be at least as long as
+    'a. That is why, if you change the return lifetime to 'b, x will throw a
+    compiler error saying that the lifetime of 'a may not be long enough.
+    
+    There is significant complexity in how sub and super lifetimes relate to one
+    another. Look up liftime variance in the official docs to learn more. */
 
 
     /*** Static ***/
@@ -1593,149 +2138,10 @@ fn lifetimes() {
     also has a static lifetime. This is because literals are part of the binary
     and are thus necessarily always in memory. */
 
+    // Neither the type or the lifetime annotations are necessary. This simply
+    // shows what is already there. You could remove both and change nothing.
     let static_string: &'static str = "Getting nothing but static on channel Z";
 
-}
-
-#[allow(unused_variables)]
-#[allow(dead_code)]
-fn pattern_matching() {
-
-    /*----------------------------------------------
-    * Pattern Matching
-    *-----------------------------------------------
-    */
-
-    /* ALong with the usual forms of control flow, Rust includes the positively
-    divine semantics of pattern matching. Pattern matching is the use of a
-    "pattern" that is used to analyze something and determine the next step in
-    the logical flow. The basic matching concept is similar to a regex, but
-    full-featured pattern matching is much more powerful. To initially
-    illustrate, let's use the Option from earlier. */
-
-    fn generate_answer() -> Option<i32> {
-        if rand::random::<bool>() {
-            Some(42)
-        } else {
-            None
-        }
-    }
-
-    let possible_answer = generate_answer();
-
-    if possible_answer == Some(42) {
-        println!("The answer is 42")
-    }
-    
-    match possible_answer {
-        Some(x) => println!("There is an answer and it is {x}!"),
-        None => println!("There is no answer"),
-    }
-
-    /* Notice how the `Some()` is unpacked and its contents are given an
-    identifier? Seems a bit heavy, no? The Rust team agrees. Options were
-    common enough to earn inclusion in the language, and as such specialized
-    syntax was also included for consuming them: the `if let`.
-    
-    `if let` allows for the `None` case to be silently ignored. If you delete
-    the `None` part of the above `match`, you will get an error because the
-    match cases are not exhaustive. You _must_ handle all possible cases. */
-
-    if let Some(x) = possible_answer {
-        println!("There is an answer and it is {x}!")
-    }
-
-    // The same syntax can be used to implement a while loop.
-    let mut random = Some(rand::random::<bool>());
-    while let Some(true) = random {
-        println!("It's true!");
-        random = Some(rand::random::<bool>());
-    }
-
-    /* Just as Option has syntax shorthand, so does Result. Instead of having
-    to chain `match` expressions, a call that could return an `Err()` can
-    simply have ? appended to it. In the below, both `result` and
-    `another_result` can return errors. Chaining matches results in deeply
-    nested pyramids almost like the old "Callback Hell" of JavaScript. With the
-    `?`, if the error occurs, the function simply returns that error. Think of
-    this like shorthand for a try/catch block. */
-
-    enum ResultError {
-        ErrOne(String),
-        ErrTwo(String),
-    }
-
-    type TestResult = Result<i32, ResultError>;
-
-    fn generate_result() -> TestResult {
-        if rand::random::<bool>() {
-            Ok(42)
-        } else {
-            Err(ResultError::ErrTwo(String::from("There was no answer")))
-        }
-    }
-
-    fn check_result() -> TestResult {
-        let result: i32 = generate_result()?;
-        let another_result: i32 = generate_result()?;
-
-        Ok(result + another_result)
-    }
-
-    let final_result = check_result();
-
-    /* As mentioned earlier, optional arguments for functions require the use
-    of Option(), which is best handled with pattern matching. Options _can_ be
-    unsafely unwrapped, but since you shouldn't do that, I won't show you how.
-
-    Again, if coming from a more free-wheeling language, this inability to
-    elide arguments may seem overly restrictive, but it is those very
-    restrictions that provide the extreme safety that is Rust's party piece.
-    Learn it, live it, love it. */
-
-    fn optional_args(op_arg: Option<i32>) {
-        if let Some(val) = op_arg {
-            println!("Found optional argument {val}")
-        } else {
-            println!("Found no argument")
-        }
-    }
-
-    optional_args(None);
-    optional_args(Some(42));
-
-    /* The real power of pattern matching comes from more complex scenarios. */
-
-    enum Magic {
-        MagicMissile(i32),
-        Fireball(i32),
-        LightingBolt(i32),
-    }
-
-    fn generate_spell(spell: Magic) {
-        match spell {
-            Magic::MagicMissile(x) => println!("You cast magic missile and do {x} damage"),
-            Magic::Fireball(x) => println!("You cast fireball and do {x} damage"),
-            Magic::LightingBolt(x) => println!("You cast lighthing bolt and do {x} damage"),
-        }
-    }
-
-    fn cast_spell() {
-        let mut rng = rand::thread_rng();
-        let spell = rng.gen_range(1..3);
-        let power = rng.gen_range(0..99);
-        match spell {
-            1 => generate_spell(Magic::MagicMissile(power)),
-            2 => generate_spell(Magic::Fireball(power)),
-            3 => generate_spell(Magic::LightingBolt(power)),
-            // This catch-all is required since the compiler does not know that
-            // the value is within 1 and 4, it only knows i32. The choice of
-            // `other` is arbitrary.
-            other => println!("Invalid value of {other} submitted"),
-        }
-    }
-
-    cast_spell();
 }
 
 #[allow(dead_code)]
@@ -1767,13 +2173,18 @@ fn opaque_types() {
     /* In the above function, the parameter `x` is restricted to all types that
     implement the `ToString` trait. The function then returns any type that
     likewise implements ToString. The returned &str implements ToString, so
-    this works, as does the integer below it. The array below that does not
+    this works, as does the integer 42 below it. The array below that does not
     implement ToString and thus fails. Similar logic applies to arguments. 
     
     An important point to recognize is that while the return type is restricted
     to types that implement ToString, the function evaluation must collapse
     down to a single type. This type is called the "hidden" type, since it is
-    not visible in the annotations. */
+    not visible in the annotations.
+    
+    You may be wondering, if the function must collapse down to a type, why
+    do we not simply use that type? By keeping the signature as small as
+    possible, we are free to refactor the function while only having to concern
+    ourselves with that single exposed implementation. */
 
     fn two_hidden_types(x : bool) -> impl ToString {
         if x {
@@ -1800,17 +2211,34 @@ fn opaque_types() {
 
     /*** Monomorphization & Zero-Cost Abstractions ***/
     
-    /* The reason for the difference between specific_function() and two_hidden_types() is a process that the Rust compiler does called "monomorphization." This is in contrast to the code that a developer writes, which is called "polymorphic." Polymorphic means "many forms" and describes specific_function() very well. The types that the function can accept take many forms, thus the function is flexible. But truly polymorphic code, as the default behavior of a function in JavaScript, suffers performance penalties, and Rust's goal is to be fast. Thus, the Rust compiler will take polymorphic code and transform it into "monomorphic" code. By that, I mean the compiler will create multiple versions of specific_function(), one for each use. For example: */
+    /* The reason for the difference between specific_function() and
+    two_hidden_types() is a process that the Rust compiler does called
+    "monomorphization." This is in contrast to the code that a developer
+    writes, which is called "polymorphic." Polymorphic means "many forms" and
+    describes specific_function() very well. The types that the function can
+    accept take many forms, thus the function is flexible. But truly
+    polymorphic code, as the default behavior of a function in JavaScript,
+    suffers performance penalties, and Rust's goal is to be fast. Thus, the
+    Rust compiler will take polymorphic code and transform it into
+    "monomorphic" code. By that, I mean the compiler will create multiple
+    versions of specific_function(), one for each use. For example: */
 
     specific_function(42);
     specific_function("a string");
     specific_function('Z');
 
-    /* When compiled, a version of specific_function() that accepts an integer, a string, and a char will be generated. Thus a polymorphic function is turned into three monomorphic functions. This requires more memory but provides a significant speed benefit.
+    /* When compiled, a version of specific_function() that accepts an integer,
+    a string, and a char will all be generated. Thus a polymorphic function is
+    turned into three monomorphic functions. This requires more memory but
+    provides a significant speed benefit.
 
-    The monomorphic transformation can easily generate functions that _accept_ different types, but because a function can be arbitrarily complex, it cannot generate functions that _return_ different types.
+    The monomorphic transformation can easily generate functions that _accept_
+    different types, but because a function can be arbitrarily complex, it
+    cannot generate functions that _return_ different types.
 
-    This monomorphic transformation by the compiler is what is meant by Rust's motto of "zero-cost abstractions." They are abstractions that only exist in the code. To call them powerful syntactic sugar is accurate. */
+    This monomorphic transformation by the compiler is what is meant by Rust's
+    motto of "zero-cost abstractions." They are abstractions that only exist in
+    the code. To call them powerful syntactic sugar is accurate. */
 }
 
 #[allow(dead_code)]
@@ -1830,17 +2258,25 @@ fn smart_pointers() {
 
     /* Box is the standard smart pointer and is extremely common in Rust
     codebases. It is a simple "box" that contains data of unknown size. The box
-    can then be filled. If coming from C, think of it like the more symbolic
-    version of `malloc`. */
+    can then be filled with data from the heap. If coming from C, think of it
+    like the more symbolic version of `malloc`. */
 
     let boxed_int = Box::new(42);
     // Use of the box automatically, and safely, dereferences the pointer.
     println!("The box contains {boxed_int}");
 
-    /* Because pointers are fixed size, they can be used in data structures
-    with values of unknown size, like in a linked list. In the below, we cannot
-    have a potentially infinite recursion of next nodes, so `next` simply
-    points to another node. */
+    /* Because pointers are of fixed size, they can be used in data structures
+    where values of unknown size need to be represented, like in a linked list.
+    In the below example, the compiler cannot understand `next` as content of
+    known size. We have theoretically infinite recursion, while the compiler
+    needs bounds. Indeed, if you remove the Box, you will get an error flagging
+    recursion without indirection.
+    
+    Indirection will be discussed later, for now, it basically means a dynamic
+    part of the code. Basically, recursion cannot be statically analyzed. It
+    can only be determined at runtime, which means the _dynamic_ part of the
+    code. We let the compiler know that the length of this list of items will be
+    determined at runtime by putting the next in a box. */
 
     struct LinkedList<T> {
         head: LinkedListNode<T>,
@@ -1880,10 +2316,12 @@ fn smart_pointers() {
     Reference counters must be instantiated, meaning that they cannot be boxed
     inside of the nodes. Each node must be an independent counter. Below, all
     three nodes are instantiated as counters, thus allowing an arbitrary number
-    of other nodes to point to them. The call to Rc::clone does not actually
-    clone the data, it simply increments the counter. I don't know why they
-    chose that word. Note that the value of `next` requires a reference, as
-    denoted by the ampersand. */
+    of other nodes to point to them.
+    
+    The call to Rc::clone does not actually clone the data, it simply
+    increments the counter that is passed in as the argument. I don't know why
+    they chose that word. Note that the value of `next` requires a reference,
+    as denoted by the ampersand. */
 
     struct SimpleRCNode<T> {
         value: T,
@@ -1922,7 +2360,7 @@ fn smart_pointers() {
     desirable. Chances are, you will never need this pattern, so while the Rust
     docs dedicate a significant amount of time to this scenario, and even
     specify a solution in the form of a "weak" reference, you should really
-    just be aware of it so you can avoid it. */
+    just be aware of it so you can not do it. */
 
 
     /*** Mutexes ***/
@@ -1933,6 +2371,120 @@ fn smart_pointers() {
 }
 
 #[allow(unused_variables)]
+#[allow(dead_code)]
+fn function_pointers_and_dynamic_dispatch() {
+    
+    /*** First Class Functions & Dynamic Dispatch ***/
+
+    /* Just as with most modern languages, Rust allows passing functions as
+    values. Anonymous functions are truly first class and are passed like any
+    other value, but regular functions can be passed as "function pointers,"
+    which are precisely that: pointers to a function sitting in memory. */
+
+    // First, let's create and return a closure just like JavaScript.
+
+    // The Box and dyn keyword will be discussed shortly.
+    fn get_closure() -> Box<dyn Fn() -> i32> {
+        Box::new(|| 42)
+    }
+
+    let a_closure = get_closure();
+
+    // Remember that naively consuming a Box automatically dereferences it.
+    let value_from_closure = a_closure(); // 42
+
+    // Now let's return a function pointer.
+
+    fn a_function() -> i32 {
+        42
+    }
+
+    // Just returning the uncalled function returns the pointer.
+    fn get_function() -> fn() -> i32 {
+        a_function
+    }
+
+    let a_function = get_function();
+    let value_from_function = a_function(); //42
+
+    // Function pointers can also serve as simple aliases.
+    let a_function_alias = a_function;
+    let another_value_from_function = a_function_alias(); // 42
+
+    /* Because function pointers are of constant size, they can be included on
+    structs without any special considerations. */
+
+    struct Strunction {
+        func: fn(x: i32) -> i32,
+        val: i32,
+    }
+
+    /* Now let's compare the type signatures of the closure and function.
+    
+    The type signature for `get_function()` makes sense. Functions are declared
+    with fn, thus a function pointer is typed with fn. But the signature for
+    `get_closure()` uses a capital F. This is because a closure is actually a
+    trait. Closures are compiled into struct instances with a method attached
+    to them that contains the actual logic of your closure. As such, the type
+    signature of the closure is as a trait on that struct. If you return to the
+    function section and analyze the implicit types of the anonymous functions,
+    you will see that they are `impl Fn()`.
+    
+    Even though closures are traits, and the earlier implicit type signatures
+    display `impl`, the `impl` keyword is not explicitly used because, as
+    mentioned when discussing opaque types and monomorphization, when `impl` is
+    used in a function signature's return type, that signature represents an
+    underlying concrete type. Closures have no underlying type because they are
+    a part of the dynamic realm and thus the trait must be determined at
+    runtime.
+    
+    We must place that trait on the heap in our code, so we achieve that
+    by putting the trait into a Box. When pointing to a trait that exists on
+    the heap, it is referred to as a "trait object." 
+    
+    Theoretically, we could use the `impl` keyword and allow the context to
+    determine its meaning, but intending to not overload terms, the `dyn`
+    keyword was created to more clearly differentiate between implementations
+    and trait objects. */
+
+    /*** Dynamic Dispatch ***/
+
+    /* Trait objects are Rust's way of handling what is known as "dynamic
+    dispatch." If you are coming from JavaScript, or any scripting language,
+    the concept of dispatch will be new to you. In compiled languages, there is
+    a distinction between knowing what function will run, i.e. be dispatched,
+    at compile time versus at runtime. For example, if an integer is greater
+    than 0, function A will run, and function B will run if less than 0. The
+    compiler does not necessarily know the value of the integer, but it doesn't
+    need to. It knowns both roads perfectly, so it can walk either one equally
+    quickly.
+    
+    But if the _function_ is not known, the compiler needs to find out what
+    road it is to walk. If the function called is determined at compile time,
+    it is called "static dispatch," meaning the behavior that is "dispatched"
+    never changes. Dyanmic dispatch is the opposite of that. A synonymous
+    description is "early binding" versus "late binding," where binding refers
+    to the act of binding a value or behavior to an identifier. For example,
+    `let x = 42;`. Rust's compiler knows that `x` is `42`, so it does not
+    bother to check the value of `x` when running. This check is called
+    "indirection." In JavaScript, every call to `x` theoretically requires the
+    runtime to check `x` to see its value, although in practice runtimes will
+    attempt to optimize this away.
+    
+    Dynamic dispatch provides significant flexibility in how a program runs but
+    achieves it with a performance hit that can be similarly significant. In
+    languages such as Python or JavaScript, the dispatch consideration is
+    completely hidden. By and large, Rust's structure negates the need to
+    consider dispatch. As mentioned, one of Rust's goals was "zero-cost
+    abstractions," meaning that Rust features many very high-level language
+    structures with great flexibility, but these "polymorphic" abstractions are
+    made "monomorphic" at compile time. This means code can feel as though it
+    is dynamically dispatching procedures while all functionality is actually
+    static. */
+}
+
+#[allow(unused_variables)]
+#[allow(dead_code)]
 fn modules_and_crates() {
     /*----------------------------------------------
     * Modules
@@ -1979,14 +2531,7 @@ fn modules_and_crates() {
             } 
         }
     }
-
-    /* Neither get_thing() nor PublicStruct are accessible outside of that
-    module by simply calling their names, even though this module is a child of
-    the main() function.
-
-    The only thing that exists within the scope of main() is the module itself.
-    As such, any usage of that module must call the module. */
-    
+   
     let new_thing = stuff::PublicStruct {
         x: 42,
         y: 2001,
@@ -1998,31 +2543,139 @@ fn modules_and_crates() {
 
     let i_got_a_thing = stuff::get_thing(); // type of PrivateStruct
 
-    /* As mentioned earlier, having modules sit next to one another can be
-    confusing because it makes it seem like they can see one another. They
-    cannot because they only exist next to each other in the code. See below. */
+    /* As mentioned earlier, having modules sit next to one another in a
+    function can be confusing because it makes it seem like they can see one
+    another. They cannot because they only exist next to each other in the
+    code. See below. */
 
     mod more_stuff {
-        pub struct MoreStuff {
-            x: i32,
-            y: i32,
+        pub struct Square {
+            pub x: i32,
+            pub y: i32,
+        }
+        impl Square {
+            pub fn area(&self) -> i32 {
+                self.x * self.y
+            }
         }
     }
 
     mod even_more_stuff {
-        // impl more_stuff::MoreStuff {
-        //     fn area(&self) {
+        // This does not work.
+        // impl more_stuff::Square {
+        //     pub fn area(&self) -> i32 {
         //         self.x * self.y
         //     }
         // }
     }
 
     /* `even_more_stuff` has no way to see `more_stuff`, even though it seems
-    like it should. The complete inability of them to see each other is
-    actually a side-effect of their being declared within a function.
+    like it should. 
     
-    Similar modules have been declared outside of the function at the bottom of
-    this file to illustrate how modules can interact. Go there now. */
+    Modules are items, meaning they are a part of the static domain. If you
+    analyze MoreStuff, you will see that its fully qualified name is actually
+    `rust_quick_guide::more_stuff::MoreStuff`.
+    
+    Name resolution works as a tree of modules. `more_stuff` and
+    `even_more_stuff` are thus a part of the root module. But since they are
+    inside a function, they are scoped to that function. When inside a scope,
+    in this case a function, modules become "local modules."
+        
+    _Scope_ resolution operates on top of name resolution. And since modules
+    are also isolated from their surroundings, a module needs to import its
+    dependencies via the `use` keyword as seen at the top of this file. But
+    since there is no way to resolve a function-scoped name inside a module,
+    there is no way for two modules to actually see each other.
+
+    Further, since scope resolution operates on top of name resolution, the
+    root scope, aka `rust_quick_guide::`, can actually have two modules with
+    the same fully qualified name just so long as they are in different scopes.
+    */
+
+    let new_stuff = more_stuff::Square {
+        x: 2,
+        y: 3,
+    };
+    
+    /* To illustrate, just below this function, there is a nearly identical
+    copy of `more_stuff`. If you comment out the `more_stuff` module above, the
+    `new_stuff` instantiation will fail but not because it cannot find
+    `more_stuff`. Instead, the compiler does not find `more_stuff` in this
+    scope, so it traverses up the scope tree to the root scope, where it finds
+    a slightly different `more_stuff`, where instead of `x` and `y`, it has `a`
+    and `b`, thus throwing that error. */
+
+
+    /* More modules have been declared outside of and below this function to
+    illustrate how modules can, and really should, interact. */
+
+}
+
+#[allow(dead_code)]
+mod more_stuff {
+    pub struct Square {
+        pub a: i32,
+        pub b: i32,
+    }
+    impl Square {
+        pub fn area(&self) -> i32 {
+            self.a * self.b
+        }
+    }
+}
+
+/* This content is part of the modules_and_crates section in the above
+function. Do not read it separately.
+
+These modules are not nested inside of a function. They are in the base scope of
+the file and thus exist on the module level. They can thus see each other. */
+
+#[allow(unused_variables)]
+#[allow(unused_assignments)]
+#[allow(dead_code)]
+mod external_stuff {
+    pub struct Stuff {
+        pub x: i32,
+        pub y: i32,
+    }
+}
+
+#[allow(dead_code)]
+mod more_external_stuff {
+    // A use path that references the crate can be used, but you can use fully
+    // qualified names in-line as well.
+    use crate::external_stuff::Stuff;
+
+    pub fn get_stuff() -> Stuff {
+        Stuff {
+            x: 42,
+            y: 2001,
+        }
+    }
+
+    // super:: can also be used. It references the _parent_ module, unlike the
+    // use crate:: above, which references the root of the project.
+    pub fn get_stuff_2() -> super::external_stuff::Stuff {
+        super::external_stuff::Stuff {
+            x: 42,
+            y: 2001,
+        }
+    }
+
+    mod nested_module {
+        pub struct NestedStuff {
+            pub x: i32,
+            pub y: i32,
+        }
+    }
+
+    // To access sibling sub-modules, the self:: selector is used.
+    pub fn get_nested() -> self::nested_module::NestedStuff {
+        self::nested_module::NestedStuff {
+            x: 42,
+            y: 2001,
+        }
+    }
 }
 
 #[allow(unused_variables)]
@@ -2046,8 +2699,8 @@ fn basic_operators() {
     capabilities are not attached by default. The struct needs to be annotated
     with a #[derive] attribute that will generate the specified trait and attach
     it to the struct. Below, the PartialEq trait will be attached, thus allowing
-    three equality operations. If the attribute is commented out, authors_1, 2,
-    and 3 will fail to compile. */
+    three equality operations. If the attribute is commented out, authors_1, _2,
+    and _3 will fail to compile. */
 
     #[derive(PartialEq)]
     struct Author {
@@ -2111,410 +2764,9 @@ fn basic_operators() {
     What this means it that a developer can create a custom .eq() trait that
     will be called when the `==` operator is used.
     
-    Be careful when overloading operators. Things can get confusing quickly.*/
-
-}
-
-#[allow(dead_code)]
-#[allow(unused_variables)]
-fn functions() {
-    /*----------------------------------------------
-    * Functions
-    *----------------------------------------------
-    */
-
-    /* Rust is deeply inspired by functional languages, so unsurprisingly its
-    functions are distinctly different from many other languages, such as those
-    from the C family. This difference was briefly discussed earlier where the
-    semantic use of semicolons was pointed out.
-    
-    To reiterate, Rust has en explicit `return` statement as a concession to the
-    C tradition, but it also has implicit final return as denoted by the lack
-    of a semicolon. In most cases, the final statement of a block being used as 
-    its implicit return will be the ideal and idiomatic pattern.
-
-    All evaluation blocks, and thus all functions, _must_ return something. If
-    no final value is present, the block will return the special value `unit`,
-    which will be discussed shortly. (There is a special case known as the
-    `never` type that functions can also return, but this is esoteric and not
-    useful to discuss or learn in this tutorial)
-
-    For example, the below function has one evaluation block: the if/else. As
-    such, this entire block is actually the return of the function. The if/else
-    is composed of two evaluation blocks that each return a value. Thus, the
-    two booleans count as the final return value of the function. */
-
-    fn greater_than_42(x: i32) -> bool {
-        if x <= 42 {
-            false
-        } else {
-            true
-        }
-    }
-
-    /* It is important to note that, even though Rust has a return statement,
-    it applies only to the _function_ level, and not the level of general
-    evaluation blocks. And only through the return statement can early return be
-    achieved. To wit, while Rust allows a return statement, it restricts the
-    semantics to avoid mixing up paradigms. Within evaluation blocks, only
-    implicit returns are allowed, and Rust bars implicit early return.
-    
-    Let's break the below function to illustrate. */
-
-    fn less_than_42(x: i32) -> bool {
-        if x >= 42 {
-            // false
-            false
-        } else {
-            // return true;
-            true
-        }
-        // if x < 42 {
-        //     false
-        // } else {
-        //     true
-        // }
-    }
-
-    /* if the first `false` is uncommented, it would lack a semicolon, and
-    Rust's compiler would think that it is thus meant to be the block's return.
-    But since there is a statement _after_ that, it knows that it cannot be the
-    implicit return. It will thus throw a missing semicolon error.
-    
-    If the second if/else is uncommented, a similar problem arises. The second
-    if/else becomes the implicit return of the function block, and thus the
-    booleans contained therein become the return value of the entire function.
-
-    The compiler knows that the implicit returns of the first if/else block are
-    now not being caught by anything and will thus throw an error indicating
-    that an explicit `return`, to thus break out of the entire function, was
-    likely intended. This is why uncommenting the `return true` line does not
-    throw an error, but instead throws a warning of unreachable code.
-    
-    This illustrates how the need for an explicit return likely means that the
-    function has been poorly designed. Composing a function of evaluation blocks
-    that all return values, and having the function itself finally evaluate to a
-    final value, should be the ideal pattern. */
-
-
-    /*** Anonymous Functions ***/
-
-    /* Just like JavaScript and TypeScript, Rust functions can be "anonymous",
-    meaning that the function itself has no identifier, but is instead bound to
-    an identifier. The syntax is slightly different but likely very familiar to
-    TypeScript developers who frequently use fat arrow function syntax. */
-
-    let sign_up_to_newsletter = |email: &str| -> String {
-        format!("{} {}", String::from("Thanks for signing up"), email)
-    };
-
-    /* In JavaScript, the above would look like this:
-    
-        let sign_up_to_newsletter = (email: string) : string => {
-            return(`Thanks for signing up ${email}``);
-        };
-
-    */
-
-    sign_up_to_newsletter("hello@rust_lovers.org");
-
-    /* One of the most significant differences of Rust if coming from
-    JavaScript/TypeScript or Go is that functions cannot access values declared
-    outside of their scope. This is known as "capturing" a value. The common
-    term is "enclosing," to wit you are writing a "closure", a concept I am
-    sure many JavaScript developers remember from their job interviews. */
-
-    let outer_var = 22;
-
-    fn normal_function() -> i32 {
-        let inner_var = 22;
-        inner_var + 20 // This works.
-        // outer_var + 20 // This does not.
-    }
-
-    /* The above is not possible because a `let` binding is part of the
-    "dynamic" environment of the program. The dynamic environment is the part
-    of the program that can change based on how the program runs. The "static"
-    environment is the part of the program that is the same whenever the
-    application runs. Because functions are static items, they do not exist on
-    the same level as let declarations.
-    
-    If you are coming from TypeScript or JavaScript, you may interpret this as
-    similar to hoisting, and while that is not entirely wrong, it is not
-    entirely right. Functions do not get moved to the top of a scope, as they
-    do in JavaScript. Functions, like all items, are lifted into a different
-    realm. That said, the problems inherent to hoisting gives us a good
-    illustration for why Rust works as it does.
-
-        displayMessage();
-
-        let message = "a message for you";
-
-        function displayMessage() {
-            console.log(message);
-        }
-    
-    In the above JavaScript code, a function can be used before its
-    declaration. But this code will fail because the `displayMessage` call is
-    relying on `message`, which is declared _after_ the call. If Rust tried to
-    allow the usage of functions with outside values, the function would not be
-    able to know where to find this value. Thus, Rust simply prevents this.
-    
-    There are many uses for this pattern, though, and Rust allows it through
-    the use of the aforementioned anonymous functions. Unlike JavaScript, where
-    a function is only a closure if it encloses external values, Rust simply
-    calls all anonymous functions "closures" as a way to differentiate them
-    from normal functions. */
-
-    let food = String::from("cookies");
-    let closure_food = |x: i32| println!("You have {x} {food}");
-
-    // Values captured by closures are borrowed by default.
-
-    // let attempted_move = food; // This fails.
-    println!("{food}"); // A simple reference use succeeds.
-    
-    closure_food(42);
-
-    /* Just as earlier, mutable borrows are treated more strictly. Any closure
-    which mutates its mutable captured values must also be labeled with the
-    `mut` keyword and no references can be created between the declaration of
-    the closure and its use. */
-
-    let mut drink = String::from("coffee");
-    let mut closure_drink = |x: i32| drink.push('s');
-
-    // println!("{drink}"); // Simple references now fail.
-    closure_drink(42);
-
-    /* Borrowing is the default behavior but ownership can be transferred via
-    the `move` keyword. The primary use of this is to transfer a closure, and
-    everything it needs, to another thread. Multithreading will be discussed
-    later. */
-
-    let dessert = String::from("cheesecakes");
-    let closure_dessert = move |x: i32| println!("You have {x} {dessert}");
-
-    // println!("{dessert}"); // This fails.
-
-    /* At this point, the value "cheesecakes" has not been dropped. It is
-    instead bound to the identifier for the closure `closure_dessert`. Only
-    once `closure_dessert` falls out of scope will the value be dropped. */
-
-    /* Because closures are bound by let declarations, they are part of the
-    dynamic environment along with the let values. As such, they can "see" each
-    other.
-    
-    But Just as entities from the dynamic environment can enclose one another,
-    functions can enclose other entities from the static environment. Both the
-    below static value and constant value exist in the same realm as the
-    function, so the function can indeed "enclose" them. */
-
-    const OUTER_CONST: i32 = 42;
-    static OUTER_STATIC: &str = "cookies";
-
-    fn function_enclosure() -> String {
-        format!("You have {OUTER_CONST} {OUTER_STATIC}")
-    }
-
-    /* Closures do not need type annotation. Since they exist within the
-    lexical scope, the Rust compiler can infer types based on how the closure
-    is used. This does not mean that the closure can be treated like a generic.
-    The compiler will in fact harden the types after the first use. */
-
-    let adder_closure = |x, y| {
-        x + y
-    };
-
-    let answer_integer = adder_closure(20, 22);
-    // let answer_float = adder_closure(2.0, 1.4159);
-
-    /* If you uncomment the above, you will get a type error. This is because
-    the usage of integers for `answer_integer` made the compiler infer the
-    types of `adder_closure` to be integers. Thus, from that point forward,
-    that is the type of `adder_closure`. This is true for all scopes in which
-    `adder_closure` is visible. This is a hard restriction. Even if you pass
-    `adder_closure` as a callback argument, the typing it acquires there will
-    apply henceforth. */
-
-
-    /*** A Note On Idiomatic Rust ***/
-
-    /* The idiomatic use of closures in Rust is for small pieces of behavior
-    that exist in small contexts. For example, a great many Rust libraries
-    accept zero-parameter functions as arguments. These are usually written as
-    inline, unbound closures. If coming from JavaScript, this will be
-    exceedingly familiar with the .then() syntax.
-    
-    That said, the Rust compiler is intelligent. The ultimate difference
-    between a closure with no captured values and a function is very small.
-    While only using closures in restricted scenarios is considered idiomatic,
-    if you want to use them in nearly every scenario, there is no real
-    downside. */
-
-
-    /*** First Class Functions & Dynamic Dispatch ***/
-
-    /* Just as with most modern languages, Rust allows passing functions as
-    values. Anonymous functions are truly first class and are passed like any
-    other value, but regular functions can be passed as "function pointers,"
-    which are preicely that: pointers to a function sitting in memory. */
-
-    fn get_closure() -> Box<dyn Fn() -> i32> {
-        Box::new(|| 42)
-    }
-
-    let a_closure = get_closure();
-    let value_from_closure = a_closure(); // 42
-
-    fn a_function() -> i32 {
-        42
-    }
-
-    fn get_function() -> fn() -> i32 {
-        a_function
-    }
-
-    let a_function = get_function();
-    let value_from_function = a_function(); //42
-
-    // Function pointers can also serve as simple aliases.
-    let a_function_alias = a_function;
-    let another_value_from_function = a_function_alias(); // 42
-
-    /* Because function pointers are of constant size, they can be included on
-    structs without any special considerations. */
-
-    struct Strunction {
-        func: fn(x: i32) -> i32,
-        val: i32,
-    }
-
-    /* There are two things to note in the above: the usage of the `dyn`
-    keyword and the capital F in Fn for the closure example.
-    
-    The type signature for get_function() makes sense. Functions are declared
-    with fn, thus a function pointer is typed with fn. But the signature for
-    get_closure() uses a capital F. This is because a closure is actually a
-    trait. Closures are compiled into struct instances with a method attached
-    to them that contains the actual logic of your closure. As such, the type
-    signature of the closure is as a trait on that struct.
-    
-    Even though closures are traits, the `impl` keyword is not used because, as
-    mentioned when discussing opaque types and monomorphization, when `impl` is
-    used in a function signature, that signature represents an underlying
-    concrete type. Closures have no underlying type. When pointing to a trait
-    that exists on the heap, such as when having a Box<Trait> like in the above
-    example, it is referred to as a "trait object." The `dyn` keyword was
-    created to more clearly differentiate between implementations and trait
-    objects. */
-
-    /* Trait objects are Rust's way of handling what is known as "dynamic
-    dispatch." If you are coming from JavaScript, or any scripting language,
-    the concept of dispatch will be new to you. In compiled languages, there is
-    a distinction between knowing what function will run, i.e. be dispatched,
-    at compile time versus at runtime. For example, if an integer is greater
-    than 0, function A will run, and function B will run if less than 0. The
-    compiler does not necessarily know the value of the integer, but it doesn't
-    need to. It knowns both roads perfectly, so it can walk either one equally
-    quickly.
-    
-    But if the _function_ is not known, the compiler needs to find out what
-    road it is to walk. If the function called is determined at compile time,
-    it is called "static dispatch," meaning the behavior that is "dispatched"
-    never changes. Dyanmic dispatch is the opposite of that. A synonymous
-    description is "early binding" versus "late binding," where binding refers
-    to the act of binding a value or behavior to an identifier. For example,
-    `let x = 42;`. Rust's compiler knows that `x` is `42`, so it does not
-    bother to check the value of `x` when running. This check is called
-    "indirection." In JavaScript, every call to `x` theoretically requires the
-    runtime to check `x` to see its value, although in practice runtimes will
-    attempt to optimize this away.
-    
-    Dynamic dispatch provides significant flexibility in how a program runs but
-    achieves it with a performance hit that can be similarly significant. In
-    languages such as Python or JavaScript, the dispatch consideration is
-    completely hidden. By and large, Rust's structure negates the need to
-    consider dispatch. As mentioned, one of Rust's goals was "zero-cost
-    abstractions," meaning that Rust features many very high-level language
-    structures with great flexibility, but these "polymorphic" abstractions are
-    made "monomorphic" at compile time. This means code can feel as though it
-    is dynamically dispatching procedures while all functionality is actually
-    static. */
-
-
-    /*** Unit ***/
-
-    /* You may have noticed in the above example of less_than_42, that if you
-    uncommented the second if/else block, the specific error that was displayed
-    was how "()" was expected, but a boolean was returned. In the previous
-    section, I used the term "caught" when describing that the first if/else was
-    returning something to nothing. That lack of a catcher for the evaluation's
-    return means that Rust expected that block to return `unit`, or nothing. If
-    there is no catcher, there should be nothing to catch.
-   
-    Unit is an interesting concept. It is the concept of a "thing" that is
-    "nothing." It is different from `None` in that `None` is the state of
-    nothing being where `Some()` could also have been. `Unit` is the state of
-    expected nothing. It is similar to `void` in other languages, but unlike
-    `void`, `unit` is actually a type, which is why the aforementioned unit
-    struct is called a unit struct: it is actually an alias for `unit`.
-        
-    From a mathematical perspective, it could be seen as the empty set, in
-    that it is still a set, but it is a set of nothing. */
-        
-    // Unit's first use is in declaring functions that take no arguments.
-    fn no_argument() -> String {
-        String::from("I've got nothing")
-    }
-
-    /* All functions necessarily return something, so if there is no expression
-    intended for return, such as in functions that only handle side-effects,
-    then that function will return `unit`. Functions that return `unit` can be
-    explicitly typed. */
-        
-    fn no_return(input: String) -> () {
-        println!("I just print {}", input)
-        // "bingpot!" // This fails.
-    }
-
-    /* The above function expects to return nothing and will throw a compile
-    error if anything is returned. */
-
-
-    /*** panic! ***/
-
-    /* While most errors will be handled with Results or Options, there are
-    always scenarios where the failure should be terminal. For these situations,
-    Rust has `panic!()`. panic is a macro that, when called, terminates the
-    process in which it is called and "unwinds" its stack. Basically,
-    everything in scope is destroyed and memory is freed. Since a panic exits
-    the control flow of the program, the reason for the panic is likely unique,
-    and thus the only information required by the compiler is a string. The key
-    thing to remember is that if a function panics, the function that called
-    the panic will also unwind. */
-
-    fn maybe_panic() {
-        println!("I'm looking for an answer");
-        let what_im_looking_for = if rand::random::<bool>() {
-            panic!("I panicked!")
-        } else {
-            42
-        };
-        println!("I found what I'm looking for. It's {what_im_looking_for}")
-    }
-
-    maybe_panic();
-
-    /* If the above panics, the main thread is unwound and the rest of the
-    program will not run.
-    
-    Panic should be a relatively rare tool, because most of the time you want
-    to catch and handle errors. Panics should be used when your logic
-    determines that the program has entered an entirely unexpected state. In
-    essense, panics in Rust are what exceptions in other languages _should_ be:
-    the machine state has fallen out of alignment with the symbolic state.
-    Panics are used to fail tests. */
+    Be careful when overloading operators. Things can get confusing quickly. You
+    can entertainingly frustrate your fellow engineers, though, which can be
+    very funny. */
 
 }
 
@@ -3208,60 +3460,4 @@ compiler to correctly manage them, they are outside the scope of this one-page
 tutorial. For full details see the Rust docs. */
 
 
-/*----------------------------------------------
-* Modules Part Deux
-*----------------------------------------------
-*/
 
-/* This content is part of a section in the above function. Do not read it
-separately.
-
-These modules are not nested inside of a function. They are in the base scope of
-the file and thus exist on the module level. They can thus see each other. */
-
-#[allow(unused_variables)]
-#[allow(unused_assignments)]
-#[allow(dead_code)]
-mod external_stuff {
-    pub struct Stuff {
-        pub x: i32,
-        pub y: i32,
-    }
-}
-
-mod more_external_stuff {
-    // A use path that references the crate can be used, but since the modules
-    // are siblings, this is not necessary.
-    use crate::external_stuff::Stuff;
-
-    pub fn get_stuff() -> Stuff {
-        Stuff {
-            x: 42,
-            y: 2001,
-        }
-    }
-
-    // super:: can also be used. It references the _parent_ module, unlike the
-    // use crate:: above, which references the root of the project.
-    pub fn get_stuff_2() -> super::external_stuff::Stuff {
-        super::external_stuff::Stuff {
-            x: 42,
-            y: 2001,
-        }
-    }
-
-    mod nested_module {
-        pub struct NestedStuff {
-            pub x: i32,
-            pub y: i32,
-        }
-    }
-
-    // To access sibling sub-modules, the self:: selector is used.
-    pub fn get_nested() -> self::nested_module::NestedStuff {
-        self::nested_module::NestedStuff {
-            x: 42,
-            y: 2001,
-        }
-    }
-}
