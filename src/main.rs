@@ -2836,9 +2836,10 @@ fn multithreading_and_concurrency() {
 
     /*** Thread Spawning and Management ***/
 
-    /* All threads require a closure that encapsulates the desired behavior.
-    Threads cannot borrow, though, so the below thread will fail to compile
-    unless the `move` keyword is applied. */
+    /* All threads require a closure that encapsulates the desired behavior. If
+    you are old like me, you can think of them with the old term "subroutine."
+    Being fully-encapsulated subroutines, threads cannot borrow, so the below
+    thread will fail to compile unless the `move` keyword is applied. */
     
     let external_value = String::from("nee");
 
@@ -2878,7 +2879,7 @@ fn multithreading_and_concurrency() {
     
         child_thread.join().unwrap();
 
-    The value can also be bound to an identifier then simply ignored.
+    The value can also be bound to an identifier and then simply ignored.
     
         let _ = child_thread.join();
     
@@ -2894,7 +2895,8 @@ fn multithreading_and_concurrency() {
     entities called "consumer." This allows independent processes to
     communicate without having to share memory. Rust docs confuse terms by also
     calling them "transmitters" and "receivers." Even worse, Rust's typing
-    information calls producers "senders." */
+    information calls producers "senders." I have no idea what they were
+    thinking. */
 
     /* We create a transmitter and receiver with the mpsc crate, which stands
     for "multiple producer, single consumer." The below example only uses one
@@ -2903,7 +2905,7 @@ fn multithreading_and_concurrency() {
     let (transmitter, receiver) = mpsc::channel();
 
     // This creates a second producer. This must remain commented since a
-    // dangling, unused transmitter will prevent a thread from completing.
+    // dangling, unused transmitter will prevent the thread from completing.
     // let transmitter_2 = transmitter.clone();
 
     // The transmitter is then moved to a new thread.
@@ -2912,7 +2914,8 @@ fn multithreading_and_concurrency() {
 
         for val in important_people {
             // Using a transmitter returns a Result. An error usually occurs
-            // because the receiver has fallen out of scope.
+            // because the receiver has fallen out of scope and thus there is
+            // nothing to accept the message.
             let result = transmitter.send(val);
             match result {
                 Ok(_) => (), // Ignore success.
@@ -2926,6 +2929,12 @@ fn multithreading_and_concurrency() {
     for received in receiver {
         println!("{received} is an important person.")
     }
+
+    /* You may be confused that the child thread did not need to be joined, and
+    that is because `mpsc::` is a part of the synchronous library. We are
+    creating a thread, but the for loop will not start until the receiver is
+    ready, and it will not be ready until all of its transmitters are done. That
+    said, it is usually best practice to always join all threads. */
 
 
     /*** Mutexes ***/
@@ -2955,7 +2964,8 @@ fn multithreading_and_concurrency() {
     }
 
     /* At this point, the naked scope above is complete, `idy` falls out of
-    scope and is destroyed, and the mutex is unlocked. */
+    scope and is destroyed, and the mutex is unlocked making it available for
+    something else to lock it. */
     
     println!("{:?}, giggidy", gigg.lock().unwrap());
 
@@ -3046,7 +3056,7 @@ async fn async_syntax() {
     /* Asynchronous Rust, henceforth called async, is a comparatively new
     addition to Rust semantics. It is actually still technically in flux, with
     breaking changes being implemented, but it has been broadly stable for a
-    couple of years. That said, _in my opinion_, unless you are using a library
+    number of years. That said, _in my opinion_, unless you are using a library
     that relies on async such as Actix-Web, you should prefer using traditional
     threads. Hopefully, async will fully stabilize in the near future.
     
@@ -3063,10 +3073,10 @@ async fn async_syntax() {
     futures return the box but do not run the function. The function must be
     "polled". Polling is done with the `await` keyword. If you are coming from
     Python, a language to which I have paid little attention, this pattern
-    should be familiar. This means that Rust more strictly enforces what can
+    should be familiar. This means that Rust more strictly enforces what we can
     call an async function. Unlike JavaScript, where any function can call an
     async function, in Rust, _only_ async functions can call other async
-    functions.
+    functions. No more concerns about the color of your function!
     
     The second key difference is that async operations in Rust are not part of
     the language per se, but instead a standard syntax around multiple possible
@@ -3100,21 +3110,23 @@ async fn async_syntax() {
         // Do something asynchronously like maybe get some data.
         String::from("Here's some data")
     }
+    
+    let some_data = async_function().await;
+    println!("{some_data}");
 
     /* Notice how the await is not a method. This is because a method implies a
     function call, while the await is not exactly that. It is a keyword and is
     semantically similar to the `await` being before the function call as in
     JavaScript. Under the covers, it transforms the code. The `.await` you see
     is syntactic sugar */
-    
-    let some_data = async_function().await;
-    println!("{some_data}");
 
 
     /*** Closures ***/
 
     // The below is technically unstable.
-    // let async_closure = async || println!("Got data!");
+
+    // Or maybe it is stable now? I am researching as I write.
+    let async_closure = async || println!("Got data!");
     
     /* The below is the accepted current solution but is fundamentally
     different to the above. In the above, the function is not run and thus no
