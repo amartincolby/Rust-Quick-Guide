@@ -311,21 +311,23 @@ This was written in VSCode and using an interactive IDE with code linting,
 folding, and highlighting is recommended.
 
 ``` rust
-use std::ops::{Add, Sub};
 /* These imports should be familiar to most. The double-colon syntax represents
 the "path" to the entity. */
 use std::{thread};
-use futures::*;
-use tokio::*;
-use async_stream::stream;
-use rand::prelude::*;
+use std::collections::HashMap;
+use std::env;
+use std::net::TcpListener;
+use std::ops::{Add, Sub};
 use std::rc::Rc;
 use std::sync::{Arc, Mutex, mpsc};
-use std::collections::HashMap;
+use futures::*;
+use tokio::*;
+use actix_web::{web, App, HttpRequest, get, HttpServer, Responder};
+use actix_web::dev::Server;
+use async_stream::stream;
+use rand::prelude::*;
 
-// use futures_util::pin_mut;
-// use futures_util::stream::StreamExt;
-
+const ACTIX_FLAG: &str = "enable_actix";
 const _GREETING: &str = "Stay awhile. Stay forever.";
 
 /* Comment blocks start with slash-star,
@@ -476,7 +478,8 @@ like VSCode to collapse the supporting functions to make scrolling easier and
 faster while also using the function calls to jump to the function definitions
 like a table of contents. */
 
-#[tokio::main]
+// #[tokio::main]
+#[actix_web::main]
 async fn main() {
     attributes();
     items();
@@ -496,7 +499,10 @@ async fn main() {
     multithreading_and_concurrency();
     async_syntax().await;
     macros();
-    actix_web_and_axum();
+    if env::var(ACTIX_FLAG).is_ok() {
+        let server = actix_and_axum().expect("Failed");
+        server.await.expect("Something went wrong");
+    }
     rustdoc();
 }
 
@@ -1717,7 +1723,7 @@ fn functions() {
     fn maybe_panic() {
         println!("I'm looking for an answer");
         let what_im_looking_for = if rand::random::<bool>() {
-            panic!("I panicked!")
+            panic!("I panicked randomly!")
         } else {
             42
         };
@@ -3369,17 +3375,18 @@ async fn async_syntax() {
     /* Asynchronous Rust, henceforth called async, is a comparatively new
     addition to Rust semantics. It is actually still technically in flux, with
     breaking changes being implemented, but it has been broadly stable for a
-    number of years. That said, _in my opinion_, unless you are using a library
-    that relies on async such as Actix-Web, you should prefer using traditional
-    threads. Hopefully, async will fully stabilize in the near future.
+    number of years. That said, _in my opinion_, the ideal use of async is in
+    conjunction with a framework like Actix or Axum, where the wrapper of its
+    design and ecosystem helps shield you from moving ground. I am not even
+    sure how much I believe that anymore, meaning that if you decide to focus
+    on async, you are likely safe.
     
-    As opposed to default concurrent Rust, async Rust uses what can be
-    described as green threads. Async is perhaps a new concept to those coming
-    from Go, C, C++, or Java, but for JavaScript developers, welcome home.
-    Everything covered here will be very familiar. There are implementation
-    details, but those should arguably be hidden. You can read about them in
-    the partially-completed async documentation.
-
+    Async is perhaps a new concept to those coming from Go, C, C++, or Java,
+    but for JavaScript developers, welcome home. Everything covered here will
+    be very familiar. There are implementation details, but those should
+    arguably be hidden. You can read about them in the partially-completed
+    async documentation.
+    
     Async functions, when called, do no work. Instead, they return a "future".
     This is synonymous to a "promise" in JavaScript. Unlike promises, which
     immediately return a boxed promise _and_ begin running the function,
@@ -3399,9 +3406,30 @@ async fn async_syntax() {
     your asynchronous behaviors. Basically, you are handing over thread
     management to a library and you should consider your use of async as you
     using a library and not "real" Rust.
+
+    This is actually a good thing. An argument in favor of JavaScript's chaos is
+    that no implementation is fixed. There is a new library to achieve just
+    about anything released just about every day. This has been a major
+    motivator in preventing a JavaScript standard library from forming. This
+    means that, while confusing, JavaScript evolves at a speed that most other
+    languages could only dream of.
+
+    Rust tries to split the difference between a more fixed and predictable
+    ecosystem and one that allows experimentation. Thus, Rust provides the
+    _syntax_ but not the implementation. In that sense, it is like JavaScript
+    itself, which provides a language spec, but not specifically how the
+    runtime actually runs the code.
     
-    The third key difference is that, because most everything in Rust is an
-    evaluation, blocks can also be labeled as async. */
+    As opposed to default concurrent Rust, async Rust uses what can be
+    described as green threads, but that is not entirely accurate. Green
+    threads, strictly speaking, are "stackful," in that they consume stack
+    space to maintain their state as things happen around them. This stack
+    space represents a minimum memory use for each thread. Async Rust instead
+    relies on turning every chain of awaits into a large state machine, meaning
+    that the compiled output between normal functions and async functions is
+    very similar. Indeed, you can think of async as a zero-cost abstraction so
+    large and complex that it basically becomes its own language. You get an
+    expressive and easy syntax with no performance penalty. */
 
 
     /*** Initializing the runtime ***/
@@ -3413,14 +3441,15 @@ async fn async_syntax() {
     application. As such, your main() function will be labeled as async. It
     requires the #[tokio::main] attribute, otherwise the compiler will throw an
     error. For this tutorial, I have labeled the main() function. Other
-    runtimes may have other methods of initialization. */
+    runtimes may have other methods of initialization and implementation
+    details. */
 
 
     /*** Functions ***/
 
     // Just like JavaScript, `async` indicates an async function.
     async fn async_function() -> String {
-        // Do something asynchronously like maybe get some data.
+        // Do something asynchronously like maybe get some data via http.
         String::from("Here's some data")
     }
     
@@ -3431,23 +3460,35 @@ async fn async_syntax() {
     function call, while the await is not exactly that. It is a keyword and is
     semantically similar to the `await` being before the function call as in
     JavaScript. Under the covers, it transforms the code. The `.await` you see
-    is syntactic sugar */
+    is syntactic sugar. Fundamentally, the await subscribes to a publisher. If
+    the value is ready, it is returned immediately, and if it is not, the caller
+    "subscribes" to the async function. */
 
 
     /*** Closures ***/
 
-    // The below is technically unstable.
+    // There are two ways to write async closures: the old way, found below, and
+    // the new way, which became stable in Rust 1.85.
 
-    // Or maybe it is stable now? I am researching as I write.
-    let async_closure = async || println!("Got data!");
+    // The old way.
+    let async_closure_old = || async { String::from("Got data!") };
+
+    // The new way.
+    let async_closure_new = async || String::from("Got more data!");
+
+    // Calling them is identical.
+    let get_data = async_closure_old().await;
+    let get_more_data = async_closure_new().await;
     
-    /* The below is the accepted current solution but is fundamentally
-    different to the above. In the above, the function is not run and thus no
-    stack space is allocated. In the below, the function _does_ run, but it
-    immediately returns a block wrapped with a future. The performance
-    difference is likely tiny, but worth noting. */
+    /* Before the new way stabilized, the old way was the workaround and is
+    common in codebases.
     
-    let async_closure = || async { String::from("More data!") };
+    While the old way is fine, it is fundamentally different from a true async
+    closure. In the new way, the function is not run and thus no stack space is
+    allocated. In the old way, the function _does_ run, but it immediately
+    returns a block wrapped with a future. The performance difference is likely
+    tiny, but the new way is now the idiomatic form. This elaboration will be
+    removed at some point when the old way passes into history. */
     
 
     /*** Blocks ***/
@@ -3460,6 +3501,8 @@ async fn async_syntax() {
         let some_data = String::from("Data from a block");
         println!("{some_data}")
     };
+
+    async_block.await;
 
 
     /*** Streams ***/
@@ -3484,14 +3527,16 @@ async fn async_syntax() {
     /* This macro is an easy way to "pin" a value. A pinned value means that it
     will remain in the same memory location for its entire lifetime or until it
     is "unpinned". Since async code runs at indeterminate intervals, ensuring
-    it is reliably positioned at all times is necessary. */
+    it is reliably positioned at all times is necessary. The creator of this
+    syntax hates it but I think it's fine. */
     
-    pin_mut!(cross_the);
+    pin!(cross_the);
 
     // Async values require the use of while loops. For loops are in progress.
     while let Some(value) = cross_the.next().await {
         println!("{value} is an important number");
     }
+
 }
 
 #[allow(unused_variables)]
@@ -3646,7 +3691,7 @@ fn rustdoc() {
 
 }
 
-fn actix_web_and_axum() {
+fn actix_and_axum() -> Result<Server, std::io::Error>{
     /*----------------------------------------------
     * Actix-Web
     *----------------------------------------------
@@ -3655,7 +3700,9 @@ fn actix_web_and_axum() {
     /* It may seem initially strange to include an external library as part of
     a tutorial, but I want to capture the people who may be coming here from
     Go, Java, or Node and are interested in Rust primarily as a tool for
-    developing n-tier applications.
+    developing n-tier applications. Further, in the previous section on async,
+    I explicitly said that you should use async primarily within the protected
+    bounds of a framework.
     
     A common refrain from programmers online is that Rust and Go are different
     languages and shouldn't be considered in opposition. I disagree with this.
@@ -3676,14 +3723,82 @@ fn actix_web_and_axum() {
     uses Tokio under the covers, I see Axum almost as the more pure alternative
     to Actix. Actix-Web also suffered something of a blowup with the creator
     and the community, pushing people away. Actix and Axum are both being
-    actively developed, though, have similar performance, similar developer
+    actively developed, though. They have similar performance, similar developer
     experiences, and comparable ecosystems.
+    
+    The primary difference is that Axum uses a third-party middleware library
+    called Tower, whereas Actix relies on its own middleware system. Axum's
+    experience is slightly more elegant, while Actix has slightly better
+    performance. You could pick one at random. I somewhat prefer Actix since
+    its middleware style has a request passing experience similar to frameworks
+    like Express in Node or Fiber in Go. */
 
-    Since the primary goals of this guide is to aid n-tier application
-    development, Rust best competes with Go when using a framework. As such, I
-    can't leave one of these frameworks uncovered, and will thus briefly cover
-    both. */
+
+    /*** Note On Running This Section ***/
+
+    /* Since running Actix starts up a server, this section is behind a config
+    flag. Set the `enable_actix` env variable before running `cargo run`.
+    
+    Windows - $env:enable_actix="true"; cargo run
+    
+    Mac/Linux - enable_actic=true cargo run
+
+    Remember, this module may randomly fail because of earlier examples. So if
+    it fails to start the server, just re-run the command. */
+
+
+    /*** Basic Structure ***/
+
+    /* The basic structure of Actix will be very familiar. You declare routes
+    then attach handlers to those routes. Let's build a simple server. */
+    
+    // Build some handlers first.
+    async fn handler_1() -> impl Responder {
+        format!("Hello there! I'm handler 1!")
+    }
+
+    // Routes can be annotated with macros.
+    #[get("/h2/{name}")]
+    async fn handler_2(req: HttpRequest) -> impl Responder {
+        let name = req.match_info().get("name").unwrap_or("World");
+        format!("Hello {}", &name)
+    }
+
+    // Create a mutex for sharing across threads. I'm from the 80s so visitor
+    // counters are still a thing to me.
+    struct AppState {
+        visitors: Mutex<i32>,
+    }
+
+    let visitors = web::Data::new(AppState {
+        visitors: Mutex::new(0),
+    });
+
+    // Create middleware to update the visitor count.
+    async fn update_visitor_count () {
+        
+    }
+
+    // Ensures we use a free port and binds a listener to it.
+    let listener = TcpListener::bind("localhost:0").expect("Failed to bind port");
+
+    let port = listener.local_addr().unwrap().port();
+
+    println!("Server available at: http://localhost:{port}");
+
+    let server = HttpServer::new(move || {
+        App::new()
+            // The data/thread management is automatic.
+            .app_data(visitors.clone())
+            .service(handler_2)
+            .route("/h1", web::get().to(handler_1))
+    })
+    .listen(listener)?
+    .run();
+    Ok(server)
 }
+
+
 
 /*----------------------------------------------
 * Testing
@@ -3788,7 +3903,5 @@ Appropriately, the tests sit inside the /tests directory that is a sibling of
 the /src directory. Since the test files must exist in this location for the
 compiler to correctly manage them, they are outside the scope of this one-page
 tutorial. For full details see the Rust docs. */
-
-
 
 ```
