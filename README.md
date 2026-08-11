@@ -322,8 +322,10 @@ use std::rc::Rc;
 use std::sync::{Arc, Mutex, mpsc};
 use futures::*;
 use tokio::*;
-use actix_web::{web, App, HttpRequest, get, HttpServer, Responder};
-use actix_web::dev::Server;
+use actix_web::{web, App, Error, HttpRequest, get, HttpServer, Responder, HttpResponse};
+use actix_web::middleware::{Next, from_fn};
+use actix_web::body::MessageBody;
+use actix_web::dev::{Server, ServiceRequest, ServiceResponse};
 use async_stream::stream;
 use rand::prelude::*;
 
@@ -3377,9 +3379,7 @@ async fn async_syntax() {
     breaking changes being implemented, but it has been broadly stable for a
     number of years. That said, _in my opinion_, the ideal use of async is in
     conjunction with a framework like Actix or Axum, where the wrapper of its
-    design and ecosystem helps shield you from moving ground. I am not even
-    sure how much I believe that anymore, meaning that if you decide to focus
-    on async, you are likely safe.
+    design and ecosystem helps shield you from moving ground.
     
     Async is perhaps a new concept to those coming from Go, C, C++, or Java,
     but for JavaScript developers, welcome home. Everything covered here will
@@ -3440,9 +3440,11 @@ async fn async_syntax() {
     Most of the time, if you are using async, it will be a key part of your
     application. As such, your main() function will be labeled as async. It
     requires the #[tokio::main] attribute, otherwise the compiler will throw an
-    error. For this tutorial, I have labeled the main() function. Other
-    runtimes may have other methods of initialization and implementation
-    details. */
+    error. For this tutorial, I have labeled the main() function. I am using the
+    Tokio attribute, but Actix has its own. Since I am only using basic async
+    syntax in this tutorial, that is fine, but if I wanted access to Actix's
+    full set of features, I would need to use its attribute, thus tying me more
+    closely to its implementation. */
 
 
     /*** Functions ***/
@@ -3728,10 +3730,9 @@ fn actix_and_axum() -> Result<Server, std::io::Error>{
     
     The primary difference is that Axum uses a third-party middleware library
     called Tower, whereas Actix relies on its own middleware system. Axum's
-    experience is slightly more elegant, while Actix has slightly better
-    performance. You could pick one at random. I somewhat prefer Actix since
-    its middleware style has a request passing experience similar to frameworks
-    like Express in Node or Fiber in Go. */
+    experience, especially when it comes to boilerplate, is slightly more
+    elegant, while Actix has slightly better performance. You could pick one at
+    random. I choose Actix simply because I had past experience. */
 
 
     /*** Note On Running This Section ***/
@@ -3751,8 +3752,19 @@ fn actix_and_axum() -> Result<Server, std::io::Error>{
 
     /* The basic structure of Actix will be very familiar. You declare routes
     then attach handlers to those routes. Let's build a simple server. */
-    
-    // Build some handlers first.
+
+    // Create a mutex for sharing data across threads. I'm from the 90s so
+    // visitor counters are still a thing to me.
+    struct AppState {
+        visitors: Mutex<i32>,
+    }
+
+    // web::Data is basically a fancy alias for Arc.
+    let visitors = web::Data::new(AppState {
+        visitors: Mutex::new(0),
+    });
+
+    // Build some handlers.
     async fn handler_1() -> impl Responder {
         format!("Hello there! I'm handler 1!")
     }
@@ -3761,22 +3773,28 @@ fn actix_and_axum() -> Result<Server, std::io::Error>{
     #[get("/h2/{name}")]
     async fn handler_2(req: HttpRequest) -> impl Responder {
         let name = req.match_info().get("name").unwrap_or("World");
-        format!("Hello {}", &name)
+        let data = req.app_data::<web::Data<AppState>>().unwrap();
+        let counter = data.visitors.lock().unwrap();
+
+        format!("Hello {}, you are visitor number {}", &name, &counter)
     }
 
-    // Create a mutex for sharing across threads. I'm from the 80s so visitor
-    // counters are still a thing to me.
-    struct AppState {
-        visitors: Mutex<i32>,
-    }
-
-    let visitors = web::Data::new(AppState {
-        visitors: Mutex::new(0),
-    });
-
-    // Create middleware to update the visitor count.
-    async fn update_visitor_count () {
-        
+    // Create middleware to update the visitor count. We can access data with
+    // "extractors" as our first arguments.
+    async fn update_visitor_count(
+        data: web::Data<AppState>,
+        req: ServiceRequest,
+        next: Next<impl MessageBody>,
+    ) -> Result<ServiceResponse<impl MessageBody>, Error> {
+        // We are locking the mutex, meaning we need to close a scope to unlock
+        // it and allow later access, otherwise requests will hang. You
+        // probably would not create the simple, naked scope below, but for this
+        // tutorial, it's fine.
+        {
+            let mut counter = data.visitors.lock().unwrap();
+            *counter += 1;
+        }
+        next.call(req).await
     }
 
     // Ensures we use a free port and binds a listener to it.
@@ -3791,13 +3809,13 @@ fn actix_and_axum() -> Result<Server, std::io::Error>{
             // The data/thread management is automatic.
             .app_data(visitors.clone())
             .service(handler_2)
-            .route("/h1", web::get().to(handler_1))
+            .route("/", web::get().to(handler_1))
+            .wrap(from_fn(update_visitor_count))
     })
     .listen(listener)?
     .run();
     Ok(server)
 }
-
 
 
 /*----------------------------------------------
@@ -3903,5 +3921,6 @@ Appropriately, the tests sit inside the /tests directory that is a sibling of
 the /src directory. Since the test files must exist in this location for the
 compiler to correctly manage them, they are outside the scope of this one-page
 tutorial. For full details see the Rust docs. */
+
 
 ```
