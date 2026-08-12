@@ -1143,6 +1143,18 @@ fn generics() {
         thing1: T1,
         thing2: T2,
     }
+
+    fn generic_fn<T>(x: &T) -> Things<&T, i32> {
+
+        let things = Things{
+            thing1: x,
+            thing2: 42,
+        };
+
+        things
+    }
+
+    generic_fn(&42);
 }
 
 #[allow(unused_variables)]
@@ -1556,7 +1568,7 @@ fn functions() {
     /* In TypeScript, the above would look like this:
     
         let sign_up_to_newsletter = (email: string) : string => {
-            return(`Thanks for signing up ${email}``);
+            return(`Thanks for signing up ${email}`);
         };
 
     */
@@ -3642,7 +3654,6 @@ fn macros() {
     
     The ultimate effect of a declarative macro is that the macro call is
     replaced with the code specified in the template. */
-
 }
 
 /// This is a Rustdoc outer document comment.
@@ -3855,7 +3866,7 @@ default. You can enable it with the `--show-output` flag.
 
 Tests can be ignored by default with the #[ignore] attribute. This is commonly
 used on long-duration tests to prevent a full test run from taking forever. The
-ignored tests can be run with the `--ignored` flag. ALl tests, regardless of
+ignored tests can be run with the `--ignored` flag. All tests, regardless of
 status, can be run with `--include-ignored`.
 
 Specific tests can be run using the same double-colon path syntax used to
@@ -3864,7 +3875,7 @@ reference modules.
     cargo test testing_stuff::test_panic 
 
 The above will only run one test. To run multiple tests, passing in any
-incompletely identifier will run all tests that match the provided string.
+incomplete identifier will run all tests that match the provided string.
 
     cargo test testing_stuff
 
@@ -3921,6 +3932,5 @@ Appropriately, the tests sit inside the /tests directory that is a sibling of
 the /src directory. Since the test files must exist in this location for the
 compiler to correctly manage them, they are outside the scope of this one-page
 tutorial. For full details see the Rust docs. */
-
 
 ```
