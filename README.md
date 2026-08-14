@@ -63,6 +63,7 @@ inspired Rust's semantics.
 - [A great blog from a Rust consultancy](https://corrode.dev/blog/)
 - [The Rust Async Docs](https://rust-lang.github.io/async-book/) *These have been perpetually unfinished*
 - [The Tokio Docs](https://tokio.rs/tokio/tutorial) *Rust's most popular async runtime and what most people mean when they say async*
+- [Async Rust: A Deep Dive](https://kerkour.com/async-rust-cooperative-scheduling-tokio) *A blog post exploring how Tokio manages its threads*
 - [The official docs for Rustdoc](https://doc.rust-lang.org/rustdoc/)
 - [The official docs for Cargo](https://doc.rust-lang.org/cargo/)
 - [The official docs for Clippy](https://doc.rust-lang.org/clippy/)
