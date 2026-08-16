@@ -3446,7 +3446,7 @@ async fn async_syntax() {
     expressive and easy syntax with no performance penalty. */
 
 
-    /*** Initializing the runtime ***/
+    /*** Initializing the Runtime ***/
 
     /* This will be the strangest part to developers from other languages like
     JavaScript. You must start your async runtime before using async.
@@ -3458,7 +3458,24 @@ async fn async_syntax() {
     Tokio attribute, but Actix has its own. Since I am only using basic async
     syntax in this tutorial, that is fine, but if I wanted access to Actix's
     full set of features, I would need to use its attribute, thus tying me more
-    closely to its implementation. */
+    closely to its implementation.
+    
+    There are three modes for Tokio, called flavors: multi-threaded and two
+    types of single-threaded. Standard multi is the default mode when using the
+    base attribute. The number of underlying threads defaults to the number of
+    physical cores on the host system but can be configured thusly:
+    #[tokio::main(worker_threads = 10)].
+    
+    Standard single-threaded is called current_thread and is initialized with
+    #[tokio::main(flavor = "current_thread")]. There is also (flavor = "local"),
+    which is internally almost identical to current_thread. The differences are
+    outside the scope of this tutorial.
+    
+    The vast majority of the time, you will use multi-threading, because, duh.
+    Single-threaded is usually restricted to testing and development. But
+    because single-threaded does not initialize the thread management
+    subsystems, it can be used for better perfomance in extremely constrained
+    environments. */
 
 
     /*** Functions ***/
@@ -3553,6 +3570,48 @@ async fn async_syntax() {
         println!("{value} is an important number");
     }
 
+    /*** Blocking and Non-Blocking ***/
+
+    /* Another aspect of async programming that JavaScript and Node programmers
+    will be familiar with is the concept of blocking and non-blocking actions.
+    In JavaScript, which is famously single-threaded, basically everything you
+    write blocks the thread. That is why Node applications rely heavily on
+    promises that call Node systems to make network calls and interface with the
+    hardware. */
+
+    async fn access_file(path: &str) -> String {
+        std::fs::read_to_string(path).unwrap()
+    }
+
+    let text = access_file("./test.txt").await;
+    println!("{} blocking", text);
+
+    /* In the above function, using std::fs blocks the thread, so even though
+    this is an async process, this function will not yield control of the thread
+    until the file system process is completed. Rust has async variants of these
+    processes just like Node, but being lower-level, it has multiple options for
+    solving the problem. */
+
+    // First option is the easiest: just use Tokio async fs.
+    async fn access_file_async(path: &str) -> String {
+        tokio::fs::read_to_string(path).await.unwrap()
+    }
+
+    let text = access_file_async("./test.txt").await;
+    println!("{} async", text);
+
+    // But if you need to do more than just access files, such as performing
+    // heavy computations, you can manually spawn a thread.
+    async fn access_file_threaded(path: String) -> Result<String, std::io::Error> {
+        tokio::task::spawn_blocking(move || {
+            std::fs::read_to_string(&path)
+        })
+        .await
+        .unwrap()
+    }
+
+    let text = access_file_threaded(String::from("./test.txt")).await.unwrap();
+    println!("{} threaded", text);
 }
 
 #[allow(unused_variables)]
